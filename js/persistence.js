@@ -57,6 +57,7 @@ export function loadSettings() {
       layoutMode,
       showStationHulls: saved.showStationHulls === true,
       showArrows: saved.showArrows !== false,
+      darkMode: saved.darkMode === true,
       repulsion: typeof saved.repulsion === "string" && /^-?\d+$/.test(saved.repulsion)
         ? saved.repulsion
         : "4000",

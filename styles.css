@@ -24,11 +24,40 @@ button { cursor: pointer; }
 .brand { gap: 13px; }
 .brand-actions { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
 .brand-mark {
-  display: grid; place-items: center; width: 50px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; width: 50px; height: 36px; padding: 0; border: 0; border-radius: 10px;
   color: white; font-size: 12px; font-weight: 800; letter-spacing: .08em;
   background: linear-gradient(135deg, #2596be, #1d7898);
   box-shadow: 0 5px 12px #2596be38;
 }
+.dark {
+  --ink: #e8f0f4;
+  --muted: #9babb5;
+  --line: #30434d;
+  --soft: #1c2a32;
+}
+.dark body { background: #111a20; }
+.dark .topbar,
+.dark .sidebar,
+.dark .button,
+.dark .template-dialog,
+.dark .template-option,
+.dark .save-input,
+.dark .disclaimer-button,
+.dark .graph-wrap,
+.dark .zoom-button,
+.dark .fullscreen-button { background: #18252c; }
+.dark .topbar { border-bottom-color: var(--line); }
+.dark .sidebar { border-right-color: var(--line); }
+.dark .panel-section { border-bottom-color: var(--line); }
+.dark #edgeEditor,
+.dark #stationEditor { color: var(--ink); background: #142027; }
+.dark .graph-wrap { background-color: #18252c; background-image: radial-gradient(#30434d 1px, transparent 1px); }
+.dark .node-circle { fill: #18252c; stroke: #d7e5eb; }
+.dark .edge-label,
+.dark .station-label { stroke: #18252c; }
+.dark .edge-label,
+.dark .station-label { fill: var(--ink); }
+.dark .mobile-legal-actions { background: #111a20; }
 h1, h2, h3, p { margin: 0; }
 h1 { font-size: 16px; letter-spacing: -.02em; }
 .brand p { margin-top: 3px; color: var(--muted); font-size: 11px; }

@@ -31,6 +31,7 @@ import {
   templateDialogClose,
   templateList,
   fullscreenButton,
+  themeToggle,
   zoomInButton,
   zoomOutButton,
   disclaimerButton,
@@ -64,6 +65,7 @@ function persistSettings() {
     dagLevelSpacing: state.dagLevelSpacing,
     showStationHulls: state.showStationHulls,
     showArrows: directedToggle.checked,
+    darkMode: document.documentElement.classList.contains("dark"),
     repulsion: repulsionSlider.value,
   });
 }
@@ -429,6 +431,13 @@ const { edgesText, stationsText } = loadSavedEditors();
 if (edgesText !== null) edgeEditor.value = edgesText;
 if (stationsText !== null) stationEditor.value = stationsText;
 const settings = loadSettings();
+document.documentElement.classList.toggle("dark", settings.darkMode);
+themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");
+themeToggle.addEventListener("click", () => {
+  const darkMode = document.documentElement.classList.toggle("dark");
+  themeToggle.setAttribute("aria-label", darkMode ? "Enable light mode" : "Enable dark mode");
+  persistSettings();
+});
 state.layoutMode = settings.layoutMode;
 state.showStationHulls = settings.showStationHulls;
 state.dagLevelSpacing = settings.dagLevelSpacing;

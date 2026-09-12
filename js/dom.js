@@ -37,6 +37,7 @@ export const templateDialog = document.querySelector("#templateDialog");
 export const templateDialogClose = document.querySelector("#templateDialogClose");
 export const templateList = document.querySelector("#templateList");
 export const fullscreenButton = document.querySelector("#fullscreenButton");
+export const themeToggle = document.querySelector("#themeToggle");
 export const zoomInButton = document.querySelector("#zoomInButton");
 export const zoomOutButton = document.querySelector("#zoomOutButton");
 export const disclaimerButton = document.querySelector("#disclaimerButton");
