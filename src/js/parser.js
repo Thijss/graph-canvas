@@ -1,4 +1,4 @@
-import { STATION_TYPES } from "./config.js";
+import { STATION_TYPE_PATTERN } from "./config.js";
 
 // Parses raw edge-list text: lines with 2+ values are edges, a lone value is a
 // standalone/floating node with no connections. Pure function — callers pass
@@ -27,12 +27,13 @@ export function parseGraph(text) {
 }
 
 // Parses raw station-group text. Each line: TYPE node,node,... [name] — TYPE is
-// the first token (must be CS/SS/SUB, else the line is ignored), the second
-// token is the comma-separated member list (no spaces inside it), and anything
-// after it is the optional station name. Member ids not present in
-// `existingNodes` are dropped. A node can belong to at most one station; if
-// it's referenced by more than one line, the last line wins. Pure function —
-// no DOM dependency, same rationale as parseGraph.
+// the first token (a word containing letters, digits, hyphens, or underscores),
+// the second token is the comma-separated member list (no spaces inside it),
+// and anything after it is the optional station name. Member ids not present in
+// `existingNodes` are dropped. Every input line remains a separate station,
+// even when multiple lines use the same type. A node can belong to at most one
+// station; if it's referenced by more than one line, the last line wins. Pure
+// function — no DOM dependency, same rationale as parseGraph.
 export function parseStations(text, existingNodes) {
   const nodeSet = new Set(existingNodes);
   const stations = [];
@@ -40,8 +41,9 @@ export function parseStations(text, existingNodes) {
     const trimmed = line.trim();
     if (!trimmed) return;
     const tokens = trimmed.split(/\s+/);
-    const type = tokens[0].toUpperCase();
-    if (!STATION_TYPES[type] || tokens.length < 2) return;
+    const typeToken = tokens[0];
+    if (!STATION_TYPE_PATTERN.test(typeToken) || tokens.length < 2) return;
+    const type = typeToken.toUpperCase();
     const members = tokens[1]
       .split(",")
       .map((id) => id.trim())

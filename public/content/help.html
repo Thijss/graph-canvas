@@ -15,14 +15,16 @@
 </section>
 <section class="help-section">
   <h3>Group stations</h3>
-  <p>Nodes can be grouped into stations for better organization. This will color-code and visually separate them in the graph.</p>
-  <p>Syntax: <code>TYPE&nbsp;&nbsp;node,node&nbsp;&nbsp;name</code>.</p>
-  <p>Available types:</p>
-  <ul class="station-type-list">
-    <li><span class="station-type-key"><span class="station-type-label"><code>SUB</code>:</span><span class="station-preview station-preview-sub" aria-label="Substation color"></span></span> Substation station</li>
-    <li><span class="station-type-key"><span class="station-type-label"><code>CS</code>:</span><span class="station-preview station-preview-cs" aria-label="Control station color"></span></span> Control station</li>
-    <li><span class="station-type-key"><span class="station-type-label"><code>SS</code>:</span><span class="station-preview station-preview-ss" aria-label="Switching station color"></span></span> Switching station</li>
-  </ul>
+  <p>Nodes can be grouped into stations. This will color-code and add a hull around the grouped nodes.</p>
+  <p>Syntax: <code>TYPE&nbsp;&nbsp;node,node,...&nbsp;&nbsp;name</code>.</p>
+  <p><code>TYPE</code> can be any word containing letters, numbers, hyphens, or underscores. Each line defines a separate station; stations with the same type share a color. Up to 10 colors are assigned in order of first appearance, then reused if more types are added.</p>
+  <div class="station-color-row" aria-label="Examples of station colors">
+    <span class="station-color-block station-color-1" title="First station type"></span>
+    <span class="station-color-block station-color-2" title="Second station type"></span>
+    <span class="station-color-block station-color-3" title="Third station type"></span>
+    <span class="station-color-block station-color-4" title="Fourth station type"></span>
+    <span class="station-color-block station-color-5" title="Fifth station type"></span>
+  </div>
   <br>
   <p>Example: <code>SUB&nbsp;&nbsp;1,2&nbsp;&nbsp;Substation</code></p>
 </section>

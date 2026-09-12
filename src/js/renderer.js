@@ -11,7 +11,7 @@ import {
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { STATION_TYPES, KEYWORD_STYLES, DEFAULT_EDGE_COLOR, MIN_NODE_RADIUS } from "./config.js";
+import { getStationColor, KEYWORD_STYLES, DEFAULT_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
 import { getNodeRadius, getStationBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
@@ -63,15 +63,19 @@ export function render(state, edges, nodes, stations, handlers) {
   ].join("");
   graph.append(defs);
   const stationNodeColors = new Map();
+  const stationTypeColors = new Map();
   stations.forEach((station) => {
-    const color = STATION_TYPES[station.type]?.color ?? DEFAULT_EDGE_COLOR;
+    if (!stationTypeColors.has(station.type)) {
+      stationTypeColors.set(station.type, getStationColor(stationTypeColors.size));
+    }
+    const color = stationTypeColors.get(station.type);
     station.members.forEach((member) => stationNodeColors.set(member, color));
-    if (state.showStationHulls) drawStationHull(state, station);
+    if (state.showStationHulls) drawStationHull(state, station, color);
   });
   const drawableEdges = edges.filter((edge) => !hasConflictingLabels(edge));
   const parallelOffsets = getParallelOffsets(drawableEdges);
   drawableEdges.forEach((edge) => drawEdge(state, edge, parallelOffsets.get(edge)));
-  nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors, state.showStationHulls));
+  nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors));
 }
 
 function createBoldStatusPart(text) {
@@ -102,8 +106,7 @@ export function updateEdgeErrors(conflictingEdges = currentConflictingEdges) {
 }
 
 // Draws one station's rectangular group boundary and its name label.
-function drawStationHull(state, station) {
-  const color = STATION_TYPES[station.type]?.color ?? DEFAULT_EDGE_COLOR;
+function drawStationHull(state, station, color) {
   const bounds = getStationBounds(state, station);
   if (!bounds) return;
 
@@ -217,7 +220,7 @@ function drawEdge(state, edge, parallelOffset = 0) {
   }
 }
 
-function drawNode(state, name, handlers, stationNodeColors, showStationHulls) {
+function drawNode(state, name, handlers, stationNodeColors) {
   const point = state.positions.get(name);
   const radius = state.nodeRadii.get(name) ?? MIN_NODE_RADIUS;
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -227,7 +230,10 @@ function drawNode(state, name, handlers, stationNodeColors, showStationHulls) {
   shape.classList.add("node-circle");
   if (stationColor) shape.classList.add("node-square");
   if (state.pinnedNodes.has(name)) shape.classList.add("pinned");
-  if (stationColor && !showStationHulls) shape.style.fill = stationColor;
+  if (stationColor) {
+    shape.style.fill = stationColor;
+    shape.style.fillOpacity = STATION_FILL_OPACITY;
+  }
   if (stationColor) {
     shape.setAttribute("x", point.x - radius);
     shape.setAttribute("y", point.y - radius);

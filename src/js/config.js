@@ -21,14 +21,29 @@ export const MAX_ZOOM = 4; // furthest zoomed in (4x larger than natural size)
 export const MIN_NODE_RADIUS = 20;
 export const LABEL_PADDING = 10; // horizontal breathing room inside the circle, per side
 export const STATION_HULL_MARGIN = 16; // breathing room between member node circles and the hull boundary
+export const STATION_FILL_OPACITY = 0.5;
 
-// Station types: fixed set, each with its own display color used for the hull outline,
-// fill, label text, and legend swatch (see styles.css .station-swatch-*).
-export const STATION_TYPES = {
-  CS: { label: "Control station", color: "#2f7de1" },
-  SS: { label: "Switching station", color: "#f2994a" },
-  SUB: { label: "Substation", color: "#6b7280" },
-};
+// Station types are words made from letters, digits, hyphens, and underscores.
+export const STATION_TYPE_PATTERN = /^[a-z0-9_-]+$/i;
+
+// Types are assigned colors in their order of first appearance by the
+// renderer. The palette is intentionally limited to ten colors.
+export const STATION_COLORS = [
+  "hsl(47 74% 57% / 1)",
+  "hsl(185 61% 45% / 1)",
+  "hsl(322 63% 45% / 1)",
+  "hsl(100 70% 43% / 1)",
+  "hsl(237 75% 47% / 1)",
+  "hsl(15 71% 45% / 1)",
+  "hsl(152 70% 49% / 1)",
+  "hsl(290 63% 56% / 1)",
+  "hsl(67 68% 44% / 1)",
+  "hsl(205 75% 51% / 1)",
+];
+
+export function getStationColor(index) {
+  return STATION_COLORS[index % STATION_COLORS.length];
+}
 
 // Special-case edge keywords: colored + hidden from the visible label. Keys double as
 // CSS class names and arrowhead marker ids; keep colors in sync with styles.css.
