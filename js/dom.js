@@ -40,3 +40,5 @@ export const licenseButton = document.querySelector("#licenseButton");
 export const licenseDialog = document.querySelector("#licenseDialog");
 export const licenseDialogClose = document.querySelector("#licenseDialogClose");
 export const licenseContent = document.querySelector("#licenseContent");
+export const mobileLicenseButton = document.querySelector("#mobileLicenseButton");
+export const mobileDisclaimerButton = document.querySelector("#mobileDisclaimerButton");

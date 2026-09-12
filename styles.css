@@ -76,6 +76,7 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   box-shadow: 0 3px 12px #26344d1a; transition: .18s ease;
 }
 .disclaimer-button:hover { color: var(--ink); border-color: #c8ced9; background: var(--soft); }
+.mobile-legal-actions { display: none; }
 .disclaimer-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .disclaimer-content p + p { margin-top: 12px; }
 .license-content {
@@ -270,9 +271,13 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--purple-dark); backgrou
 .station-label { font-size: 11px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 4px; stroke-linejoin: round; }
 
 @media (max-width: 760px) {
-  .topbar { height: auto; min-height: 72px; padding: 16px 18px; gap: 14px; }
+  .topbar { height: auto; min-height: 72px; padding: 16px 18px; gap: 14px; flex-direction: column; align-items: stretch; }
   .brand { flex-wrap: wrap; gap: 10px; }
-  .brand-actions { margin-left: 46px; }
+  .brand-actions { display: none; }
+  .mobile-legal-actions {
+    display: flex; justify-content: center; gap: 8px; padding: 16px 18px 24px;
+    background: #f2f4f8;
+  }
   .topbar-actions { justify-content: flex-end; flex-wrap: wrap; }
   .topbar-file-actions { margin-right: 0; }
   .workspace { display: block; }
@@ -291,8 +296,9 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--purple-dark); backgrou
 
 @media (max-width: 480px) {
   .topbar-actions { justify-content: flex-start; }
-  .topbar-file-actions { width: 100%; }
-  .topbar-file-actions .button { flex: 1; }
+  .topbar-actions { display: grid; grid-template-columns: repeat(4, max-content); width: 100%; }
+  .topbar-file-actions { display: contents; }
+  .topbar-actions .button { width: auto; justify-self: start; }
   .canvas-area { padding: 18px 12px 24px; }
   .canvas-controls { gap: 14px; }
   .layout-mode-buttons { width: 100%; }
