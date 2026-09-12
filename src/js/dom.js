@@ -2,6 +2,7 @@
 export const edgeEditor = document.querySelector("#edgeEditor");
 export const edgeErrors = document.querySelector("#edgeErrors");
 export const stationEditor = document.querySelector("#stationEditor");
+export const routeEditor = document.querySelector("#routeEditor");
 export const graph = document.querySelector("#graph");
 export const graphWrap = document.querySelector("#graphWrap");
 export const emptyState = document.querySelector("#emptyState");
@@ -12,6 +13,7 @@ export const statusText = document.querySelector("#statusText");
 export const statusDot = document.querySelector(".status-dot");
 export const directedToggle = document.querySelector("#directedToggle");
 export const hullToggle = document.querySelector("#hullToggle");
+export const routesToggle = document.querySelector("#routesToggle");
 export const repulsionSlider = document.querySelector("#repulsionSlider");
 export const repulsionControl = document.querySelector("#repulsionControl");
 export const dagSpacingSlider = document.querySelector("#dagSpacingSlider");

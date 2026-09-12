@@ -28,7 +28,7 @@ export const STATION_TYPE_PATTERN = /^[a-z0-9_-]+$/i;
 
 // Types are assigned colors in their order of first appearance by the
 // renderer. The palette is intentionally limited to ten colors.
-export const STATION_COLORS = [
+export const COLOR_PALETTE = [
   "hsl(47 74% 57% / 1)",
   "hsl(185 61% 45% / 1)",
   "hsl(322 63% 45% / 1)",
@@ -41,8 +41,25 @@ export const STATION_COLORS = [
   "hsl(205 75% 51% / 1)",
 ];
 
-export function getStationColor(index) {
-  return STATION_COLORS[index % STATION_COLORS.length];
+export function getPaletteColor(index) {
+  return COLOR_PALETTE[index % COLOR_PALETTE.length];
+}
+
+export const ROUTE_COLOR_PALETTE = [
+  "hsl(335 62% 68% / 1)",
+  "hsl(28 92% 60% / 1)",
+  "hsl(105 52% 55% / 1)",
+  "hsl(174 45% 60% / 1)",
+  "hsl(208 58% 58% / 1)",
+  "hsl(270 45% 62% / 1)",
+  "hsl(68 65% 58% / 1)",
+  "hsl(48 90% 60% / 1)",
+  "hsl(320 62% 65% / 1)",
+  "hsl(20 12% 60% / 1)",
+];
+
+export function getRouteColor(index) {
+  return ROUTE_COLOR_PALETTE[index % ROUTE_COLOR_PALETTE.length];
 }
 
 // Special-case edge keywords: colored + hidden from the visible label. Keys double as

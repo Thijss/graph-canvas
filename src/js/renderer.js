@@ -11,7 +11,7 @@ import {
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { getStationColor, KEYWORD_STYLES, DEFAULT_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
+import { getPaletteColor, getRouteColor, KEYWORD_STYLES, DEFAULT_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
 import { getNodeRadius, getStationBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
@@ -27,7 +27,7 @@ function hasConflictingLabels(edge) {
 // instead of being imported here. This keeps rendering decoupled from both
 // the concrete state store and the simulation-restart logic, so this module
 // has no dependency on engine.js and no circular import.
-export function render(state, edges, nodes, stations, handlers) {
+export function render(state, edges, nodes, stations, routes, handlers) {
   graph.replaceChildren();
   state.nodeRadii = new Map(nodes.map((name) => [name, getNodeRadius(name)]));
   edgeCount.textContent = edges.length;
@@ -63,19 +63,28 @@ export function render(state, edges, nodes, stations, handlers) {
   ].join("");
   graph.append(defs);
   const stationNodeColors = new Map();
+  const routeNodeColors = new Map();
   const stationTypeColors = new Map();
   stations.forEach((station) => {
     if (!stationTypeColors.has(station.type)) {
-      stationTypeColors.set(station.type, getStationColor(stationTypeColors.size));
+      stationTypeColors.set(station.type, getPaletteColor(stationTypeColors.size));
     }
     const color = stationTypeColors.get(station.type);
     station.members.forEach((member) => stationNodeColors.set(member, color));
     if (state.showStationHulls) drawStationHull(state, station, color);
   });
+  if (state.showRoutes) {
+    const routeColors = new Map();
+    routes.forEach((route) => {
+      if (!routeColors.has(route.label)) routeColors.set(route.label, getRouteColor(routeColors.size));
+      const color = routeColors.get(route.label);
+      route.nodes.forEach((member) => routeNodeColors.set(member, color));
+    });
+  }
   const drawableEdges = edges.filter((edge) => !hasConflictingLabels(edge));
   const parallelOffsets = getParallelOffsets(drawableEdges);
   drawableEdges.forEach((edge) => drawEdge(state, edge, parallelOffsets.get(edge)));
-  nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors));
+  nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors, routeNodeColors));
 }
 
 function createBoldStatusPart(text) {
@@ -220,19 +229,20 @@ function drawEdge(state, edge, parallelOffset = 0) {
   }
 }
 
-function drawNode(state, name, handlers, stationNodeColors) {
+function drawNode(state, name, handlers, stationNodeColors, routeNodeColors) {
   const point = state.positions.get(name);
   const radius = state.nodeRadii.get(name) ?? MIN_NODE_RADIUS;
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.dataset.node = name;
   const stationColor = stationNodeColors.get(name);
+  const nodeColor = routeNodeColors.get(name) ?? stationColor;
   const shape = document.createElementNS("http://www.w3.org/2000/svg", stationColor ? "rect" : "circle");
   shape.classList.add("node-circle");
   if (stationColor) shape.classList.add("node-square");
   if (state.pinnedNodes.has(name)) shape.classList.add("pinned");
-  if (stationColor) {
-    shape.style.fill = stationColor;
-    shape.style.fillOpacity = STATION_FILL_OPACITY;
+  if (nodeColor) {
+    shape.style.fill = nodeColor;
+    shape.style.fillOpacity = routeNodeColors.has(name) ? "0.8" : STATION_FILL_OPACITY;
   }
   if (stationColor) {
     shape.setAttribute("x", point.x - radius);

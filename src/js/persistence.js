@@ -1,8 +1,9 @@
-// Persists just the two textareas' raw text (edges + stations) to
+// Persists the editor text (edges + stations + routes) to
 // localStorage, so a page refresh restores what the user typed. Node
 // positions and other UI state are intentionally not persisted.
 const EDGES_KEY = "graph-editor:edges";
 const STATIONS_KEY = "graph-editor:stations";
+const ROUTES_KEY = "graph-editor:routes";
 const LAYOUT_MODE_KEY = "graph-editor:layout-mode";
 const SETTINGS_KEY = "graph-editor:settings";
 
@@ -13,18 +14,20 @@ export function loadSavedEditors() {
     return {
       edgesText: localStorage.getItem(EDGES_KEY),
       stationsText: localStorage.getItem(STATIONS_KEY),
+      routesText: localStorage.getItem(ROUTES_KEY),
     };
   } catch {
-    return { edgesText: null, stationsText: null };
+    return { edgesText: null, stationsText: null, routesText: null };
   }
 }
 
 // Saves the current editor text. Silently no-ops if localStorage is
 // unavailable (e.g. private browsing with storage disabled).
-export function saveEditors(edgesText, stationsText) {
+export function saveEditors(edgesText, stationsText, routesText) {
   try {
     localStorage.setItem(EDGES_KEY, edgesText);
     localStorage.setItem(STATIONS_KEY, stationsText);
+    localStorage.setItem(ROUTES_KEY, routesText);
   } catch {
     // ignore — persistence is a nice-to-have, not a requirement
   }
@@ -56,6 +59,7 @@ export function loadSettings() {
     return {
       layoutMode,
       showStationHulls: saved.showStationHulls === true,
+      showRoutes: saved.showRoutes !== false,
       showArrows: saved.showArrows !== false,
       darkMode: saved.darkMode === true,
       repulsion: typeof saved.repulsion === "string" && /^-?\d+$/.test(saved.repulsion)
@@ -69,6 +73,7 @@ export function loadSettings() {
     return {
       layoutMode: loadLayoutMode(),
       showStationHulls: false,
+      showRoutes: true,
       showArrows: true,
       repulsion: "4000",
       dagLevelSpacing: 120,

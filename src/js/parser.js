@@ -63,3 +63,23 @@ export function parseStations(text, existingNodes) {
   });
   return stations.filter((station) => station.members.length);
 }
+
+// Parses route text. Each line is LABEL node,node,...; every line remains a
+// separate route, and nodes not present in `existingNodes` are dropped.
+export function parseRoutes(text, existingNodes) {
+  const nodeSet = new Set(existingNodes);
+  const routes = [];
+  text.split(/\r?\n/).forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    const tokens = trimmed.split(/\s+/);
+    if (tokens.length < 2) return;
+    const nodes = tokens[1]
+      .split(",")
+      .map((id) => id.trim())
+      .filter((id) => id && nodeSet.has(id));
+    if (!nodes.length) return;
+    routes.push({ label: tokens[0], nodes });
+  });
+  return routes;
+}

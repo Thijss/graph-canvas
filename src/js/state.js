@@ -16,5 +16,6 @@ export const state = {
   layoutMode: "physics",
   dagLevelSpacing: 120,
   showStationHulls: false,
+  showRoutes: true,
   view: { scale: 1, x: 0, y: 0 }, // pan/zoom applied via the graph SVG's viewBox (see js/zoom.js); x/y are the viewBox origin in node-coordinate space
 };

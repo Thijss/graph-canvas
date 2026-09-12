@@ -1,11 +1,13 @@
 import {
   edgeEditor,
   stationEditor,
+  routeEditor,
   graph,
   graphWrap,
   statusText,
   directedToggle,
   hullToggle,
+  routesToggle,
   layoutModeButtons,
   repulsionSlider,
   repulsionControl,
@@ -55,12 +57,12 @@ import { updateBorderBump, clearBorderBump, updateEdgeErrors } from "./renderer.
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { createPinchZoomController } from "./gestures.js";
-import { readGraphFile, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
+import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 
 let exportFormat = "txt";
 
 function persistEditors() {
-  saveEditors(edgeEditor.value, stationEditor.value);
+  saveEditors(edgeEditor.value, stationEditor.value, routeEditor.value);
 }
 
 function persistSettings() {
@@ -68,6 +70,7 @@ function persistSettings() {
     layoutMode: state.layoutMode,
     dagLevelSpacing: state.dagLevelSpacing,
     showStationHulls: state.showStationHulls,
+    showRoutes: state.showRoutes,
     showArrows: directedToggle.checked,
     darkMode: document.documentElement.classList.contains("dark"),
     repulsion: repulsionSlider.value,
@@ -211,6 +214,7 @@ clearButton.addEventListener("click", () => {
   cancelScheduledEditorRedraw();
   edgeEditor.value = "";
   stationEditor.value = "";
+  routeEditor.value = "";
   persistEditors();
   state.positions.clear();
   state.pinnedNodes.clear();
@@ -264,10 +268,10 @@ async function loadTemplate(templateName) {
     const response = await fetch(templateFile);
     if (!response.ok) throw new Error(`Could not load template: ${templateName}`);
     const templateText = await response.text();
-    const [edgesText, stationsText] = templateText.split("----------");
-    if (stationsText === undefined) throw new Error(`Invalid template: ${templateName}`);
+    const { edgesText, stationsText, routesText } = splitGraphText(templateText);
     edgeEditor.value = edgesText.trim();
     stationEditor.value = stationsText.trim();
+    routeEditor.value = routesText.trim();
     persistEditors();
   } catch {
     statusText.textContent = "Couldn't load template (serve this page over http(s) to enable it)";
@@ -333,7 +337,7 @@ saveForm.addEventListener("submit", async (event) => {
     } else if (exportFormat === "svg") {
       downloadGraphSvg(graph, filename);
     } else {
-      downloadGraphFile(edgeEditor.value.trim(), stationEditor.value.trim(), filename);
+      downloadGraphFile(edgeEditor.value.trim(), stationEditor.value.trim(), routeEditor.value.trim(), filename);
     }
     saveDialog.close();
   } catch (error) {
@@ -346,11 +350,12 @@ fileInput.addEventListener("change", async () => {
   if (!file) return;
 
   try {
-    const { edgesText, stationsText } = await readGraphFile(file);
+    const { edgesText, stationsText, routesText } = await readGraphFile(file);
 
     cancelScheduledEditorRedraw();
     edgeEditor.value = edgesText.trim();
     stationEditor.value = stationsText.trim();
+    routeEditor.value = routesText.trim();
     persistEditors();
     state.positions.clear();
     state.pinnedNodes.clear();
@@ -395,12 +400,18 @@ licenseDialog.addEventListener("click", (event) => {
 edgeEditor.addEventListener("input", scheduleEditorRedraw);
 edgeEditor.addEventListener("scroll", () => updateEdgeErrors());
 stationEditor.addEventListener("input", scheduleEditorRedraw);
+routeEditor.addEventListener("input", scheduleEditorRedraw);
 directedToggle.addEventListener("change", () => {
   persistSettings();
   draw();
 });
 hullToggle.addEventListener("change", () => {
   state.showStationHulls = hullToggle.checked;
+  persistSettings();
+  draw();
+});
+routesToggle.addEventListener("change", () => {
+  state.showRoutes = routesToggle.checked;
   persistSettings();
   draw();
 });
@@ -448,9 +459,10 @@ document.addEventListener("fullscreenchange", () => {
   restartSimulation(0.4); // canvas size changed, let physics resettle
 });
 
-const { edgesText, stationsText } = loadSavedEditors();
+const { edgesText, stationsText, routesText } = loadSavedEditors();
 if (edgesText !== null) edgeEditor.value = edgesText;
 if (stationsText !== null) stationEditor.value = stationsText;
+if (routesText !== null) routeEditor.value = routesText;
 const settings = loadSettings();
 document.documentElement.classList.toggle("dark", settings.darkMode);
 themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");
@@ -461,11 +473,13 @@ themeToggle.addEventListener("click", () => {
 });
 state.layoutMode = settings.layoutMode;
 state.showStationHulls = settings.showStationHulls;
+state.showRoutes = settings.showRoutes;
 state.dagLevelSpacing = settings.dagLevelSpacing;
 directedToggle.checked = settings.showArrows;
 repulsionSlider.value = settings.repulsion;
 dagSpacingSlider.value = state.dagLevelSpacing;
 hullToggle.checked = state.showStationHulls;
+routesToggle.checked = state.showRoutes;
 updateLayoutControlVisibility();
 layoutModeButtons.forEach((button) => {
   const isActive = button.dataset.layoutMode === state.layoutMode;

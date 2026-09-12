@@ -31,7 +31,7 @@
 13 19 open
 19 25 open
 25 30 open
-----------
+-----STATIONS-----
 SUB 1 Substation
 CS 2,8,14,20,26 Control Station
 SS 4,10,16,22,28 Switching Station

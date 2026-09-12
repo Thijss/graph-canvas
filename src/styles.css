@@ -50,7 +50,8 @@ button { cursor: pointer; }
 .dark .sidebar { border-right-color: var(--line); }
 .dark .panel-section { border-bottom-color: var(--line); }
 .dark #edgeEditor,
-.dark #stationEditor { color: var(--ink); background: #142027; }
+.dark #stationEditor,
+.dark #routeEditor { color: var(--ink); background: #142027; }
 .dark .graph-wrap { background-color: #18252c; background-image: radial-gradient(#30434d 1px, transparent 1px); }
 .dark .node-circle { fill: #18252c; stroke: #d7e5eb; }
 .dark .edge-label,
@@ -183,7 +184,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .station-color-8 { background: hsl(290 63% 56% / 1); }
 .station-color-9 { background: hsl(67 68% 44% / 1); }
 .station-color-10 { background: hsl(205 75% 51% / 1); }
-#edgeEditor, #stationEditor {
+#edgeEditor, #stationEditor, #routeEditor {
   display: block; width: 100%; min-height: 230px; resize: vertical; padding: 13px 14px;
   border: 1px solid var(--line); border-radius: 8px; outline: none; color: var(--ink);
   background: #fbfcfe; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -213,9 +214,10 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   line-height: 1;
   pointer-events: none;
 }
-#edgeEditor:focus, #stationEditor:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #2596be15; }
-#edgeEditor::placeholder, #stationEditor::placeholder { color: #aab2bf; }
+#edgeEditor:focus, #stationEditor:focus, #routeEditor:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #2596be15; }
+#edgeEditor::placeholder, #stationEditor::placeholder, #routeEditor::placeholder { color: #aab2bf; }
 #stationEditor { min-height: 110px; margin-top: 4px; }
+#routeEditor { min-height: 110px; margin-top: 4px; }
 .editor-hint { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; color: var(--muted); font-size: 10px; }
 .options { padding-top: 23px; }
 .switch-row { justify-content: space-between; gap: 18px; margin-top: 20px; }

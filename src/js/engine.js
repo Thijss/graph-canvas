@@ -1,6 +1,6 @@
-import { graph, repulsionSlider, edgeEditor, stationEditor } from "./dom.js";
+import { graph, repulsionSlider, edgeEditor, stationEditor, routeEditor } from "./dom.js";
 import { state } from "./state.js";
-import { parseGraph, parseStations } from "./parser.js";
+import { parseGraph, parseStations, parseRoutes } from "./parser.js";
 import { layoutNodes, layoutTopDown, createSimulation, updateSimulationForces, clampToBounds } from "./simulation.js";
 import { render } from "./renderer.js";
 
@@ -14,20 +14,21 @@ const handlers = { onNodeActivity: (heat) => restartSimulation(heat) };
 // "tick" callback (registered once, in draw() below) always clamps/renders
 // against up-to-date edges/nodes/stations/dimensions without needing to
 // re-parse the textareas or re-measure the canvas on every animation frame.
-let currentGraph = { edges: [], nodes: [], stations: [] };
+let currentGraph = { edges: [], nodes: [], stations: [], routes: [] };
 let currentSize = { width: 800, height: 520 };
 
 function readGraph() {
   const { edges, nodes } = parseGraph(edgeEditor.value);
   const stations = parseStations(stationEditor.value, nodes);
-  return { edges, nodes, stations };
+  const routes = parseRoutes(routeEditor.value, nodes);
+  return { edges, nodes, stations, routes };
 }
 
 // Re-parses the textareas, seeds any new nodes, and reconfigures the physics
 // simulation's forces to match. Renders once immediately (covers the
 // physics-off case, and gives instant feedback before any tick fires).
 export function draw() {
-  const { edges, nodes, stations } = readGraph();
+  const { edges, nodes, stations, routes } = readGraph();
   const { width, height } = graph.getBoundingClientRect();
   const w = width || 800;
   const h = height || 520;
@@ -42,15 +43,15 @@ export function draw() {
     // snapshot from simulation creation time.
     state.simulation.on("tick", () => {
       clampToBounds(state, currentGraph.nodes, currentSize.width, currentSize.height, state.view);
-      render(state, currentGraph.edges, currentGraph.nodes, currentGraph.stations, handlers);
+      render(state, currentGraph.edges, currentGraph.nodes, currentGraph.stations, currentGraph.routes, handlers);
     });
   }
   updateSimulationForces(state, nodes, edges, stations, w, h, -Number(repulsionSlider.value));
 
-  currentGraph = { edges, nodes, stations };
+  currentGraph = { edges, nodes, stations, routes };
   currentSize = { width: w, height: h };
   clampToBounds(state, nodes, w, h, state.view);
-  render(state, edges, nodes, stations, handlers);
+  render(state, edges, nodes, stations, routes, handlers);
 }
 
 // Reheats the simulation (e.g. after nodes/edges change) so gravity animates

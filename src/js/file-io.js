@@ -1,10 +1,22 @@
 // File format helpers stay independent from the graph state and editor DOM.
 export function splitGraphText(text) {
   const lines = text.split(/\r?\n/);
-  const delimiterIndex = lines.findIndex((line) => line.trim() === "----------");
+  const delimiters = lines
+    .map((line, index) => {
+      const marker = line.trim();
+      if (marker === "-----STATIONS-----") return { index, type: "stations" };
+      if (marker === "-----ROUTES-----") return { index, type: "routes" };
+      return null;
+    })
+    .filter(Boolean);
+  const stationsDelimiter = delimiters.find((delimiter) => delimiter.type === "stations");
+  const routesDelimiter = delimiters.find((delimiter) => delimiter.type === "routes");
   return {
-    edgesText: delimiterIndex === -1 ? text.trim() : lines.slice(0, delimiterIndex).join("\n").trim(),
-    stationsText: delimiterIndex === -1 ? "" : lines.slice(delimiterIndex + 1).join("\n").trim(),
+    edgesText: stationsDelimiter === undefined ? text.trim() : lines.slice(0, stationsDelimiter.index).join("\n").trim(),
+    stationsText: stationsDelimiter === undefined
+      ? ""
+      : lines.slice(stationsDelimiter.index + 1, routesDelimiter?.index ?? lines.length).join("\n").trim(),
+    routesText: routesDelimiter === undefined ? "" : lines.slice(routesDelimiter.index + 1).join("\n").trim(),
   };
 }
 
@@ -13,10 +25,10 @@ export async function readGraphFile(file) {
   return splitGraphText(await file.text());
 }
 
-export function downloadGraphFile(edgesText, stationsText, filename) {
-  const content = stationsText
-    ? `${edgesText}\n----------\n${stationsText}\n`
-    : `${edgesText}\n`;
+export function downloadGraphFile(edgesText, stationsText, routesText, filename) {
+  let content = edgesText ? `${edgesText}\n` : "";
+  if (stationsText) content += `-----STATIONS-----\n${stationsText}\n`;
+  if (routesText) content += `-----ROUTES-----\n${routesText}\n`;
   const downloadUrl = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
   const link = document.createElement("a");
   link.href = downloadUrl;
