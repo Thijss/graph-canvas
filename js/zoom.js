@@ -8,9 +8,8 @@ import { MIN_ZOOM, MAX_ZOOM } from "./config.js";
 // the point currently under the cursor visually fixed (so zooming feels
 // anchored to the pointer instead of jumping to re-center on each step).
 // `cursor` is the pointer's position in screen px relative to the graph
-// element's top-left; `bounds` is that element's on-screen (CSS) width/height,
-// which stays constant across zoom levels since viewBox doesn't affect layout.
-export function computeZoomedView(view, deltaY, cursor, bounds) {
+// element's top-left.
+export function computeZoomedView(view, deltaY, cursor) {
   const zoomFactor = Math.exp(-deltaY * 0.01);
   const scale = Math.min(Math.max(view.scale * zoomFactor, MIN_ZOOM), MAX_ZOOM);
   if (scale === view.scale) return view;

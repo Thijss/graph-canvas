@@ -21,6 +21,15 @@ Then open http://localhost:8000 in your browser.
 (A local server is required — opening `index.html` directly via `file://` won't
 work, since loading template data uses `fetch()`.)
 
+## Development
+
+Install the development dependencies and run the JavaScript linter with:
+
+```bash
+npm install
+npm run lint
+```
+
 ## Adding templates
 
 Add each built-in template as a `.txt` file in `templates/` and register it in

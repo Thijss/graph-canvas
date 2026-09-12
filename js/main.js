@@ -93,7 +93,7 @@ graphWrap.addEventListener(
     event.preventDefault();
     const bounds = graph.getBoundingClientRect();
     const cursor = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
-    state.view = computeZoomedView(state.view, event.deltaY, cursor, bounds);
+    state.view = computeZoomedView(state.view, event.deltaY, cursor);
     applyViewBox();
   },
   { passive: false },
