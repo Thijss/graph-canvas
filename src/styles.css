@@ -178,6 +178,11 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .station-color-3 { background: hsl(322 63% 45% / 1); }
 .station-color-4 { background: hsl(100 70% 43% / 1); }
 .station-color-5 { background: hsl(237 75% 47% / 1); }
+.station-color-6 { background: hsl(15 71% 45% / 1); }
+.station-color-7 { background: hsl(152 70% 49% / 1); }
+.station-color-8 { background: hsl(290 63% 56% / 1); }
+.station-color-9 { background: hsl(67 68% 44% / 1); }
+.station-color-10 { background: hsl(205 75% 51% / 1); }
 #edgeEditor, #stationEditor {
   display: block; width: 100%; min-height: 230px; resize: vertical; padding: 13px 14px;
   border: 1px solid var(--line); border-radius: 8px; outline: none; color: var(--ink);
