@@ -77,6 +77,7 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   background: white;
   box-shadow: 0 20px 60px #26344d2e;
 }
+.help-dialog { width: min(1000px, calc(100vw - 32px)); }
 .template-dialog::backdrop { background: #17202d66; }
 .template-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .template-dialog h2 { margin-top: 5px; font-size: 22px; }
