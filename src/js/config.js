@@ -29,16 +29,16 @@ export const STATION_TYPE_PATTERN = /^[a-z0-9_-]+$/i;
 // Types are assigned colors in their order of first appearance by the
 // renderer. The palette is intentionally limited to ten colors.
 export const COLOR_PALETTE = [
-  "hsl(47 74% 57% / 1)",
-  "hsl(185 61% 45% / 1)",
-  "hsl(322 63% 45% / 1)",
-  "hsl(100 70% 43% / 1)",
-  "hsl(237 75% 47% / 1)",
-  "hsl(15 71% 45% / 1)",
-  "hsl(152 70% 49% / 1)",
-  "hsl(290 63% 56% / 1)",
-  "hsl(67 68% 44% / 1)",
-  "hsl(205 75% 51% / 1)",
+  "#4e79a7",
+  "#f28e2b",
+  "#bab0ab",
+  "#76b7b2",
+  "#59a14f",
+  "#edc948",
+  "#b07aa1",
+  "#ff9da7",
+  "#9c755f",
+  "#e15759",
 ];
 
 export function getPaletteColor(index) {
