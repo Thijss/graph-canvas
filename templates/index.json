@@ -1,0 +1,26 @@
+[
+    {
+    "id": "sub-4-routes",
+    "title": "SUB-4",
+    "description": "One substation with four routes.",
+    "file": "SUB-4-ROUTES.txt"
+  },
+  {
+    "id": "sub-cs-ss",
+    "title": "SUB - CS - SS",
+    "description": "Substation - Control Station - Switching Station.",
+    "file": "SUB-CS-SS.txt"
+  },
+  {
+    "id": "sub-cs-detail",
+    "title": "SUB - CS (detailed)",
+    "description": "Substation and a detailed version of a Control Station.",
+    "file": "SUB-CS-DETAIL.txt"
+  },
+  {
+    "id": "30-node",
+    "title": "30 node network",
+    "description": "A 30-node network.",
+    "file": "30-NODE.txt"
+  }
+]
