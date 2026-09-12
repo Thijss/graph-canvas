@@ -41,6 +41,7 @@ export const themeToggle = document.querySelector("#themeToggle");
 export const helpButton = document.querySelector("#helpButton");
 export const helpDialog = document.querySelector("#helpDialog");
 export const helpDialogClose = document.querySelector("#helpDialogClose");
+export const helpContent = document.querySelector("#helpContent");
 export const zoomInButton = document.querySelector("#zoomInButton");
 export const zoomOutButton = document.querySelector("#zoomOutButton");
 export const disclaimerButton = document.querySelector("#disclaimerButton");

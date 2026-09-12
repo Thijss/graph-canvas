@@ -134,57 +134,7 @@ SS   4    Switching Station"></textarea>
         </div>
         <button class="dialog-close" id="helpDialogClose" type="button" aria-label="Close help">×</button>
       </div>
-      <div class="help-content">
-        <section class="help-section">
-          <h3>Define the graph</h3>
-          <p>An edge connects two nodes in the graph. 
-            Edges are defined by specifying the starting node, the ending node, and an optional label.</p>
-          <p>Multiple labels can be combined, separated by commas.</p>
-          <p>Syntax:</p>
-          <p><code class="help-example">FROM_NODE&nbsp;&nbsp;TO_NODE&nbsp;&nbsp;LABEL1,LABEL2</code></p>
-          <p>For parallel edges, just repeat the definition.</p>
-          <p>There are special labels that modify the behavior or appearance of the edge:</p>
-          <ul class="keyword-list">
-                <li><span class="keyword-label"><code>transformer</code>:</span><span class="keyword-preview keyword-preview-blue" aria-hidden="true"></span></li>
-                <li><span class="keyword-label"><code>link</code>:</span><span class="keyword-preview keyword-preview-green" aria-hidden="true"></span></li>
-                <li><span class="keyword-label"><code>open</code>:</span><span class="keyword-preview keyword-preview-dotted" aria-hidden="true"></span></li>
-                <li><span class="keyword-label"><code>x</code>:</span><span class="keyword-preview keyword-preview-red" aria-hidden="true"></span></li>
-          </ul>
-        </section>
-        <section class="help-section">
-          <h3>Group stations</h3>
-          <p>Nodes can be grouped into stations for better organization. This will color-code and visually separate them in the graph.</p>
-          <p>Syntax:</p>
-          <p><code class="help-example">TYPE&nbsp;&nbsp;NODE1,NODE2&nbsp;&nbsp;NAME</code></p>
-          <p>Available types:</p>
-          <ul class="station-type-list">
-            <li><span class="station-type-key"><span class="station-type-label"><code>SUB</code>:</span><span class="station-preview station-preview-sub" aria-label="Substation color"></span></span> (Substation station)</li>
-            <li><span class="station-type-key"><span class="station-type-label"><code>CS</code>:</span><span class="station-preview station-preview-cs" aria-label="Control station color"></span></span> (Control station)</li>
-            <li><span class="station-type-key"><span class="station-type-label"><code>SS</code>:</span><span class="station-preview station-preview-ss" aria-label="Switching station color"></span></span> (Switching station)</li>
-          </ul>
-        </section>
-        <section class="help-section">
-          <h3>Templates</h3>
-          <p>Click Templates in the top menu to browse the built-in graph examples.</p>
-          <p>Selecting a template replaces the current Edges and Stations editor contents with the template data.</p>
-        </section>
-        <section class="help-section">
-          <h3>Move around</h3>
-          <p>Drag nodes to reposition them, drag empty canvas space to pan, and use the zoom buttons or pinch gestures to zoom.</p>
-        </section>
-        <section class="help-section">
-          <h3>Change the layout</h3>
-          <p>Choose Physics, DAG, or Custom and adjust the available controls.</p>
-        </section>
-        <section class="help-section">
-          <h3>Save your work</h3>
-          <p>Use Import to open a TXT graph file and Export to save TXT, PNG, or SVG.</p>
-        </section>
-        <section class="help-section">
-          <h3>Toggle the theme</h3>
-          <p>Click the PGM logo to switch between light and dark mode.</p>
-        </section>
-      </div>
+      <div class="help-content" id="helpContent">Loading help...</div>
     </dialog>
     <dialog class="template-dialog" id="templateDialog" aria-labelledby="templateDialogTitle">
       <div class="template-dialog-header">

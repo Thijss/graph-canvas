@@ -35,6 +35,7 @@ import {
   helpButton,
   helpDialog,
   helpDialogClose,
+  helpContent,
   zoomInButton,
   zoomOutButton,
   disclaimerButton,
@@ -279,7 +280,19 @@ async function loadTemplate(templateName) {
   restartSimulation();
 }
 templateButton.addEventListener("click", () => templateDialog.showModal());
-helpButton.addEventListener("click", () => helpDialog.showModal());
+let helpLoaded = false;
+helpButton.addEventListener("click", async () => {
+  helpDialog.showModal();
+  if (helpLoaded) return;
+  try {
+    const response = await fetch("content/help.html");
+    if (!response.ok) throw new Error("Could not load help");
+    helpContent.innerHTML = await response.text();
+    helpLoaded = true;
+  } catch {
+    helpContent.textContent = "Could not load help content.";
+  }
+});
 helpDialogClose.addEventListener("click", () => helpDialog.close());
 helpDialog.addEventListener("click", (event) => {
   if (event.target === helpDialog) helpDialog.close();
