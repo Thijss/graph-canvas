@@ -43,6 +43,7 @@ import { draw, restartSimulation } from "./engine.js";
 import { updateBorderBump, clearBorderBump, updateEdgeErrors } from "./renderer.js";
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
+import { createPinchZoomController } from "./gestures.js";
 import { readGraphFile, downloadGraphFile } from "./file-io.js";
 
 function persistEditors() {
@@ -96,6 +97,8 @@ function zoomFromCenter(deltaY) {
   applyViewBox();
 }
 
+const pinchZoom = createPinchZoomController({ graph, graphWrap, state, applyViewBox });
+
 // Trackpad pinch-to-zoom is reported by the browser as a wheel event with
 // ctrlKey set (there's no separate "pinch" event on the web platform), so the
 // same handler also covers ctrl+scroll-wheel zooming on non-trackpad input.
@@ -117,11 +120,13 @@ graphWrap.addEventListener(
 // bail out here whenever the event originated on a node.
 graph.addEventListener("pointerdown", (event) => {
   if (event.target.closest("[data-node]")) return;
+  if (pinchZoom.pointerDown(event)) return;
   state.panning = { pointerId: event.pointerId, lastX: event.clientX, lastY: event.clientY };
   graphWrap.classList.add("panning");
 });
 
 window.addEventListener("pointermove", (event) => {
+  if (pinchZoom.pointerMove(event)) return;
   if (state.panning && event.pointerId === state.panning.pointerId) {
     const dx = event.clientX - state.panning.lastX;
     const dy = event.clientY - state.panning.lastY;
@@ -166,7 +171,8 @@ window.addEventListener("pointermove", (event) => {
     draw(); // physics off: just re-render the dragged node at its new spot
   }
 });
-window.addEventListener("pointerup", () => {
+window.addEventListener("pointerup", (event) => {
+  pinchZoom.pointerUp(event);
   if (state.panning) {
     state.panning = null;
     graphWrap.classList.remove("panning");
@@ -182,6 +188,9 @@ window.addEventListener("pointerup", () => {
   state.dragging = null;
   clearBorderBump();
   restartSimulation(0.3); // gently settle the released node back into place
+});
+window.addEventListener("pointercancel", (event) => {
+  pinchZoom.pointerCancel(event);
 });
 
 clearButton.addEventListener("click", () => {
