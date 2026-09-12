@@ -30,23 +30,6 @@ npm install
 npm run lint
 ```
 
-## Adding templates
-
-Add each built-in template as a `.txt` file in `templates/` and register it in
-`templates/index.json`:
-
-```json
-{
-  "id": "my-template",
-  "title": "My template",
-  "description": "A short description shown in the template picker.",
-  "file": "MY-TEMPLATE.txt"
-}
-```
-
-Template files keep the existing format: edge definitions, followed by a line
-containing `----------`, followed by station definitions.
-
 ## Privacy & security
 
 This is a fully client-side tool — everything runs in your browser and nothing
