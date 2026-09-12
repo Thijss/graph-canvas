@@ -25,6 +25,8 @@ import {
   templateDialogClose,
   templateList,
   fullscreenButton,
+  zoomInButton,
+  zoomOutButton,
   disclaimerButton,
   disclaimerDialog,
   disclaimerDialogClose,
@@ -81,6 +83,15 @@ function cancelScheduledEditorRedraw() {
 
 function applyViewBox() {
   graph.setAttribute("viewBox", viewBoxString(state.view, graph.getBoundingClientRect()));
+}
+
+function zoomFromCenter(deltaY) {
+  const bounds = graph.getBoundingClientRect();
+  state.view = computeZoomedView(state.view, deltaY, {
+    x: bounds.width / 2,
+    y: bounds.height / 2,
+  });
+  applyViewBox();
 }
 
 // Trackpad pinch-to-zoom is reported by the browser as a wheel event with
@@ -353,6 +364,8 @@ fullscreenButton.addEventListener("click", () => {
     graphWrap.requestFullscreen?.();
   }
 });
+zoomInButton.addEventListener("click", () => zoomFromCenter(-30));
+zoomOutButton.addEventListener("click", () => zoomFromCenter(30));
 document.addEventListener("fullscreenchange", () => {
   const isFullscreen = document.fullscreenElement === graphWrap;
   fullscreenButton.textContent = isFullscreen ? "⤦" : "⛶";
