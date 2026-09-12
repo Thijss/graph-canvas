@@ -21,8 +21,8 @@
         </div>
         <div class="topbar-actions">
           <div class="topbar-file-actions">
-            <button class="button button-quiet" id="openButton" type="button">Load</button>
-            <button class="button button-quiet" id="saveButton" type="button">Save</button>
+            <button class="button button-quiet" id="openButton" type="button">Import</button>
+            <button class="button button-quiet" id="saveButton" type="button">Export</button>
           </div>
           <button class="button button-quiet" id="templateButton" type="button">Templates</button>
           <button class="button button-danger" id="clearButton" type="button">Clear all</button>
@@ -157,17 +157,32 @@ CS   3    Control Station"></textarea>
     <dialog class="template-dialog save-dialog" id="saveDialog" aria-labelledby="saveDialogTitle">
       <div class="template-dialog-header">
         <div>
-          <span class="eyebrow">Save graph</span>
-          <h2 id="saveDialogTitle">Choose a file name</h2>
+          <span class="eyebrow">Export graph</span>
+          <h2 id="saveDialogTitle">Choose export format</h2>
         </div>
         <button class="dialog-close" id="saveDialogClose" type="button" aria-label="Close save dialog">×</button>
       </div>
-      <form id="saveForm">
+      <div class="export-options" id="exportOptions">
+        <button class="template-option" id="exportPngButton" type="button">
+          <strong>PNG</strong>
+          <span>Export the current graph as an image.</span>
+        </button>
+        <button class="template-option" id="exportSvgButton" type="button">
+          <strong>SVG</strong>
+          <span>Export the current graph as a vector image.</span>
+        </button>
+        <button class="template-option" id="exportTxtButton" type="button">
+          <strong>TXT</strong>
+          <span>Export the current graph data as a text file.</span>
+        </button>
+      </div>
+      <form id="saveForm" hidden>
         <label class="save-label" for="saveFilename">File name</label>
         <input class="save-input" id="saveFilename" type="text" value="graph.txt" required />
         <div class="dialog-actions">
+          <button class="button button-quiet" id="saveDialogBack" type="button">Back</button>
           <button class="button button-quiet" id="saveDialogCancel" type="button">Cancel</button>
-          <button class="button" type="submit">Save</button>
+          <button class="button" type="submit">Export</button>
         </div>
       </form>
     </dialog>

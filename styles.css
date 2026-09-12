@@ -56,6 +56,8 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 }
 .dialog-close:hover { color: var(--ink); background: var(--soft); }
 .template-list { display: grid; gap: 10px; margin-top: 24px; }
+.export-options { display: grid; gap: 10px; margin-top: 24px; }
+.export-options[hidden], .save-dialog form[hidden] { display: none; }
 .template-option {
   display: grid; gap: 5px; width: 100%; padding: 15px; border: 1px solid var(--line);
   border-radius: 9px; color: var(--ink); background: white; text-align: left; transition: .18s ease;
