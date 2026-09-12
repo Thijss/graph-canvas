@@ -32,6 +32,9 @@ import {
   templateList,
   fullscreenButton,
   themeToggle,
+  helpButton,
+  helpDialog,
+  helpDialogClose,
   zoomInButton,
   zoomOutButton,
   disclaimerButton,
@@ -276,6 +279,11 @@ async function loadTemplate(templateName) {
   restartSimulation();
 }
 templateButton.addEventListener("click", () => templateDialog.showModal());
+helpButton.addEventListener("click", () => helpDialog.showModal());
+helpDialogClose.addEventListener("click", () => helpDialog.close());
+helpDialog.addEventListener("click", (event) => {
+  if (event.target === helpDialog) helpDialog.close();
+});
 openButton.addEventListener("click", () => fileInput.click());
 saveButton.addEventListener("click", () => {
   exportFormat = "txt";

@@ -112,6 +112,18 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 .mobile-legal-actions { display: none; }
 .disclaimer-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .disclaimer-content p + p { margin-top: 12px; }
+.help-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.help-content p + p { margin-top: 12px; }
+.help-section + .help-section { margin-top: 22px; }
+.help-section h3 { margin-bottom: 8px; color: var(--ink); font-size: 15px; }
+.help-example { display: inline-block; margin-left: 12px; }
+.help-subsection-title { margin-top: 14px; color: var(--ink); }
+.help-section ul { margin: 8px 0 0; padding-left: 18px; }
+.help-section li + li { margin-top: 4px; }
+.help-section .keyword-list { padding-left: 18px; list-style: disc; }
+.help-section .keyword-list li { display: list-item; }
+.help-section .keyword-list .keyword-label { display: inline-block; width: 94px; }
+.help-section .keyword-list li + li { margin-top: 4px; }
 .license-content {
   max-height: min(60vh, 520px); margin: 22px 0 0; padding: 14px; overflow: auto;
   border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
@@ -162,6 +174,12 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .station-swatch-cs { background: #2f7de1; }
 .station-swatch-ss { background: #f2994a; }
 .station-swatch-sub { background: #6b7280; }
+.station-type-key { display: inline-flex; align-items: center; width: 58px; }
+.station-type-label { display: inline-block; width: 34px; }
+.station-preview { display: inline-block; width: 12px; height: 12px; margin-left: 6px; border-radius: 2px; }
+.station-preview-cs { background: #2f7de1; }
+.station-preview-ss { background: #f2994a; }
+.station-preview-sub { background: #6b7280; }
 #edgeEditor, #stationEditor {
   display: block; width: 100%; min-height: 230px; resize: vertical; padding: 13px 14px;
   border: 1px solid var(--line); border-radius: 8px; outline: none; color: var(--ink);
@@ -306,7 +324,8 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 @media (max-width: 760px) {
   .topbar { height: auto; min-height: 72px; padding: 16px 18px; gap: 14px; flex-direction: column; align-items: stretch; }
   .brand { flex-wrap: wrap; gap: 10px; }
-  .brand-actions { display: none; }
+  .brand-actions { display: flex; margin-left: 46px; }
+  .brand-actions .mobile-bottom-legal { display: none; }
   .mobile-legal-actions {
     display: flex; justify-content: center; gap: 8px; padding: 16px 18px 24px;
     background: #f2f4f8;

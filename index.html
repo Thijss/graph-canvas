@@ -15,9 +15,10 @@
             <h1>GraphCanvas</h1>
           </div>
           <div class="brand-actions">
-            <button class="disclaimer-button" id="licenseButton" type="button">License</button>
-            <button class="disclaimer-button" id="disclaimerButton" type="button">Disclaimer</button>
-            <a class="disclaimer-button" href="https://github.com/Thijss/graph-canvas" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <button class="disclaimer-button" id="helpButton" type="button">Help</button>
+            <button class="disclaimer-button mobile-bottom-legal" id="licenseButton" type="button">License</button>
+            <button class="disclaimer-button mobile-bottom-legal" id="disclaimerButton" type="button">Disclaimer</button>
+            <a class="disclaimer-button mobile-bottom-legal" href="https://github.com/Thijss/graph-canvas" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
         <div class="topbar-actions">
@@ -40,20 +41,6 @@
               </div>
             </div>
             <input id="fileInput" type="file" accept=".txt,text/plain" hidden />
-            <p class="help-text">One edge per row: <code>from&nbsp;&nbsp;to&nbsp;&nbsp;label</code>.</p>
-            <ul class="help-list">
-              <li>The label is optional.</li>
-              <li>A line with just one name adds a floating node.</li>
-              <li>Multiple labels can be combined, separated by commas.</li>
-              <li>Repeated connections are shown as parallel lines.</li>
-            </ul>
-            <p class="help-text help-subheading">Special labels:</p>
-            <ul class="help-list keyword-list">
-              <li><span class="keyword-label"><code>transformer</code>:</span><span class="keyword-preview keyword-preview-blue" aria-hidden="true"></span></li>
-              <li><span class="keyword-label"><code>link</code>:</span><span class="keyword-preview keyword-preview-green" aria-hidden="true"></span></li>
-              <li><span class="keyword-label"><code>open</code>:</span><span class="keyword-preview keyword-preview-dotted" aria-hidden="true"></span></li>
-              <li><span class="keyword-label"><code>x</code>:</span><span class="keyword-preview keyword-preview-red" aria-hidden="true"></span></li>
-            </ul>
             <div class="editor-status-wrap">
               <textarea id="edgeEditor" spellcheck="false" aria-label="Graph connections" placeholder="1 2
 1 2
@@ -71,12 +58,6 @@
                 <h2>Stations</h2>
               </div>
             </div>
-            <p class="help-text">One station per row: <code>TYPE&nbsp;&nbsp;node,node&nbsp;&nbsp;name</code>.</p>
-            <ul class="help-list">
-              <li>Start with <code class="station-swatch station-swatch-sub">SUB</code>, <code class="station-swatch station-swatch-cs">CS</code>, or <code class="station-swatch station-swatch-ss">SS</code>.</li>
-              <li>Follow with comma-separated node labels, then an optional station name.</li>
-              <li>A node belongs to at most one station.</li>
-            </ul>
             <textarea id="stationEditor" spellcheck="false" aria-label="Station groups" placeholder="SUB  1,2  Substation
 CS   3    Control Station"></textarea>
           </section>
@@ -146,6 +127,61 @@ CS   3    Control Station"></textarea>
       <button class="disclaimer-button" id="mobileDisclaimerButton" type="button">Disclaimer</button>
       <a class="disclaimer-button" href="https://github.com/Thijss/graph-canvas" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
+    <dialog class="template-dialog help-dialog" id="helpDialog" aria-labelledby="helpDialogTitle">
+      <div class="template-dialog-header">
+        <div>
+          <span class="eyebrow">Getting started</span>
+          <h2 id="helpDialogTitle">How to use GraphCanvas</h2>
+        </div>
+        <button class="dialog-close" id="helpDialogClose" type="button" aria-label="Close help">×</button>
+      </div>
+      <div class="help-content">
+        <section class="help-section">
+          <h3>Define the graph</h3>
+          <p>An edge connects two nodes in the graph. Edges are defined by specifying the starting node, the ending node, and an optional label.</p>
+          <p>Example:</p>
+          <p><code class="help-example">1&nbsp;&nbsp;2&nbsp;&nbsp;link</code></p>
+          <p>Multiple labels can be combined, separated by commas. For parallel edges, just repeat the definition.</p>
+          <p>There are special labels that modify the behavior or appearance of the edge:</p>
+          <ul class="keyword-list">
+                <li><span class="keyword-label"><code>transformer</code>:</span><span class="keyword-preview keyword-preview-blue" aria-hidden="true"></span></li>
+                <li><span class="keyword-label"><code>link</code>:</span><span class="keyword-preview keyword-preview-green" aria-hidden="true"></span></li>
+                <li><span class="keyword-label"><code>open</code>:</span><span class="keyword-preview keyword-preview-dotted" aria-hidden="true"></span></li>
+                <li><span class="keyword-label"><code>x</code>:</span><span class="keyword-preview keyword-preview-red" aria-hidden="true"></span></li>
+          </ul>
+        </section>
+        <section class="help-section">
+          <h3>Group stations</h3>
+          <p>Nodes can be grouped into stations for better organization. This will color-code and visually separate them in the graph.</p>
+          <p>Syntax: <code>TYPE&nbsp;&nbsp;node,node&nbsp;&nbsp;name</code>.</p>
+          <p>Available types:</p>
+          <ul class="station-type-list">
+            <li><span class="station-type-key"><span class="station-type-label"><code>SUB</code>:</span><span class="station-preview station-preview-sub" aria-label="Substation color"></span></span> (Substation station)</li>
+            <li><span class="station-type-key"><span class="station-type-label"><code>CS</code>:</span><span class="station-preview station-preview-cs" aria-label="Control station color"></span></span> (Control station)</li>
+            <li><span class="station-type-key"><span class="station-type-label"><code>SS</code>:</span><span class="station-preview station-preview-ss" aria-label="Switching station color"></span></span> (Switching station)</li>
+          </ul>
+          <br>
+          <p>Example: <code>SUB&nbsp;&nbsp;1,2&nbsp;&nbsp;Substation</code></p>
+
+        </section>
+        <section class="help-section">
+          <h3>Move around</h3>
+          <p>Drag nodes to reposition them, drag empty canvas space to pan, and use the zoom buttons or pinch gestures to zoom.</p>
+        </section>
+        <section class="help-section">
+          <h3>Change the layout</h3>
+          <p>Choose Physics, DAG, or Custom and adjust the available controls.</p>
+        </section>
+        <section class="help-section">
+          <h3>Save your work</h3>
+          <p>Use Import to open a TXT graph file and Export to save TXT, PNG, or SVG.</p>
+        </section>
+        <section class="help-section">
+          <h3>Toggle the theme</h3>
+          <p>Click the PGM logo to switch between light and dark mode.</p>
+        </section>
+      </div>
+    </dialog>
     <dialog class="template-dialog" id="templateDialog" aria-labelledby="templateDialogTitle">
       <div class="template-dialog-header">
         <div>
