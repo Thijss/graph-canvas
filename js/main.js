@@ -25,6 +25,13 @@ import {
   templateDialogClose,
   templateList,
   fullscreenButton,
+  disclaimerButton,
+  disclaimerDialog,
+  disclaimerDialogClose,
+  licenseButton,
+  licenseDialog,
+  licenseDialogClose,
+  licenseContent,
 } from "./dom.js";
 import { state } from "./state.js";
 import { MIN_NODE_RADIUS } from "./config.js";
@@ -280,6 +287,25 @@ templateList.addEventListener("click", (event) => {
 });
 templateDialog.addEventListener("click", (event) => {
   if (event.target === templateDialog) templateDialog.close();
+});
+disclaimerButton.addEventListener("click", () => disclaimerDialog.showModal());
+disclaimerDialogClose.addEventListener("click", () => disclaimerDialog.close());
+disclaimerDialog.addEventListener("click", (event) => {
+  if (event.target === disclaimerDialog) disclaimerDialog.close();
+});
+licenseButton.addEventListener("click", async () => {
+  licenseDialog.showModal();
+  try {
+    const response = await fetch("LICENSE");
+    if (!response.ok) throw new Error("Could not load license");
+    licenseContent.textContent = await response.text();
+  } catch {
+    licenseContent.textContent = "Could not load the license.";
+  }
+});
+licenseDialogClose.addEventListener("click", () => licenseDialog.close());
+licenseDialog.addEventListener("click", (event) => {
+  if (event.target === licenseDialog) licenseDialog.close();
 });
 edgeEditor.addEventListener("input", scheduleEditorRedraw);
 edgeEditor.addEventListener("scroll", () => updateEdgeErrors());

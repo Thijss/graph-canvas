@@ -22,6 +22,7 @@ button { cursor: pointer; }
 }
 .brand, .topbar-actions, .section-heading, .canvas-toolbar, .canvas-meta, .switch-row { display: flex; align-items: center; }
 .brand { gap: 13px; }
+.brand-actions { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
 .brand-mark {
   display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
   color: white; font-weight: 800; background: linear-gradient(135deg, #7f6bf1, #5541d0);
@@ -69,6 +70,20 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 }
 .save-input:focus { border-color: var(--purple); background: white; box-shadow: 0 0 0 3px #6e5be615; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.disclaimer-button {
+  padding: 9px 13px; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--muted); background: white; font-size: 11px; font-weight: 650;
+  box-shadow: 0 3px 12px #26344d1a; transition: .18s ease;
+}
+.disclaimer-button:hover { color: var(--ink); border-color: #c8ced9; background: var(--soft); }
+.disclaimer-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.disclaimer-content p + p { margin-top: 12px; }
+.license-content {
+  max-height: min(60vh, 520px); margin: 22px 0 0; padding: 14px; overflow: auto;
+  border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
+  background: var(--soft); font: 11px/1.6 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+}
 
 .workspace { display: grid; grid-template-columns: 336px minmax(0, 1fr); min-height: calc(100vh - 82px); }
 .sidebar { display: flex; flex-direction: column; background: white; border-right: 1px solid var(--line); }

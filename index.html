@@ -14,6 +14,10 @@
           <div>
             <h1>Graph editor</h1>
           </div>
+          <div class="brand-actions">
+            <button class="disclaimer-button" id="licenseButton" type="button">License</button>
+            <button class="disclaimer-button" id="disclaimerButton" type="button">Disclaimer</button>
+          </div>
         </div>
         <div class="topbar-actions">
           <div class="topbar-file-actions">
@@ -158,6 +162,29 @@ CS   3    Control Station"></textarea>
           <button class="button" type="submit">Save</button>
         </div>
       </form>
+    </dialog>
+    <dialog class="template-dialog disclaimer-dialog" id="disclaimerDialog" aria-labelledby="disclaimerDialogTitle">
+      <div class="template-dialog-header">
+        <div>
+          <span class="eyebrow">Important information</span>
+          <h2 id="disclaimerDialogTitle">Disclaimer</h2>
+        </div>
+        <button class="dialog-close" id="disclaimerDialogClose" type="button" aria-label="Close disclaimer">×</button>
+      </div>
+      <div class="disclaimer-content">
+        <p>This project is largely built using AI.</p>
+        <p>It is provided as-is and may contain errors, omissions, or unexpected behavior. Review and verify any output before relying on it, and use it at your own discretion.</p>
+      </div>
+    </dialog>
+    <dialog class="template-dialog license-dialog" id="licenseDialog" aria-labelledby="licenseDialogTitle">
+      <div class="template-dialog-header">
+        <div>
+          <span class="eyebrow">Legal information</span>
+          <h2 id="licenseDialogTitle">License</h2>
+        </div>
+        <button class="dialog-close" id="licenseDialogClose" type="button" aria-label="Close license">×</button>
+      </div>
+      <pre class="license-content" id="licenseContent">Loading license...</pre>
     </dialog>
     <script type="module" src="js/main.js"></script>
   </body>
