@@ -137,10 +137,12 @@ SS   4    Switching Station"></textarea>
       <div class="help-content">
         <section class="help-section">
           <h3>Define the graph</h3>
-          <p>An edge connects two nodes in the graph. Edges are defined by specifying the starting node, the ending node, and an optional label.</p>
-          <p>Example:</p>
-          <p><code class="help-example">1&nbsp;&nbsp;2&nbsp;&nbsp;link</code></p>
-          <p>Multiple labels can be combined, separated by commas. For parallel edges, just repeat the definition.</p>
+          <p>An edge connects two nodes in the graph. 
+            Edges are defined by specifying the starting node, the ending node, and an optional label.</p>
+          <p>Multiple labels can be combined, separated by commas.</p>
+          <p>Syntax:</p>
+          <p><code class="help-example">FROM_NODE&nbsp;&nbsp;TO_NODE&nbsp;&nbsp;LABEL1,LABEL2</code></p>
+          <p>For parallel edges, just repeat the definition.</p>
           <p>There are special labels that modify the behavior or appearance of the edge:</p>
           <ul class="keyword-list">
                 <li><span class="keyword-label"><code>transformer</code>:</span><span class="keyword-preview keyword-preview-blue" aria-hidden="true"></span></li>
@@ -152,7 +154,8 @@ SS   4    Switching Station"></textarea>
         <section class="help-section">
           <h3>Group stations</h3>
           <p>Nodes can be grouped into stations for better organization. This will color-code and visually separate them in the graph.</p>
-          <p>Syntax: <code>TYPE&nbsp;&nbsp;node,node&nbsp;&nbsp;name</code>.</p>
+          <p>Syntax:</p>
+          <p><code class="help-example">TYPE&nbsp;&nbsp;NODE1,NODE2&nbsp;&nbsp;NAME</code></p>
           <p>Available types:</p>
           <ul class="station-type-list">
             <li><span class="station-type-key"><span class="station-type-label"><code>SUB</code>:</span><span class="station-preview station-preview-sub" aria-label="Substation color"></span></span> (Substation station)</li>
@@ -160,8 +163,12 @@ SS   4    Switching Station"></textarea>
             <li><span class="station-type-key"><span class="station-type-label"><code>SS</code>:</span><span class="station-preview station-preview-ss" aria-label="Switching station color"></span></span> (Switching station)</li>
           </ul>
           <br>
-          <p>Example: <code>SUB&nbsp;&nbsp;1,2&nbsp;&nbsp;Substation</code></p>
 
+        </section>
+        <section class="help-section">
+          <h3>Templates</h3>
+          <p>Click Templates in the top menu to browse the built-in graph examples.</p>
+          <p>Selecting a template replaces the current Edges and Stations editor contents with the template data.</p>
         </section>
         <section class="help-section">
           <h3>Move around</h3>
