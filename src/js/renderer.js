@@ -235,7 +235,7 @@ function drawNode(state, name, handlers, stationNodeColors, routeNodeColors) {
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.dataset.node = name;
   const stationColor = stationNodeColors.get(name);
-  const nodeColor = routeNodeColors.get(name) ?? stationColor;
+  const nodeColor = routeNodeColors.get(name);
   const shape = document.createElementNS("http://www.w3.org/2000/svg", stationColor ? "rect" : "circle");
   shape.classList.add("node-circle");
   if (stationColor) shape.classList.add("node-square");
