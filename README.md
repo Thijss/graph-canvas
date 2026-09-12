@@ -10,16 +10,16 @@ All rights reserved; copying, modifying, distributing, publishing, sublicensing,
 
 ## Running locally
 
-This is a static site (no build step). Serve it with:
+This is a Vite-powered static site. Start the development server with:
 
 ```
-python3 -m http.server 8000
+npm run dev
 ```
 
-Then open http://localhost:8000 in your browser.
+Then open the URL shown by Vite.
 
-(A local server is required — opening `index.html` directly via `file://` won't
-work, since loading template data uses `fetch()`.)
+Create a production build with `npm run build`; GitHub Pages deploys the
+resulting `dist/` directory.
 
 ## Development
 
@@ -28,6 +28,7 @@ Install the development dependencies and run the JavaScript linter with:
 ```bash
 npm install
 npm run lint
+npm run build
 ```
 
 ## Privacy & security
@@ -39,6 +40,6 @@ you type is ever sent anywhere:
 - All graph/station data lives only in the page's memory and two `<textarea>`
   fields; nothing is saved to disk or a network unless you copy it yourself.
 - The only network requests are same-origin fetches of bundled files in the
-  `templates/` folder when you select a template.
+  `public/templates/` folder when you select a template.
 - User input is rendered using safe DOM APIs (`textContent`/`setAttribute`),
   not `innerHTML`, so there's no script-injection risk from anything you type.
