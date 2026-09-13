@@ -55,10 +55,6 @@ Playwright's Chromium browser must be installed once on a new machine:
 npx playwright install chromium
 ```
 
-GitHub Actions caches the Playwright browser binary using the dependency
-lockfile as part of the cache key. The browser is downloaded again
-automatically when the Playwright version changes.
-
 The browser smoke tests start Vite automatically and cover only critical
 end-to-end flows: loading the editor, entering graph data, restoring it after
 a refresh, and exporting a text file. They do not replace manual testing of
