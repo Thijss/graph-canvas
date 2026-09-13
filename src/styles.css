@@ -340,6 +340,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-style-option { border: 0; }
 .edge-style-option:hover, .edge-style-option.is-selected { background: var(--soft); }
 .dark .edge-style-button, .dark .edge-style-option, .dark .edge-style-popover { background: #18252c; }
+.dark .edge-style-button::before, .dark .edge-style-option::before { border-top-color: white; }
 .edge-color-control { position: relative; width: 100%; }
 .edge-color-button, .edge-color-option {
   width: 100%;
