@@ -522,6 +522,22 @@ function setGroupEditorMode(mode) {
 }
 groupVisualModeButton.addEventListener("click", () => setGroupEditorMode("visual"));
 groupTextModeButton.addEventListener("click", () => setGroupEditorMode("text"));
+document.querySelectorAll(".panel-section-toggle").forEach((toggle) => {
+  const toggleSection = () => {
+    const section = toggle.closest(".panel-section");
+    const collapsed = section.classList.toggle("is-collapsed");
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    const title = section.querySelector("h2")?.textContent ?? "section";
+    toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${title} section`);
+  };
+  toggle.addEventListener("click", toggleSection);
+  toggle.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleSection();
+    }
+  });
+});
 const settings = loadSettings();
 document.documentElement.classList.toggle("dark", settings.darkMode);
 themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");

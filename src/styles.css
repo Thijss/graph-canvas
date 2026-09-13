@@ -160,6 +160,23 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 }
 .boundary-mode-toggle { width: max-content; margin-left: auto; }
 .section-heading.compact { justify-content: flex-start; }
+.panel-section.is-collapsed > :not(.section-heading) { display: none; }
+.panel-section-toggle {
+  flex: 0 0 auto;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .18s ease, color .18s ease;
+}
+.panel-section-toggle:hover { color: var(--ink); }
+.panel-section-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.panel-section.is-collapsed .panel-section-toggle { transform: rotate(180deg); }
 .topbar-file-actions { display: flex; gap: 6px; margin-right: 72px; }
 .eyebrow { display: block; color: var(--accent-dark); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 h2 { margin-top: 4px; font-size: 20px; letter-spacing: -.04em; }
