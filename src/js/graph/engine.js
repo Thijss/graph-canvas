@@ -1,5 +1,5 @@
-import { graph, repulsionSlider, edgeEditor, boundaryEditor, groupEditor } from "./dom.js";
-import { state } from "./state.js";
+import { graph, repulsionSlider, edgeEditor, boundaryEditor, groupEditor } from "../dom.js";
+import { state } from "../state.js";
 import { parseEdgeText, parseBoundaryText, parseGroups } from "./parser.js";
 import { layoutNodes, layoutTopDown, createSimulation, updateSimulationForces, clampToBounds } from "./simulation.js";
 import { render } from "./renderer.js";

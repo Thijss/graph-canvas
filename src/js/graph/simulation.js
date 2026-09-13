@@ -5,7 +5,7 @@ import {
   forceX,
   forceY,
   forceCollide,
-} from "./vendor/d3-force.js";
+} from "../vendor/d3-force.js";
 import {
   MIN_NODE_RADIUS,
   LABEL_PADDING,
@@ -22,7 +22,7 @@ import {
   BOUNDARY_REPULSION_PADDING,
   ALPHA_DECAY,
   ALPHA_MIN,
-} from "./config.js";
+} from "../config.js";
 
 const measureCtx = document.createElement("canvas").getContext("2d");
 measureCtx.font = "750 12px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";

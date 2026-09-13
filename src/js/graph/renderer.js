@@ -9,8 +9,8 @@ import {
   edgeCount,
   statusText,
   directedToggle,
-} from "./dom.js";
-import { EDGE_COLORS, getGroupColor, getBoundaryTypeColor, MIN_NODE_RADIUS, BOUNDARY_FILL_OPACITY } from "./config.js";
+} from "../dom.js";
+import { EDGE_COLORS, getGroupColor, getBoundaryTypeColor, MIN_NODE_RADIUS, BOUNDARY_FILL_OPACITY } from "../config.js";
 import { getNodeRadius, getBoundaryBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];

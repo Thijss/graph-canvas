@@ -1,6 +1,6 @@
 import { EDGE_COLORS } from "../config.js";
 import { edgeEditor, edgeEmptyState, edgeList, edgeListHeader, edgeNodeSuggestions } from "../dom.js";
-import { parseEdgeText, serializeEdges } from "../parser.js";
+import { parseEdgeText, serializeEdges } from "../graph/parser.js";
 import { createDeleteButton, createPopoverPicker, updateEditorListState } from "./editor-controls.js";
 
 function createField(label, value, className, withSuggestions = false) {

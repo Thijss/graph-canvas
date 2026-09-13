@@ -1,6 +1,6 @@
 import { GROUP_COLOR_PALETTE, getGroupColor } from "../config.js";
 import { edgeEditor, groupEditor, groupEmptyState, groupList, groupListHeader } from "../dom.js";
-import { parseEdgeText, parseGroups, serializeGroups } from "../parser.js";
+import { parseEdgeText, parseGroups, serializeGroups } from "../graph/parser.js";
 import {
   createDeleteButton,
   createNodeListField,

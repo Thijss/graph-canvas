@@ -1,6 +1,6 @@
 import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "../config.js";
 import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "../dom.js";
-import { parseEdgeText, parseBoundaryText, serializeBoundaries } from "../parser.js";
+import { parseEdgeText, parseBoundaryText, serializeBoundaries } from "../graph/parser.js";
 import {
   createDeleteButton,
   createNodeListField,

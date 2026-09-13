@@ -1,6 +1,6 @@
-import { MIN_NODE_RADIUS } from "./config.js";
-import { draw, restartSimulation } from "./engine.js";
-import { updateBorderBump, clearBorderBump } from "./renderer.js";
+import { MIN_NODE_RADIUS } from "../config.js";
+import { draw, restartSimulation } from "../graph/engine.js";
+import { updateBorderBump, clearBorderBump } from "../graph/renderer.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 
 export function setupCanvasInteraction({

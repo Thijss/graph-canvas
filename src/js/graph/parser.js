@@ -1,4 +1,4 @@
-import { EDGE_COLORS, BOUNDARY_TYPE_PATTERN } from "./config.js";
+import { EDGE_COLORS, BOUNDARY_TYPE_PATTERN } from "../config.js";
 
 const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
 

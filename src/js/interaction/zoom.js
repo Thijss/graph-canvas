@@ -1,4 +1,4 @@
-import { MIN_ZOOM, MAX_ZOOM } from "./config.js";
+import { MIN_ZOOM, MAX_ZOOM } from "../config.js";
 
 // Pure zoom-math helpers, kept independent of the DOM: callers pass in the
 // current view + wheel event data and get back a new view to apply

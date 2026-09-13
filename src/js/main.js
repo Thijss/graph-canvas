@@ -49,17 +49,17 @@ import {
   licenseContent,
 } from "./dom.js";
 import { state } from "./state.js";
-import { draw, restartSimulation } from "./engine.js";
-import { updateEdgeErrors } from "./renderer.js";
+import { draw, restartSimulation } from "./graph/engine.js";
+import { updateEdgeErrors } from "./graph/renderer.js";
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
-import { readGraphFile, splitGraphText } from "./file-io.js";
+import { readGraphFile, splitGraphText } from "./io/file-io.js";
 import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
 import { wireEditorModeToggle } from "./editors/editor-mode.js";
 import { wireDialog } from "./dialogs.js";
-import { setupCanvasInteraction } from "./canvas-interaction.js";
-import { setupExportDialog } from "./export-dialog.js";
+import { setupCanvasInteraction } from "./interaction/canvas-interaction.js";
+import { setupExportDialog } from "./io/export-dialog.js";
 
 function persistEditors() {
   saveEditors(edgeEditor.value, boundaryEditor.value, groupEditor.value);

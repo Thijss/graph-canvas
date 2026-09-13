@@ -11,7 +11,7 @@ import {
   exportPngButton,
   exportSvgButton,
   exportTxtButton,
-} from "./dom.js";
+} from "../dom.js";
 import { downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 
 export function setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText }) {
