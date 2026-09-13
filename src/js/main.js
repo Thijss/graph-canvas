@@ -28,19 +28,7 @@ import {
   clearButton,
   templateButton,
   openButton,
-  saveButton,
   fileInput,
-  saveDialog,
-  saveDialogClose,
-  saveDialogCancel,
-  saveDialogBack,
-  saveForm,
-  saveFilename,
-  saveDialogTitle,
-  exportOptions,
-  exportPngButton,
-  exportSvgButton,
-  exportTxtButton,
   templateDialog,
   templateDialogClose,
   templateList,
@@ -64,15 +52,14 @@ import { state } from "./state.js";
 import { draw, restartSimulation } from "./engine.js";
 import { updateEdgeErrors } from "./renderer.js";
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
-import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
+import { readGraphFile, splitGraphText } from "./file-io.js";
 import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
 import { wireEditorModeToggle } from "./editors/editor-mode.js";
 import { wireDialog } from "./dialogs.js";
 import { setupCanvasInteraction } from "./canvas-interaction.js";
-
-let exportFormat = "txt";
+import { setupExportDialog } from "./export-dialog.js";
 
 function persistEditors() {
   saveEditors(edgeEditor.value, boundaryEditor.value, groupEditor.value);
@@ -220,48 +207,7 @@ wireDialog({
   onOpen: loadHelp,
 });
 openButton.addEventListener("click", () => fileInput.click());
-saveButton.addEventListener("click", () => {
-  exportFormat = "txt";
-  saveDialogTitle.textContent = "Choose export format";
-  exportOptions.hidden = false;
-  saveForm.hidden = true;
-  saveDialog.showModal();
-});
-saveDialogClose.addEventListener("click", () => saveDialog.close());
-saveDialogCancel.addEventListener("click", () => saveDialog.close());
-saveDialogBack.addEventListener("click", () => {
-  saveDialogTitle.textContent = "Choose export format";
-  exportOptions.hidden = false;
-  saveForm.hidden = true;
-});
-function chooseExportFormat(format) {
-  exportFormat = format;
-  saveDialogTitle.textContent = "Choose a file name";
-  exportOptions.hidden = true;
-  saveForm.hidden = false;
-  saveFilename.value = `graph.${format}`;
-  saveFilename.select();
-}
-exportTxtButton.addEventListener("click", () => chooseExportFormat("txt"));
-exportPngButton.addEventListener("click", () => chooseExportFormat("png"));
-exportSvgButton.addEventListener("click", () => chooseExportFormat("svg"));
-saveForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const filename = saveFilename.value.trim();
-  if (!filename) return;
-  try {
-    if (exportFormat === "png") {
-      await downloadGraphPng(graph, filename);
-    } else if (exportFormat === "svg") {
-      downloadGraphSvg(graph, filename);
-    } else {
-      downloadGraphFile(edgeEditor.value.trim(), boundaryEditor.value.trim(), groupEditor.value.trim(), filename);
-    }
-    saveDialog.close();
-  } catch (error) {
-    statusText.textContent = `Couldn't export ${exportFormat.toUpperCase()}: ${error.message}`;
-  }
-});
+setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText });
 fileInput.addEventListener("change", async () => {
   const [file] = fileInput.files;
   fileInput.value = "";
