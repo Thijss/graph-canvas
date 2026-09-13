@@ -11,7 +11,7 @@ import {
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { getPaletteColor, getRouteColor, KEYWORD_STYLES, LINE_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
+import { getRouteColor, getStationTypeColor, KEYWORD_STYLES, LINE_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
 import { getNodeRadius, getStationBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
@@ -67,7 +67,7 @@ export function render(state, edges, nodes, stations, routes, handlers) {
   const stationTypeColors = new Map();
   stations.forEach((station) => {
     if (!stationTypeColors.has(station.type)) {
-      stationTypeColors.set(station.type, getPaletteColor(stationTypeColors.size));
+      stationTypeColors.set(station.type, getStationTypeColor(station.type, stationTypeColors.size));
     }
     const color = stationTypeColors.get(station.type);
     station.members.forEach((member) => stationNodeColors.set(member, color));

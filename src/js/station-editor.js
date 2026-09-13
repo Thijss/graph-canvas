@@ -1,3 +1,4 @@
+import { COLOR_PALETTE, getStationTypeColor, isCanonicalStationColorType } from "./config.js";
 import { edgeEditor, stationEditor, stationEmptyState, stationList, stationListHeader } from "./dom.js";
 import { parseGraph, parseStationText, serializeStations } from "./parser.js";
 
@@ -82,12 +83,111 @@ function createNodesField(members, onChange) {
   return { wrapper, getValues: () => [...values], input };
 }
 
-function createStationRow(station, index, onChange) {
+// Builds the station color selector: clicking the swatch dot opens a small
+// popover of the 10 fixed palette colors as clickable circles. A hidden input
+// holds the actual station type value used for reading/serializing rows.
+// Legacy/custom type words (e.g. "SUB", used by the physics layout for
+// special substation positioning) are preserved verbatim until the user picks
+// a palette color, so switching to Visual mode never silently discards or
+// recolors data from an existing saved graph.
+function createColorField(value, previewColor, onChange) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "station-field station-type";
+
+  const control = document.createElement("div");
+  control.className = "station-color-control";
+
+  const hiddenInput = document.createElement("input");
+  hiddenInput.type = "hidden";
+  hiddenInput.value = value || "COLOR-1";
+
+  const swatchButton = document.createElement("button");
+  swatchButton.type = "button";
+  swatchButton.className = "station-color-swatch";
+  swatchButton.setAttribute("aria-haspopup", "listbox");
+  swatchButton.setAttribute("aria-expanded", "false");
+
+  const popover = document.createElement("div");
+  popover.className = "station-color-popover";
+  popover.setAttribute("role", "listbox");
+  popover.hidden = true;
+
+  const options = COLOR_PALETTE.map((color, i) => {
+    const optionValue = `COLOR-${i + 1}`;
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "station-color-option";
+    option.style.background = color;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-label", `Color ${i + 1}`);
+    option.dataset.value = optionValue;
+    popover.append(option);
+    return option;
+  });
+
+  const updateSwatch = () => {
+    const currentIsCanonical = isCanonicalStationColorType(hiddenInput.value);
+    swatchButton.style.background = currentIsCanonical
+      ? getStationTypeColor(hiddenInput.value, 0)
+      : previewColor || "#aab2bf";
+    swatchButton.setAttribute(
+      "aria-label",
+      `Color group: ${currentIsCanonical ? `Color ${hiddenInput.value.split("-")[1]}` : hiddenInput.value}`,
+    );
+    options.forEach((option) => {
+      const isSelected = option.dataset.value === hiddenInput.value;
+      option.classList.toggle("is-selected", isSelected);
+      option.setAttribute("aria-selected", String(isSelected));
+    });
+  };
+
+  function closePopover() {
+    popover.hidden = true;
+    swatchButton.setAttribute("aria-expanded", "false");
+    document.removeEventListener("pointerdown", handleOutsideClick, true);
+    document.removeEventListener("keydown", handleKeydown, true);
+  }
+  function handleOutsideClick(event) {
+    if (!control.contains(event.target)) closePopover();
+  }
+  function handleKeydown(event) {
+    if (event.key === "Escape") {
+      closePopover();
+      swatchButton.focus();
+    }
+  }
+  function openPopover() {
+    popover.hidden = false;
+    swatchButton.setAttribute("aria-expanded", "true");
+    document.addEventListener("pointerdown", handleOutsideClick, true);
+    document.addEventListener("keydown", handleKeydown, true);
+  }
+
+  swatchButton.addEventListener("click", () => {
+    if (popover.hidden) openPopover();
+    else closePopover();
+  });
+  options.forEach((option) => {
+    option.addEventListener("click", () => {
+      hiddenInput.value = option.dataset.value;
+      updateSwatch();
+      closePopover();
+      onChange();
+    });
+  });
+
+  updateSwatch();
+  control.append(swatchButton, popover);
+  wrapper.append(control);
+  return { wrapper, input: hiddenInput };
+}
+
+function createStationRow(station, index, onChange, previewColor) {
   const row = document.createElement("div");
   row.className = "station-row";
   row.dataset.stationIndex = String(index);
 
-  const type = createField("Color group", station.type ?? "", "station-type");
+  const type = createColorField(station.type ?? "", previewColor, onChange);
   const nodes = createNodesField(station.members, onChange);
   const name = createField("Name", station.name ?? "", "station-name");
 
@@ -103,7 +203,7 @@ function createStationRow(station, index, onChange) {
   actions.append(deleteButton);
   row.append(type.wrapper, nodes.wrapper, name.wrapper, actions);
 
-  [type.input, name.input].forEach((input) => input.addEventListener("input", onChange));
+  name.input.addEventListener("input", onChange);
   deleteButton.addEventListener("click", () => {
     row.remove();
     onChange();
@@ -114,7 +214,7 @@ function createStationRow(station, index, onChange) {
 
 function readRows() {
   return [...stationList.querySelectorAll(".station-row")].map((row) => {
-    const [type, name] = row.querySelectorAll(".station-type input, .station-name input");
+    const [type, name] = row.querySelectorAll(".station-type input[type=hidden], .station-name input");
     return {
       type: type.value.trim(),
       members: row._getMembers(),
@@ -123,8 +223,23 @@ function readRows() {
   }).filter((station) => station.type || station.members.length || station.name);
 }
 
+// Mirrors the renderer's station-color assignment (see renderer.js) so the
+// Visual editor's swatch preview matches what will actually be drawn for
+// legacy/custom station types that don't use the canonical COLOR-N scheme.
+function computeStationPreviewColors(stations) {
+  const colors = new Map();
+  stations.forEach((station) => {
+    if (!colors.has(station.type)) {
+      colors.set(station.type, getStationTypeColor(station.type, colors.size));
+    }
+  });
+  return colors;
+}
+
 function updateListState() {
-  stationEmptyState.hidden = stationList.querySelectorAll(".station-row").length > 0;
+  const hasRows = stationList.querySelectorAll(".station-row").length > 0;
+  stationEmptyState.hidden = hasRows;
+  stationListHeader.hidden = !hasRows;
 }
 
 function updateSourceText() {
@@ -136,10 +251,11 @@ function updateSourceText() {
 export function syncStationEditor() {
   const { nodes } = parseGraph(edgeEditor.value);
   const stations = parseStationText(stationEditor.value, nodes);
+  const previewColors = computeStationPreviewColors(stations);
   stationList.replaceChildren(
     stationListHeader,
     stationEmptyState,
-    ...stations.map((station, index) => createStationRow(station, index, updateSourceText)),
+    ...stations.map((station, index) => createStationRow(station, index, updateSourceText, previewColors.get(station.type))),
   );
   updateListState();
 }

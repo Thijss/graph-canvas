@@ -147,7 +147,9 @@ function restoreRow(row, values) {
 }
 
 function updateListState() {
-  edgeEmptyState.hidden = edgeList.querySelectorAll(".edge-row").length > 0;
+  const hasRows = edgeList.querySelectorAll(".edge-row").length > 0;
+  edgeEmptyState.hidden = hasRows;
+  edgeListHeader.hidden = !hasRows;
 }
 
 function updateNodeSuggestions() {

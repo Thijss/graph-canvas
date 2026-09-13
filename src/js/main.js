@@ -55,8 +55,6 @@ import {
   licenseDialog,
   licenseDialogClose,
   licenseContent,
-  mobileLicenseButton,
-  mobileDisclaimerButton,
 } from "./dom.js";
 import { state } from "./state.js";
 import { MIN_NODE_RADIUS } from "./config.js";
@@ -394,7 +392,6 @@ templateDialog.addEventListener("click", (event) => {
   if (event.target === templateDialog) templateDialog.close();
 });
 disclaimerButton.addEventListener("click", () => disclaimerDialog.showModal());
-mobileDisclaimerButton.addEventListener("click", () => disclaimerDialog.showModal());
 disclaimerDialogClose.addEventListener("click", () => disclaimerDialog.close());
 disclaimerDialog.addEventListener("click", (event) => {
   if (event.target === disclaimerDialog) disclaimerDialog.close();
@@ -410,7 +407,6 @@ async function showLicense() {
   }
 }
 licenseButton.addEventListener("click", showLicense);
-mobileLicenseButton.addEventListener("click", showLicense);
 licenseDialogClose.addEventListener("click", () => licenseDialog.close());
 licenseDialog.addEventListener("click", (event) => {
   if (event.target === licenseDialog) licenseDialog.close();

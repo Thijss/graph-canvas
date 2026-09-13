@@ -45,6 +45,26 @@ export function getPaletteColor(index) {
   return COLOR_PALETTE[index % COLOR_PALETTE.length];
 }
 
+// Canonical station color keywords (COLOR-1..COLOR-10) let the visual station
+// editor assign an exact palette color directly instead of relying on order of
+// first appearance. Custom/legacy type words (e.g. "SUB", used by the physics
+// layout for special substation positioning) keep using order-based palette
+// assignment for backward compatibility with existing saved graphs.
+const CANONICAL_STATION_COLOR_PATTERN = /^COLOR-([1-9]|10)$/;
+
+export function isCanonicalStationColorType(type) {
+  return CANONICAL_STATION_COLOR_PATTERN.test((type ?? "").toUpperCase());
+}
+
+export function getStationTypeColor(type, fallbackIndex) {
+  const match = CANONICAL_STATION_COLOR_PATTERN.exec((type ?? "").toUpperCase());
+  if (match) {
+    const index = Number(match[1]) - 1;
+    if (index < COLOR_PALETTE.length) return COLOR_PALETTE[index];
+  }
+  return getPaletteColor(fallbackIndex);
+}
+
 export const ROUTE_COLOR_PALETTE = [
   "hsl(335 62% 68% / 1)",
   "hsl(28 92% 60% / 1)",
