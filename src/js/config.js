@@ -20,6 +20,7 @@ export const MIN_NODE_RADIUS = 20;
 export const LABEL_PADDING = 10; // horizontal breathing room inside the circle, per side
 export const BOUNDARY_HULL_MARGIN = 16; // breathing room between member node circles and the hull boundary
 export const BOUNDARY_FILL_OPACITY = 0.5;
+export const NODE_CLICK_PHYSICS_LOCK_MS = 300;
 
 // Boundary types are words made from letters, digits, hyphens, and underscores.
 export const BOUNDARY_TYPE_PATTERN = /^[a-z0-9_-]+$/i;

@@ -10,6 +10,7 @@ export const state = {
   dragging: null, // { name, pointerId } while a node is being dragged
   panning: null, // { pointerId, lastX, lastY } while the empty canvas is being dragged to pan
   pinnedNodes: new Set(), // nodes frozen in place via double-click, exempt from physics (node.fx/fy set)
+  nodePhysicsLocks: new Map(), // name -> timeout releasing the short post-click physics lock
   lastNodeClick: { name: null, time: 0 }, // manual double-click detection (see pointerdown)
   nodeRadii: new Map(),
   simulation: null, // the persistent d3 forceSimulation instance, created lazily by engine.js

@@ -1,4 +1,4 @@
-import { MIN_NODE_RADIUS } from "../config.js";
+import { MIN_NODE_RADIUS, NODE_CLICK_PHYSICS_LOCK_MS } from "../config.js";
 import { draw, restartSimulation } from "../graph/engine.js";
 import { updateBorderBump, clearBorderBump } from "../graph/renderer.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
@@ -89,10 +89,20 @@ export function setupCanvasInteraction({
       graphWrap.classList.remove("panning");
     }
     if (!state.dragging) return;
-    const node = state.positions.get(state.dragging.name);
-    if (node && !state.pinnedNodes.has(state.dragging.name)) {
-      node.fx = null;
-      node.fy = null;
+    const { name } = state.dragging;
+    const node = state.positions.get(name);
+    if (node && !state.pinnedNodes.has(name)) {
+      const lock = setTimeout(() => {
+        state.nodePhysicsLocks.delete(name);
+        if (!state.dragging && !state.pinnedNodes.has(name)) {
+          const currentNode = state.positions.get(name);
+          if (currentNode) {
+            currentNode.fx = null;
+            currentNode.fy = null;
+          }
+        }
+      }, NODE_CLICK_PHYSICS_LOCK_MS);
+      state.nodePhysicsLocks.set(name, lock);
     }
     state.dragging = null;
     clearBorderBump();

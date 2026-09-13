@@ -227,8 +227,17 @@ function drawNode(state, name, handlers, groupNodeColors) {
     const now = performance.now();
     const isDoubleClick = state.lastNodeClick.name === name && now - state.lastNodeClick.time < 350;
     state.lastNodeClick = { name: isDoubleClick ? null : name, time: now };
+    const previousLock = state.nodePhysicsLocks.get(name);
+    if (previousLock) clearTimeout(previousLock);
+    state.nodePhysicsLocks.delete(name);
+    const node = state.positions.get(name);
+    if (node) {
+      node.fx = node.x;
+      node.fy = node.y;
+      node.vx = 0;
+      node.vy = 0;
+    }
     if (isDoubleClick) {
-      const node = state.positions.get(name);
       if (state.pinnedNodes.has(name)) {
         state.pinnedNodes.delete(name);
         if (node) { node.fx = null; node.fy = null; } // release back to physics control
@@ -245,7 +254,6 @@ function drawNode(state, name, handlers, groupNodeColors) {
       return;
     }
     state.dragging = { name, pointerId: event.pointerId };
-    const node = state.positions.get(name);
     if (node) { node.vx = 0; node.vy = 0; }
     handlers.onNodeActivity(0.4); // let neighboring nodes react while dragging
   });
