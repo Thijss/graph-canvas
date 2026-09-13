@@ -1,0 +1,63 @@
+.template-dialog {
+  width: min(460px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: white;
+  box-shadow: 0 20px 60px #26344d2e;
+}
+.help-dialog { width: min(1000px, calc(100vw - 32px)); }
+.template-dialog::backdrop { background: #17202d66; }
+.template-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.template-dialog h2 { margin-top: 5px; font-size: 22px; }
+.dialog-close {
+  width: 30px; height: 30px; padding: 0; border: 0; border-radius: 7px;
+  color: var(--muted); background: transparent; font-size: 24px; line-height: 1;
+}
+.dialog-close:hover { color: var(--ink); background: var(--soft); }
+.template-list { display: grid; gap: 10px; margin-top: 24px; }
+.export-options { display: grid; gap: 10px; margin-top: 24px; }
+.export-options[hidden], .save-dialog form[hidden] { display: none; }
+.template-option {
+  display: grid; gap: 5px; width: 100%; padding: 15px; border: 1px solid var(--line);
+  border-radius: 9px; color: var(--ink); background: white; text-align: left; transition: .18s ease;
+}
+.template-option:hover { border-color: var(--accent); background: #e8fbf7; }
+.template-option span { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.save-dialog form { margin-top: 24px; }
+.save-label { display: block; color: var(--muted); font-size: 12px; }
+.save-input {
+  width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 8px; outline: none; color: var(--ink); background: #fbfcfe; font-size: 12px;
+}
+.save-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #09d5ad15; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.disclaimer-button {
+  display: inline-block; text-decoration: none;
+  padding: 9px 13px; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--muted); background: white; font-size: 11px; font-weight: 650;
+  box-shadow: 0 3px 12px #26344d1a; transition: .18s ease;
+}
+.disclaimer-button:hover { color: var(--ink); border-color: #c8ced9; background: var(--soft); }
+.disclaimer-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.disclaimer-content p + p { margin-top: 12px; }
+.help-content { margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.help-content p + p { margin-top: 12px; }
+.help-section + .help-section { margin-top: 22px; }
+.help-section h3 { margin-bottom: 8px; color: var(--ink); font-size: 15px; }
+.help-example { display: inline-block; margin-left: 12px; }
+.help-subsection-title { margin-top: 14px; color: var(--ink); }
+.help-section ul { margin: 8px 0 0; padding-left: 18px; }
+.help-section li + li { margin-top: 4px; }
+.help-section .keyword-list { padding-left: 18px; list-style: disc; }
+.help-section .keyword-list li { display: list-item; }
+.help-section .keyword-list .keyword-label { display: inline-block; width: 94px; }
+.help-section .keyword-list li + li { margin-top: 4px; }
+.license-content {
+  max-height: min(60vh, 520px); margin: 22px 0 0; padding: 14px; overflow: auto;
+  border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
+  background: var(--soft); font: 11px/1.6 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+}
+
