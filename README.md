@@ -33,13 +33,17 @@ npm run build
 
 ## Privacy & security
 
-This is a fully client-side tool — everything runs in your browser and nothing
-you type is ever sent anywhere:
+This is a fully client-side tool — graph data is processed in your browser and
+is not sent to a backend, analytics service, or third party:
 
 - No backend, no database, no analytics or third-party requests.
-- All graph and boundary data lives only in the page's memory and three `<textarea>`
-  fields; nothing is saved to disk or a network unless you copy it yourself.
-- The only network requests are same-origin fetches of bundled files in the
-  `public/templates/` folder when you select a template.
-- User input is rendered using safe DOM APIs (`textContent`/`setAttribute`),
-  not `innerHTML`, so there's no script-injection risk from anything you type.
+- Editor text and selected settings are saved in browser `localStorage` so the
+  page can restore them after a refresh. Node positions are not persisted.
+- Import reads a file selected by the user. Export creates a local browser
+  download and does not upload the graph.
+- The app makes same-origin requests for bundled templates, help content, and
+  the license text. These files are served from the application's own static
+  assets.
+- User-entered graph data is rendered with safe DOM APIs (`textContent` and
+  `setAttribute`). The help page uses `innerHTML` only for its bundled,
+  trusted static content.
