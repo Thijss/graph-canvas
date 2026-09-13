@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests and coverage
+        run: npm run test:coverage
+
+      - name: Browser smoke tests
+        run: npm run test:e2e
+
+      - name: Build
+        run: npm run build

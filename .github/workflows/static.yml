@@ -6,6 +6,8 @@ on:
   push:
     branches: ["main"]
 
+  pull_request:
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -22,8 +24,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  test:
+    uses: ./.github/workflows/tests.yml
+    permissions:
+      contents: read
+
   # Single deploy job since we're just deploying
   deploy:
+    needs: test
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
