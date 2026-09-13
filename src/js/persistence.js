@@ -67,6 +67,7 @@ export function loadSettings() {
       showBoundaryHulls: true,
       showGroups: true,
       showArrows: false,
+      darkMode: false,
       repulsion: "4000",
       dagLevelSpacing: 120,
     };

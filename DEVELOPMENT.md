@@ -19,10 +19,34 @@ Run the available checks before submitting changes:
 
 ```bash
 npm run lint
+npm test
+npm run test:coverage
 npm run build
 ```
 
 The site is deployed as a static build from `dist/`.
+
+## Testing
+
+Unit tests use Vitest. They cover pure parsing, serialization, configuration,
+and browser storage behavior without starting the development server:
+
+```bash
+npm test                 # Run the unit tests once
+npm run test:watch       # Re-run tests while files change
+npm run test:coverage    # Run tests and write a coverage report
+```
+
+Coverage output is written to `coverage/`, which is ignored by Git. The
+coverage percentage is useful for finding untested code, but it is not a
+quality score by itself; prioritize important behavior and edge cases over
+maximizing the number.
+
+Place unit tests under `tests/` and name them `*.test.js`. Keep tests focused
+on observable behavior. Parser and configuration tests should remain
+independent of the DOM; tests for `localStorage` use Vitest's jsdom environment.
+Browser smoke tests are kept separate because they exercise the built
+application in a real browser.
 
 ## Source layout
 
