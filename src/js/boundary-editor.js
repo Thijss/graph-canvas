@@ -1,10 +1,10 @@
-import { COLOR_PALETTE, getStationTypeColor, isCanonicalStationColorType } from "./config.js";
-import { edgeEditor, stationEditor, stationEmptyState, stationList, stationListHeader } from "./dom.js";
-import { parseGraph, parseStationText, serializeStations } from "./parser.js";
+import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "./config.js";
+import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "./dom.js";
+import { parseGraph, parseBoundaryText, serializeBoundaries } from "./parser.js";
 
 function createField(label, value, className) {
   const wrapper = document.createElement("label");
-  wrapper.className = `station-field ${className}`;
+  wrapper.className = `boundary-field ${className}`;
 
   const caption = document.createElement("span");
   caption.textContent = label;
@@ -21,15 +21,15 @@ function createField(label, value, className) {
 
 function createNodesField(members, onChange) {
   const wrapper = document.createElement("label");
-  wrapper.className = "station-field station-nodes";
+  wrapper.className = "boundary-field boundary-nodes";
 
   const caption = document.createElement("span");
   caption.textContent = "Nodes";
   const editor = document.createElement("div");
-  editor.className = "station-node-editor";
+  editor.className = "boundary-node-editor";
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "Node + Enter";
+  input.placeholder = "Node ID, then [Enter]";
   input.title = "Type a node ID and press Enter to add it";
   input.setAttribute("aria-label", "Nodes");
   input.autocomplete = "off";
@@ -39,14 +39,14 @@ function createNodesField(members, onChange) {
 
   const values = [...members];
   const renderNodes = (notify = true) => {
-    editor.querySelectorAll(".station-node-chip").forEach((chip) => chip.remove());
+    editor.querySelectorAll(".boundary-node-chip").forEach((chip) => chip.remove());
     values.forEach((node) => {
       const chip = document.createElement("span");
-      chip.className = "station-node-chip";
+      chip.className = "boundary-node-chip";
       chip.textContent = node;
       const remove = document.createElement("button");
       remove.type = "button";
-      remove.className = "station-node-remove";
+      remove.className = "boundary-node-remove";
       remove.setAttribute("aria-label", `Remove node ${node}`);
       remove.textContent = "×";
       remove.addEventListener("click", () => {
@@ -83,18 +83,18 @@ function createNodesField(members, onChange) {
   return { wrapper, getValues: () => [...values], input };
 }
 
-// Builds the station color selector: clicking the swatch dot opens a small
+// Builds the boundary color selector: clicking the swatch dot opens a small
 // popover of the 10 fixed palette colors as clickable circles. A hidden input
-// holds the actual station type value used for reading/serializing rows.
+// holds the actual boundary type value used for reading/serializing rows.
 // Legacy/custom type words are preserved verbatim until the user picks a
 // palette color, so switching to Visual mode never silently discards or
 // recolors data from an existing saved graph.
 function createColorField(value, previewColor, onChange) {
   const wrapper = document.createElement("div");
-  wrapper.className = "station-field station-type";
+  wrapper.className = "boundary-field boundary-type";
 
   const control = document.createElement("div");
-  control.className = "station-color-control";
+  control.className = "boundary-color-control";
 
   const hiddenInput = document.createElement("input");
   hiddenInput.type = "hidden";
@@ -102,12 +102,12 @@ function createColorField(value, previewColor, onChange) {
 
   const swatchButton = document.createElement("button");
   swatchButton.type = "button";
-  swatchButton.className = "station-color-swatch";
+  swatchButton.className = "boundary-color-swatch";
   swatchButton.setAttribute("aria-haspopup", "listbox");
   swatchButton.setAttribute("aria-expanded", "false");
 
   const popover = document.createElement("div");
-  popover.className = "station-color-popover";
+  popover.className = "boundary-color-popover";
   popover.setAttribute("role", "listbox");
   popover.hidden = true;
 
@@ -115,7 +115,7 @@ function createColorField(value, previewColor, onChange) {
     const optionValue = `COLOR-${i + 1}`;
     const option = document.createElement("button");
     option.type = "button";
-    option.className = "station-color-option";
+    option.className = "boundary-color-option";
     option.style.background = color;
     option.setAttribute("role", "option");
     option.setAttribute("aria-label", `Color ${i + 1}`);
@@ -125,13 +125,13 @@ function createColorField(value, previewColor, onChange) {
   });
 
   const updateSwatch = () => {
-    const currentIsCanonical = isCanonicalStationColorType(hiddenInput.value);
+    const currentIsCanonical = isCanonicalBoundaryColorType(hiddenInput.value);
     swatchButton.style.background = currentIsCanonical
-      ? getStationTypeColor(hiddenInput.value, 0)
+      ? getBoundaryTypeColor(hiddenInput.value, 0)
       : previewColor || "#aab2bf";
     swatchButton.setAttribute(
       "aria-label",
-      `Color group: ${currentIsCanonical ? `Color ${hiddenInput.value.split("-")[1]}` : hiddenInput.value}`,
+      `Color boundary: ${currentIsCanonical ? `Color ${hiddenInput.value.split("-")[1]}` : hiddenInput.value}`,
     );
     options.forEach((option) => {
       const isSelected = option.dataset.value === hiddenInput.value;
@@ -181,24 +181,24 @@ function createColorField(value, previewColor, onChange) {
   return { wrapper, input: hiddenInput };
 }
 
-function createStationRow(station, index, onChange, previewColor) {
+function createBoundaryRow(boundary, index, onChange, previewColor) {
   const row = document.createElement("div");
-  row.className = "station-row";
-  row.dataset.stationIndex = String(index);
+  row.className = "boundary-row";
+  row.dataset.boundaryIndex = String(index);
 
-  const type = createColorField(station.type ?? "", previewColor, onChange);
-  const nodes = createNodesField(station.members, onChange);
-  const name = createField("Name", station.name ?? "", "station-name");
+  const type = createColorField(boundary.type ?? "", previewColor, onChange);
+  const nodes = createNodesField(boundary.members, onChange);
+  const name = createField("Name", boundary.name ?? "", "boundary-name");
 
   const deleteButton = document.createElement("button");
-  deleteButton.className = "station-delete-button";
+  deleteButton.className = "boundary-delete-button";
   deleteButton.type = "button";
-  deleteButton.title = "Delete station";
-  deleteButton.setAttribute("aria-label", `Delete station ${index + 1}`);
+  deleteButton.title = "Delete boundary";
+  deleteButton.setAttribute("aria-label", `Delete boundary ${index + 1}`);
   deleteButton.textContent = "×";
 
   const actions = document.createElement("div");
-  actions.className = "station-actions";
+  actions.className = "boundary-actions";
   actions.append(deleteButton);
   row.append(type.wrapper, nodes.wrapper, name.wrapper, actions);
 
@@ -214,73 +214,73 @@ function createStationRow(station, index, onChange, previewColor) {
 }
 
 function readRows() {
-  return [...stationList.querySelectorAll(".station-row")].map((row) => {
+  return [...boundaryList.querySelectorAll(".boundary-row")].map((row) => {
     if (!row._getType || !row._getMembers || !row._getName) return null;
     return {
       type: row._getType().trim(),
       members: row._getMembers(),
       name: row._getName().trim(),
     };
-  }).filter((station) => station && (station.members.length || station.name));
+  }).filter((boundary) => boundary && (boundary.members.length || boundary.name));
 }
 
-// Mirrors the renderer's station-color assignment (see renderer.js) so the
+// Mirrors the renderer's boundary-color assignment (see renderer.js) so the
 // Visual editor's swatch preview matches what will actually be drawn for
-// legacy/custom station types that don't use the canonical COLOR-N scheme.
-function computeStationPreviewColors(stations) {
+// legacy/custom boundary types that don't use the canonical COLOR-N scheme.
+function computeBoundaryPreviewColors(boundaries) {
   const colors = new Map();
-  stations.forEach((station) => {
-    if (!colors.has(station.type)) {
-      colors.set(station.type, getStationTypeColor(station.type, colors.size));
+  boundaries.forEach((boundary) => {
+    if (!colors.has(boundary.type)) {
+      colors.set(boundary.type, getBoundaryTypeColor(boundary.type, colors.size));
     }
   });
   return colors;
 }
 
-function colorGroupLabel(index) {
+function colorBoundaryLabel(index) {
   return String.fromCharCode("A".charCodeAt(0) + index);
 }
 
-function serializeVisualStations(stations) {
-  const typeColors = computeStationPreviewColors(stations);
+function serializeVisualBoundaries(boundaries) {
+  const typeColors = computeBoundaryPreviewColors(boundaries);
   const colorLabels = new Map();
   typeColors.forEach((color) => {
-    if (!colorLabels.has(color)) colorLabels.set(color, colorGroupLabel(colorLabels.size));
+    if (!colorLabels.has(color)) colorLabels.set(color, colorBoundaryLabel(colorLabels.size));
   });
-  return serializeStations(stations.map((station) => ({
-    ...station,
-    type: colorLabels.get(typeColors.get(station.type)),
+  return serializeBoundaries(boundaries.map((boundary) => ({
+    ...boundary,
+    type: colorLabels.get(typeColors.get(boundary.type)),
   })));
 }
 
 function updateListState() {
-  const hasRows = stationList.querySelectorAll(".station-row").length > 0;
-  stationEmptyState.hidden = hasRows;
-  stationListHeader.hidden = !hasRows;
+  const hasRows = boundaryList.querySelectorAll(".boundary-row").length > 0;
+  boundaryEmptyState.hidden = hasRows;
+  boundaryListHeader.hidden = !hasRows;
 }
 
-export function updateStationSourceText() {
-  stationEditor.value = serializeVisualStations(readRows());
+export function updateBoundarySourceText() {
+  boundaryEditor.value = serializeVisualBoundaries(readRows());
   updateListState();
-  stationEditor.dispatchEvent(new Event("input", { bubbles: true }));
+  boundaryEditor.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-export function syncStationEditor() {
+export function syncBoundaryEditor() {
   const { nodes } = parseGraph(edgeEditor.value);
-  const stations = parseStationText(stationEditor.value, nodes);
-  const previewColors = computeStationPreviewColors(stations);
-  stationList.replaceChildren(
-    stationListHeader,
-    stationEmptyState,
-    ...stations.map((station, index) => createStationRow(station, index, updateStationSourceText, previewColors.get(station.type))),
+  const boundaries = parseBoundaryText(boundaryEditor.value, nodes);
+  const previewColors = computeBoundaryPreviewColors(boundaries);
+  boundaryList.replaceChildren(
+    boundaryListHeader,
+    boundaryEmptyState,
+    ...boundaries.map((boundary, index) => createBoundaryRow(boundary, index, updateBoundarySourceText, previewColors.get(boundary.type))),
   );
   updateListState();
 }
 
-export function addStation() {
-  const index = stationList.children.length;
-  const row = createStationRow({ type: "", members: [], name: "" }, index, updateStationSourceText);
-  stationList.append(row);
+export function addBoundary() {
+  const index = boundaryList.children.length;
+  const row = createBoundaryRow({ type: "", members: [], name: "" }, index, updateBoundarySourceText);
+  boundaryList.append(row);
   updateListState();
   row.querySelector("input")?.focus();
 }

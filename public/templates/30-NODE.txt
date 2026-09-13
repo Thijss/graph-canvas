@@ -31,7 +31,7 @@
 13 19 dotted
 19 25 dotted
 25 30 dotted
------STATIONS-----
+-----BOUNDARIES-----
 SUB 1 Substation
 CS 2,8,14,20,26 Control Station
 SS 4,10,16,22,28 Switching Station

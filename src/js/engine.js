@@ -1,6 +1,6 @@
-import { graph, repulsionSlider, edgeEditor, stationEditor, routeEditor } from "./dom.js";
+import { graph, repulsionSlider, edgeEditor, boundaryEditor, groupEditor } from "./dom.js";
 import { state } from "./state.js";
-import { parseGraph, parseStations, parseRoutes } from "./parser.js";
+import { parseGraph, parseBoundaries, parseGroups } from "./parser.js";
 import { layoutNodes, layoutTopDown, createSimulation, updateSimulationForces, clampToBounds } from "./simulation.js";
 import { render } from "./renderer.js";
 
@@ -12,23 +12,23 @@ const handlers = { onNodeActivity: (heat) => restartSimulation(heat) };
 
 // The most recently parsed graph and canvas size, kept so the simulation's
 // "tick" callback (registered once, in draw() below) always clamps/renders
-// against up-to-date edges/nodes/stations/dimensions without needing to
+// against up-to-date edges/nodes/boundaries/dimensions without needing to
 // re-parse the textareas or re-measure the canvas on every animation frame.
-let currentGraph = { edges: [], nodes: [], stations: [], routes: [] };
+let currentGraph = { edges: [], nodes: [], boundaries: [], groups: [] };
 let currentSize = { width: 800, height: 520 };
 
 function readGraph() {
   const { edges, nodes } = parseGraph(edgeEditor.value);
-  const stations = parseStations(stationEditor.value, nodes);
-  const routes = parseRoutes(routeEditor.value, nodes);
-  return { edges, nodes, stations, routes };
+  const boundaries = parseBoundaries(boundaryEditor.value, nodes);
+  const groups = parseGroups(groupEditor.value, nodes);
+  return { edges, nodes, boundaries, groups };
 }
 
 // Re-parses the textareas, seeds any new nodes, and reconfigures the physics
 // simulation's forces to match. Renders once immediately (covers the
 // physics-off case, and gives instant feedback before any tick fires).
 export function draw() {
-  const { edges, nodes, stations, routes } = readGraph();
+  const { edges, nodes, boundaries, groups } = readGraph();
   const { width, height } = graph.getBoundingClientRect();
   const w = width || 800;
   const h = height || 520;
@@ -43,15 +43,15 @@ export function draw() {
     // snapshot from simulation creation time.
     state.simulation.on("tick", () => {
       clampToBounds(state, currentGraph.nodes, currentSize.width, currentSize.height, state.view);
-      render(state, currentGraph.edges, currentGraph.nodes, currentGraph.stations, currentGraph.routes, handlers);
+      render(state, currentGraph.edges, currentGraph.nodes, currentGraph.boundaries, currentGraph.groups, handlers);
     });
   }
-  updateSimulationForces(state, nodes, edges, stations, w, h, -Number(repulsionSlider.value));
+  updateSimulationForces(state, nodes, edges, boundaries, w, h, -Number(repulsionSlider.value));
 
-  currentGraph = { edges, nodes, stations, routes };
+  currentGraph = { edges, nodes, boundaries, groups };
   currentSize = { width: w, height: h };
   clampToBounds(state, nodes, w, h, state.view);
-  render(state, edges, nodes, stations, routes, handlers);
+  render(state, edges, nodes, boundaries, groups, handlers);
 }
 
 // Reheats the simulation (e.g. after nodes/edges change) so gravity animates

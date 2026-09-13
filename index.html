@@ -66,39 +66,54 @@
           <section class="panel-section">
             <div class="section-heading">
               <div>
-                <span class="eyebrow">02 / Group</span>
-                <h2>Stations</h2>
+                <span class="eyebrow">02 / Boundary</span>
+                <h2>Boundaries</h2>
               </div>
-              <div class="edge-mode-toggle station-mode-toggle" role="group" aria-label="Station editor mode">
-                <button class="edge-mode-button is-active" id="stationVisualModeButton" type="button" aria-pressed="true">Visual</button>
-                <button class="edge-mode-button" id="stationTextModeButton" type="button" aria-pressed="false">Text</button>
+              <div class="edge-mode-toggle boundary-mode-toggle" role="group" aria-label="Boundary editor mode">
+                <button class="edge-mode-button is-active" id="boundaryVisualModeButton" type="button" aria-pressed="true">Visual</button>
+                <button class="edge-mode-button" id="boundaryTextModeButton" type="button" aria-pressed="false">Text</button>
               </div>
             </div>
-            <div class="station-editor" id="stationEditorPanel">
-              <div class="station-list" id="stationList" aria-live="polite">
-                <div class="station-list-header" id="stationListHeader" aria-hidden="true">
+            <div class="boundary-editor" id="boundaryEditorPanel">
+              <div class="boundary-list" id="boundaryList" aria-live="polite">
+                <div class="boundary-list-header" id="boundaryListHeader" aria-hidden="true">
                   <span></span>
                   <span>Nodes</span>
                   <span>Name</span>
                   <span></span>
                 </div>
-                <div class="station-empty-state" id="stationEmptyState">No stations yet. Add a station to group your nodes.</div>
+                <div class="boundary-empty-state" id="boundaryEmptyState">No boundaries yet. Add a boundary to organize your nodes.</div>
               </div>
-              <button class="button station-add-button" id="addStationButton" type="button">+ Add station</button>
+              <button class="button boundary-add-button" id="addBoundaryButton" type="button">+ Add boundary</button>
             </div>
-            <textarea id="stationEditor" class="station-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
-            <p class="section-description">Stations in the same color group share the same color.</p>
+            <textarea id="boundaryEditor" class="boundary-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
+            <p class="section-description">Boundaries with the same type share the same color.</p>
           </section>
 
           <section class="panel-section">
             <div class="section-heading">
               <div>
                 <span class="eyebrow">03 / Mark</span>
-                <h2>Routes</h2>
+                <h2>Groups</h2>
+              </div>
+              <div class="edge-mode-toggle group-mode-toggle" role="group" aria-label="Group editor mode">
+                <button class="edge-mode-button is-active" id="groupVisualModeButton" type="button" aria-pressed="true">Visual</button>
+                <button class="edge-mode-button" id="groupTextModeButton" type="button" aria-pressed="false">Text</button>
               </div>
             </div>
-            <textarea id="routeEditor" spellcheck="false" aria-label="Routes" placeholder="LINE-A  1,2,3
-LINE-B  3,4,5"></textarea>
+            <div class="group-editor" id="groupEditorPanel">
+              <div class="group-list" id="groupList" aria-live="polite">
+                <div class="group-list-header" id="groupListHeader" aria-hidden="true">
+                  <span></span>
+                  <span>Nodes</span>
+                  <span></span>
+                </div>
+                <div class="group-empty-state" id="groupEmptyState">No groups yet. Add a group to color-code your nodes.</div>
+              </div>
+              <button class="button group-add-button" id="addGroupButton" type="button">+ Add group</button>
+            </div>
+            <textarea id="groupEditor" class="group-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
+            <p class="section-description">Groups color their member nodes.</p>
           </section>
 
           <div class="sidebar-footer">
@@ -131,13 +146,13 @@ LINE-B  3,4,5"></textarea>
                   <span class="switch"></span>
                 </label>
                 <label class="switch-row toolbar-toggle toolbar-toggle-stacked">
-                  <strong class="toggle-label-stack"><span>Show</span><span>Stations</span></strong>
-                  <input id="hullToggle" type="checkbox" />
+                  <strong class="toggle-label-stack"><span>Show</span><span>Boundaries</span></strong>
+                  <input id="hullToggle" type="checkbox" checked />
                   <span class="switch"></span>
                 </label>
                 <label class="switch-row toolbar-toggle toolbar-toggle-stacked">
-                  <strong class="toggle-label-stack"><span>Show</span><span>Routes</span></strong>
-                  <input id="routesToggle" type="checkbox" checked />
+                  <strong class="toggle-label-stack"><span>Show</span><span>Groups</span></strong>
+                  <input id="groupsToggle" type="checkbox" checked />
                   <span class="switch"></span>
                 </label>
               </div>
@@ -146,7 +161,7 @@ LINE-B  3,4,5"></textarea>
               <span><b id="nodeCount">0</b> nodes</span>
               <span class="separator"></span>
               <span><b id="edgeCount">0</b> edges</span>
-              <span><b id="stationMetaCount">0</b> stations</span>
+              <span><b id="boundaryMetaCount">0</b> boundaries</span>
             </div>
           </div>
           <div class="graph-wrap" id="graphWrap">

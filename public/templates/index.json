@@ -1,8 +1,8 @@
 [
     {
-    "id": "sub-4-routes",
+    "id": "sub-4-groups",
     "title": "SUB-4",
-    "description": "One substation with four routes.",
+    "description": "One substation with four groups.",
     "file": "SUB-4-ROUTES.txt"
   },
   {

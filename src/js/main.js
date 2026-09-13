@@ -4,18 +4,22 @@ import {
   addEdgeButton,
   visualEdgeModeButton,
   rawEdgeModeButton,
-  stationEditor,
-  stationList,
-  addStationButton,
-  stationVisualModeButton,
-  stationTextModeButton,
-  routeEditor,
+  boundaryEditor,
+  boundaryList,
+  addBoundaryButton,
+  boundaryVisualModeButton,
+  boundaryTextModeButton,
+  groupEditor,
+  groupList,
+  addGroupButton,
+  groupVisualModeButton,
+  groupTextModeButton,
   graph,
   graphWrap,
   statusText,
   directedToggle,
   hullToggle,
-  routesToggle,
+  groupsToggle,
   layoutModeButtons,
   repulsionSlider,
   repulsionControl,
@@ -64,20 +68,21 @@ import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./per
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 import { addEdge, syncEdgeEditor } from "./edge-editor.js";
-import { addStation, syncStationEditor, updateStationSourceText } from "./station-editor.js";
+import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./boundary-editor.js";
+import { addGroup, syncGroupEditor, updateGroupSourceText } from "./group-editor.js";
 
 let exportFormat = "txt";
 
 function persistEditors() {
-  saveEditors(edgeEditor.value, stationEditor.value, routeEditor.value);
+  saveEditors(edgeEditor.value, boundaryEditor.value, groupEditor.value);
 }
 
 function persistSettings() {
   saveSettings({
     layoutMode: state.layoutMode,
     dagLevelSpacing: state.dagLevelSpacing,
-    showStationHulls: state.showStationHulls,
-    showRoutes: state.showRoutes,
+    showBoundaryHulls: state.showBoundaryHulls,
+    showGroups: state.showGroups,
     showArrows: directedToggle.checked,
     darkMode: document.documentElement.classList.contains("dark"),
     repulsion: repulsionSlider.value,
@@ -89,7 +94,7 @@ function updateLayoutControlVisibility() {
   dagSpacingControl.hidden = state.layoutMode !== "hierarchy";
 }
 
-// Typing in the edge/station editors debounces the redraw+physics restart by
+// Typing in the edge/boundary editors debounces the redraw+physics restart by
 // 1s, so rapid keystrokes don't each trigger a full re-layout — only once
 // typing pauses. Buttons that replace the text outright (Clear/Load template)
 // cancel any pending debounce so they take effect immediately instead of
@@ -102,7 +107,8 @@ function scheduleEditorRedraw() {
     editorDrawTimer = null;
     restartSimulation();
     if (edgeEditor.classList.contains("is-raw")) syncEdgeEditor();
-    if (stationEditor.classList.contains("is-text")) syncStationEditor();
+    if (boundaryEditor.classList.contains("is-text")) syncBoundaryEditor();
+    if (groupEditor.classList.contains("is-text")) syncGroupEditor();
   }, 500);
 }
 function cancelScheduledEditorRedraw() {
@@ -198,10 +204,11 @@ window.addEventListener("pointerup", () => {
 clearButton.addEventListener("click", () => {
   cancelScheduledEditorRedraw();
   edgeEditor.value = "";
-  stationEditor.value = "";
-  routeEditor.value = "";
+  boundaryEditor.value = "";
+  groupEditor.value = "";
   syncEdgeEditor();
-  syncStationEditor();
+  syncBoundaryEditor();
+  syncGroupEditor();
   persistEditors();
   state.positions.clear();
   state.pinnedNodes.clear();
@@ -255,12 +262,13 @@ async function loadTemplate(templateName) {
     const response = await fetch(templateFile);
     if (!response.ok) throw new Error(`Could not load template: ${templateName}`);
     const templateText = await response.text();
-    const { edgesText, stationsText, routesText } = splitGraphText(templateText);
+    const { edgesText, boundariesText, groupsText } = splitGraphText(templateText);
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
-    stationEditor.value = stationsText.trim();
-    syncStationEditor();
-    routeEditor.value = routesText.trim();
+    boundaryEditor.value = boundariesText.trim();
+    syncBoundaryEditor();
+    groupEditor.value = groupsText.trim();
+    syncGroupEditor();
     persistEditors();
   } catch {
     statusText.textContent = "Couldn't load template (serve this page over http(s) to enable it)";
@@ -326,7 +334,7 @@ saveForm.addEventListener("submit", async (event) => {
     } else if (exportFormat === "svg") {
       downloadGraphSvg(graph, filename);
     } else {
-      downloadGraphFile(edgeEditor.value.trim(), stationEditor.value.trim(), routeEditor.value.trim(), filename);
+      downloadGraphFile(edgeEditor.value.trim(), boundaryEditor.value.trim(), groupEditor.value.trim(), filename);
     }
     saveDialog.close();
   } catch (error) {
@@ -339,14 +347,15 @@ fileInput.addEventListener("change", async () => {
   if (!file) return;
 
   try {
-    const { edgesText, stationsText, routesText } = await readGraphFile(file);
+    const { edgesText, boundariesText, groupsText } = await readGraphFile(file);
 
     cancelScheduledEditorRedraw();
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
-    stationEditor.value = stationsText.trim();
-    syncStationEditor();
-    routeEditor.value = routesText.trim();
+    boundaryEditor.value = boundariesText.trim();
+    syncBoundaryEditor();
+    groupEditor.value = groupsText.trim();
+    syncGroupEditor();
     persistEditors();
     state.positions.clear();
     state.pinnedNodes.clear();
@@ -388,19 +397,19 @@ licenseDialog.addEventListener("click", (event) => {
 });
 edgeEditor.addEventListener("input", scheduleEditorRedraw);
 edgeEditor.addEventListener("scroll", () => updateEdgeErrors());
-stationEditor.addEventListener("input", scheduleEditorRedraw);
-routeEditor.addEventListener("input", scheduleEditorRedraw);
+boundaryEditor.addEventListener("input", scheduleEditorRedraw);
+groupEditor.addEventListener("input", scheduleEditorRedraw);
 directedToggle.addEventListener("change", () => {
   persistSettings();
   draw();
 });
 hullToggle.addEventListener("change", () => {
-  state.showStationHulls = hullToggle.checked;
+  state.showBoundaryHulls = hullToggle.checked;
   persistSettings();
   draw();
 });
-routesToggle.addEventListener("change", () => {
-  state.showRoutes = routesToggle.checked;
+groupsToggle.addEventListener("change", () => {
+  state.showGroups = groupsToggle.checked;
   persistSettings();
   draw();
 });
@@ -448,14 +457,16 @@ document.addEventListener("fullscreenchange", () => {
   restartSimulation(0.4); // canvas size changed, let physics resettle
 });
 
-const { edgesText, stationsText, routesText } = loadSavedEditors();
+const { edgesText, boundariesText, groupsText } = loadSavedEditors();
 if (edgesText !== null) edgeEditor.value = edgesText;
-if (stationsText !== null) stationEditor.value = stationsText;
-if (routesText !== null) routeEditor.value = routesText;
+if (boundariesText !== null) boundaryEditor.value = boundariesText;
+if (groupsText !== null) groupEditor.value = groupsText;
 syncEdgeEditor();
-syncStationEditor();
+syncBoundaryEditor();
+syncGroupEditor();
 addEdgeButton.addEventListener("click", addEdge);
-addStationButton.addEventListener("click", addStation);
+addBoundaryButton.addEventListener("click", addBoundary);
+addGroupButton.addEventListener("click", addGroup);
 
 function setEdgeEditorMode(mode) {
   const isRaw = mode === "raw";
@@ -474,25 +485,43 @@ function setEdgeEditorMode(mode) {
 visualEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("visual"));
 rawEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("raw"));
 
-function setStationEditorMode(mode) {
+function setBoundaryEditorMode(mode) {
   const isText = mode === "text";
-  stationEditor.classList.toggle("is-text", isText);
-  stationEditor.setAttribute("aria-hidden", String(!isText));
-  stationEditor.tabIndex = isText ? 0 : -1;
-  stationList.hidden = isText;
-  addStationButton.hidden = isText;
-  stationVisualModeButton.classList.toggle("is-active", !isText);
-  stationTextModeButton.classList.toggle("is-active", isText);
-  stationVisualModeButton.setAttribute("aria-pressed", String(!isText));
-  stationTextModeButton.setAttribute("aria-pressed", String(isText));
+  boundaryEditor.classList.toggle("is-text", isText);
+  boundaryEditor.setAttribute("aria-hidden", String(!isText));
+  boundaryEditor.tabIndex = isText ? 0 : -1;
+  boundaryList.hidden = isText;
+  addBoundaryButton.hidden = isText;
+  boundaryVisualModeButton.classList.toggle("is-active", !isText);
+  boundaryTextModeButton.classList.toggle("is-active", isText);
+  boundaryVisualModeButton.setAttribute("aria-pressed", String(!isText));
+  boundaryTextModeButton.setAttribute("aria-pressed", String(isText));
   if (isText) {
-    updateStationSourceText();
-    stationEditor.focus();
+    updateBoundarySourceText();
+    boundaryEditor.focus();
   }
-  else syncStationEditor();
+  else syncBoundaryEditor();
 }
-stationVisualModeButton.addEventListener("click", () => setStationEditorMode("visual"));
-stationTextModeButton.addEventListener("click", () => setStationEditorMode("text"));
+boundaryVisualModeButton.addEventListener("click", () => setBoundaryEditorMode("visual"));
+boundaryTextModeButton.addEventListener("click", () => setBoundaryEditorMode("text"));
+function setGroupEditorMode(mode) {
+  const isText = mode === "text";
+  groupEditor.classList.toggle("is-text", isText);
+  groupEditor.setAttribute("aria-hidden", String(!isText));
+  groupEditor.tabIndex = isText ? 0 : -1;
+  groupList.hidden = isText;
+  addGroupButton.hidden = isText;
+  groupVisualModeButton.classList.toggle("is-active", !isText);
+  groupTextModeButton.classList.toggle("is-active", isText);
+  groupVisualModeButton.setAttribute("aria-pressed", String(!isText));
+  groupTextModeButton.setAttribute("aria-pressed", String(isText));
+  if (isText) {
+    updateGroupSourceText();
+    groupEditor.focus();
+  } else syncGroupEditor();
+}
+groupVisualModeButton.addEventListener("click", () => setGroupEditorMode("visual"));
+groupTextModeButton.addEventListener("click", () => setGroupEditorMode("text"));
 const settings = loadSettings();
 document.documentElement.classList.toggle("dark", settings.darkMode);
 themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");
@@ -502,14 +531,14 @@ themeToggle.addEventListener("click", () => {
   persistSettings();
 });
 state.layoutMode = settings.layoutMode;
-state.showStationHulls = settings.showStationHulls;
-state.showRoutes = settings.showRoutes;
+state.showBoundaryHulls = settings.showBoundaryHulls;
+state.showGroups = settings.showGroups;
 state.dagLevelSpacing = settings.dagLevelSpacing;
 directedToggle.checked = settings.showArrows;
 repulsionSlider.value = settings.repulsion;
 dagSpacingSlider.value = state.dagLevelSpacing;
-hullToggle.checked = state.showStationHulls;
-routesToggle.checked = state.showRoutes;
+hullToggle.checked = state.showBoundaryHulls;
+groupsToggle.checked = state.showGroups;
 updateLayoutControlVisibility();
 layoutModeButtons.forEach((button) => {
   const isActive = button.dataset.layoutMode === state.layoutMode;

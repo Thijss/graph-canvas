@@ -4,15 +4,15 @@ import {
   emptyState,
   edgeEditor,
   edgeErrors,
-  stationMetaCount,
+  boundaryMetaCount,
   nodeCount,
   edgeCount,
   statusText,
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { EDGE_COLORS, getRouteColor, getStationTypeColor, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
-import { getNodeRadius, getStationBounds } from "./simulation.js";
+import { EDGE_COLORS, getGroupColor, getBoundaryTypeColor, MIN_NODE_RADIUS, BOUNDARY_FILL_OPACITY } from "./config.js";
+import { getNodeRadius, getBoundaryBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
 const PARALLEL_EDGE_SPACING = 12;
@@ -27,11 +27,11 @@ function hasConflictingColors(edge) {
 // instead of being imported here. This keeps rendering decoupled from both
 // the concrete state store and the simulation-restart logic, so this module
 // has no dependency on engine.js and no circular import.
-export function render(state, edges, nodes, stations, routes, handlers) {
+export function render(state, edges, nodes, boundaries, groups, handlers) {
   graph.replaceChildren();
   state.nodeRadii = new Map(nodes.map((name) => [name, getNodeRadius(name)]));
   edgeCount.textContent = edges.length;
-  stationMetaCount.textContent = stations.length;
+  boundaryMetaCount.textContent = boundaries.length;
   nodeCount.textContent = nodes.length;
   emptyState.hidden = nodes.length > 0;
   const conflictingEdges = edges.filter(hasConflictingColors);
@@ -53,29 +53,24 @@ export function render(state, edges, nodes, stations, routes, handlers) {
     ...EDGE_COLORS.map((style) => markerFor(style.className, style.color)),
   ].join("");
   graph.append(defs);
-  const stationNodeColors = new Map();
-  const routeNodeColors = new Map();
-  const stationTypeColors = new Map();
-  stations.forEach((station) => {
-    if (!stationTypeColors.has(station.type)) {
-      stationTypeColors.set(station.type, getStationTypeColor(station.type, stationTypeColors.size));
-    }
-    const color = stationTypeColors.get(station.type);
-    station.members.forEach((member) => stationNodeColors.set(member, color));
-    if (state.showStationHulls) drawStationHull(state, station, color);
+  const groupNodeColors = new Map();
+  const boundaryTypes = [...new Set(boundaries.map((boundary) => boundary.type))];
+  boundaries.forEach((boundary) => {
+    const color = getBoundaryTypeColor(boundary.type, boundaryTypes.indexOf(boundary.type));
+    if (state.showBoundaryHulls) drawBoundaryHull(state, boundary, color);
   });
-  if (state.showRoutes) {
-    const routeColors = new Map();
-    routes.forEach((route) => {
-      if (!routeColors.has(route.label)) routeColors.set(route.label, getRouteColor(routeColors.size));
-      const color = routeColors.get(route.label);
-      route.nodes.forEach((member) => routeNodeColors.set(member, color));
+  if (state.showGroups) {
+    const groupColors = new Map();
+    groups.forEach((group) => {
+      if (!groupColors.has(group.label)) groupColors.set(group.label, getGroupColor(group.label, groupColors.size));
+      const color = groupColors.get(group.label);
+      group.nodes.forEach((member) => groupNodeColors.set(member, color));
     });
   }
   const drawableEdges = edges.filter((edge) => !hasConflictingColors(edge));
   const parallelOffsets = getParallelOffsets(drawableEdges);
   drawableEdges.forEach((edge) => drawEdge(state, edge, parallelOffsets.get(edge)));
-  nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors, routeNodeColors));
+  nodes.forEach((name) => drawNode(state, name, handlers, groupNodeColors));
 }
 
 export function updateEdgeErrors(conflictingEdges = currentConflictingEdges) {
@@ -99,13 +94,13 @@ export function updateEdgeErrors(conflictingEdges = currentConflictingEdges) {
   });
 }
 
-// Draws one station's rectangular group boundary and its name label.
-function drawStationHull(state, station, color) {
-  const bounds = getStationBounds(state, station);
+// Draws one boundary's rectangular boundary and its name label.
+function drawBoundaryHull(state, boundary, color) {
+  const bounds = getBoundaryBounds(state, boundary);
   if (!bounds) return;
 
   const rectangle = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  rectangle.classList.add("station-hull");
+  rectangle.classList.add("boundary-hull");
   rectangle.setAttribute("x", bounds.left);
   rectangle.setAttribute("y", bounds.top);
   rectangle.setAttribute("width", bounds.right - bounds.left);
@@ -114,30 +109,30 @@ function drawStationHull(state, station, color) {
   rectangle.setAttribute("stroke", color);
   graph.append(rectangle);
 
-  if (station.name) {
+  if (boundary.name) {
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.classList.add("station-label");
+    label.classList.add("boundary-label");
     label.setAttribute("x", (bounds.left + bounds.right) / 2);
     label.setAttribute("y", bounds.top - 8);
     label.setAttribute("fill", color);
-    label.textContent = station.name;
+    label.textContent = boundary.name;
     graph.append(label);
   }
 }
 
 function getParallelOffsets(edges) {
-  const groups = new Map();
+  const boundaries = new Map();
   edges.forEach((edge) => {
     const key = JSON.stringify([edge.from, edge.to]);
-    const group = groups.get(key) ?? [];
-    group.push(edge);
-    groups.set(key, group);
+    const boundary = boundaries.get(key) ?? [];
+    boundary.push(edge);
+    boundaries.set(key, boundary);
   });
 
   const offsets = new Map();
-  groups.forEach((group) => {
-    const center = (group.length - 1) / 2;
-    group.forEach((edge, index) => {
+  boundaries.forEach((boundary) => {
+    const center = (boundary.length - 1) / 2;
+    boundary.forEach((edge, index) => {
       offsets.set(edge, (index - center) * PARALLEL_EDGE_SPACING);
     });
   });
@@ -205,38 +200,29 @@ function drawEdge(state, edge, parallelOffset = 0) {
   }
 }
 
-function drawNode(state, name, handlers, stationNodeColors, routeNodeColors) {
+function drawNode(state, name, handlers, groupNodeColors) {
   const point = state.positions.get(name);
   const radius = state.nodeRadii.get(name) ?? MIN_NODE_RADIUS;
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.dataset.node = name;
-  const stationColor = stationNodeColors.get(name);
-  const nodeColor = routeNodeColors.get(name);
-  const shape = document.createElementNS("http://www.w3.org/2000/svg", stationColor ? "rect" : "circle");
+  const boundary = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  boundary.dataset.node = name;
+  const nodeColor = groupNodeColors.get(name);
+  const shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   shape.classList.add("node-circle");
-  if (stationColor) shape.classList.add("node-square");
   if (state.pinnedNodes.has(name)) shape.classList.add("pinned");
   if (nodeColor) {
     shape.style.fill = nodeColor;
-    shape.style.fillOpacity = routeNodeColors.has(name) ? "0.8" : STATION_FILL_OPACITY;
+    shape.style.fillOpacity = groupNodeColors.has(name) ? "0.8" : BOUNDARY_FILL_OPACITY;
   }
-  if (stationColor) {
-    shape.setAttribute("x", point.x - radius);
-    shape.setAttribute("y", point.y - radius);
-    shape.setAttribute("width", radius * 2);
-    shape.setAttribute("height", radius * 2);
-  } else {
-    shape.setAttribute("cx", point.x);
-    shape.setAttribute("cy", point.y);
-    shape.setAttribute("r", radius);
-  }
+  shape.setAttribute("cx", point.x);
+  shape.setAttribute("cy", point.y);
+  shape.setAttribute("r", radius);
   const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
   label.classList.add("node-label");
   label.setAttribute("x", point.x);
   label.setAttribute("y", point.y);
   label.textContent = name;
-  group.append(shape, label);
-  group.addEventListener("pointerdown", (event) => {
+  boundary.append(shape, label);
+  boundary.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     // preventDefault above suppresses native click/dblclick synthesis, so detect
     // double-clicks manually from consecutive pointerdown timestamps instead.
@@ -265,7 +251,7 @@ function drawNode(state, name, handlers, stationNodeColors, routeNodeColors) {
     if (node) { node.vx = 0; node.vy = 0; }
     handlers.onNodeActivity(0.4); // let neighboring nodes react while dragging
   });
-  graph.append(group);
+  graph.append(boundary);
 }
 
 // Lights up the graph border on whichever side(s) a dragged node is currently pressed against.

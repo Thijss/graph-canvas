@@ -6,9 +6,9 @@ export const LINK_STRENGTH = 0.4; // spring stiffness along edges (d3's 0..1 con
 export const SPRING_LENGTH = 150; // ideal edge length
 export const VELOCITY_DECAY = 0.3; // d3's per-tick "friction" (lower = livelier motion, more momentum)
 export const COLLIDE_PADDING = 6; // extra gap the collision force enforces beyond each node's own radius
-export const STATION_ATTRACTION_STRENGTH = 0.01; // pulls station members toward their group's live centroid
-export const STATION_REPULSION_STRENGTH = 3; // keeps unrelated nodes outside station rectangles
-export const STATION_REPULSION_PADDING = 12; // starts pushing unrelated nodes before they touch a hull
+export const BOUNDARY_ATTRACTION_STRENGTH = 0.01; // pulls boundary members toward their boundary's live centroid
+export const BOUNDARY_REPULSION_STRENGTH = 3; // keeps unrelated nodes outside boundary rectangles
+export const BOUNDARY_REPULSION_PADDING = 12; // starts pushing unrelated nodes before they touch a hull
 export const ALPHA_DECAY = 0.05; // how fast the simulation cools down (higher = settles sooner)
 export const ALPHA_MIN = 0.001; // below this, the simulation is considered settled
 
@@ -18,11 +18,11 @@ export const MAX_ZOOM = 4; // furthest zoomed in (4x larger than natural size)
 
 export const MIN_NODE_RADIUS = 20;
 export const LABEL_PADDING = 10; // horizontal breathing room inside the circle, per side
-export const STATION_HULL_MARGIN = 16; // breathing room between member node circles and the hull boundary
-export const STATION_FILL_OPACITY = 0.5;
+export const BOUNDARY_HULL_MARGIN = 16; // breathing room between member node circles and the hull boundary
+export const BOUNDARY_FILL_OPACITY = 0.5;
 
-// Station types are words made from letters, digits, hyphens, and underscores.
-export const STATION_TYPE_PATTERN = /^[a-z0-9_-]+$/i;
+// Boundary types are words made from letters, digits, hyphens, and underscores.
+export const BOUNDARY_TYPE_PATTERN = /^[a-z0-9_-]+$/i;
 
 // Types are assigned colors in their order of first appearance by the
 // renderer. The palette is intentionally limited to ten colors.
@@ -43,18 +43,18 @@ export function getPaletteColor(index) {
   return COLOR_PALETTE[index % COLOR_PALETTE.length];
 }
 
-// Canonical station color keywords (COLOR-1..COLOR-10) let the visual station
+// Canonical boundary color keywords (COLOR-1..COLOR-10) let the visual boundary
 // editor assign an exact palette color directly instead of relying on order of
 // first appearance. Custom/legacy type words keep using order-based palette
 // assignment for backward compatibility with existing saved graphs.
-const CANONICAL_STATION_COLOR_PATTERN = /^COLOR-([1-9]|10)$/;
+const CANONICAL_BOUNDARY_COLOR_PATTERN = /^COLOR-([1-9]|10)$/;
 
-export function isCanonicalStationColorType(type) {
-  return CANONICAL_STATION_COLOR_PATTERN.test((type ?? "").toUpperCase());
+export function isCanonicalBoundaryColorType(type) {
+  return CANONICAL_BOUNDARY_COLOR_PATTERN.test((type ?? "").toUpperCase());
 }
 
-export function getStationTypeColor(type, fallbackIndex) {
-  const match = CANONICAL_STATION_COLOR_PATTERN.exec((type ?? "").toUpperCase());
+export function getBoundaryTypeColor(type, fallbackIndex) {
+  const match = CANONICAL_BOUNDARY_COLOR_PATTERN.exec((type ?? "").toUpperCase());
   if (match) {
     const index = Number(match[1]) - 1;
     if (index < COLOR_PALETTE.length) return COLOR_PALETTE[index];
@@ -62,7 +62,7 @@ export function getStationTypeColor(type, fallbackIndex) {
   return getPaletteColor(fallbackIndex);
 }
 
-export const ROUTE_COLOR_PALETTE = [
+export const GROUP_COLOR_PALETTE = [
   "hsl(335 62% 68% / 1)",
   "hsl(28 92% 60% / 1)",
   "hsl(105 52% 55% / 1)",
@@ -75,8 +75,11 @@ export const ROUTE_COLOR_PALETTE = [
   "hsl(20 12% 60% / 1)",
 ];
 
-export function getRouteColor(index) {
-  return ROUTE_COLOR_PALETTE[index % ROUTE_COLOR_PALETTE.length];
+export function getGroupColor(labelOrIndex, fallbackIndex = 0) {
+  const index = typeof labelOrIndex === "number"
+    ? labelOrIndex
+    : Number(/^GROUP-([1-9]|10)$/i.exec(labelOrIndex ?? "")?.[1] ?? fallbackIndex + 1) - 1;
+  return GROUP_COLOR_PALETTE[(index + GROUP_COLOR_PALETTE.length) % GROUP_COLOR_PALETTE.length];
 }
 
 export const EDGE_COLORS = [

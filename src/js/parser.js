@@ -1,4 +1,4 @@
-import { EDGE_COLORS, STATION_TYPE_PATTERN } from "./config.js";
+import { EDGE_COLORS, BOUNDARY_TYPE_PATTERN } from "./config.js";
 
 const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
 
@@ -80,23 +80,23 @@ export function parseGraph(text) {
   return parseEdgeText(text);
 }
 
-// Parses raw station-group text into normalized station records. Each line:
+// Parses raw boundary text into normalized boundary records. Each line:
 // TYPE node,node,... [name] — TYPE is the first token (a word containing
 // letters, digits, hyphens, or underscores), the second token is the
-// comma-separated member list, and anything after it is the optional station
+// comma-separated member list, and anything after it is the optional boundary
 // name. Member ids not present in `existingNodes` are dropped. Every input line
-// remains a separate station, even when multiple lines use the same type. A
-// node can belong to at most one station; if it's referenced by more than one
+// remains a separate boundary, even when multiple lines use the same type. A
+// node can belong to at most one boundary; if it's referenced by more than one
 // line, the last line wins.
-export function parseStationText(text, existingNodes) {
+export function parseBoundaryText(text, existingNodes) {
   const nodeSet = new Set(existingNodes);
-  const stations = [];
+  const boundaries = [];
   text.split(/\r?\n/).forEach((line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
     const tokens = trimmed.split(/\s+/);
     const typeToken = tokens[0];
-    if (!STATION_TYPE_PATTERN.test(typeToken) || tokens.length < 2) return;
+    if (!BOUNDARY_TYPE_PATTERN.test(typeToken) || tokens.length < 2) return;
     const type = typeToken.toUpperCase();
     const members = tokens[1]
       .split(",")
@@ -105,36 +105,36 @@ export function parseStationText(text, existingNodes) {
     if (!members.length) return;
     const nameTokens = tokens.slice(2);
     const name = nameTokens.length ? nameTokens.join(" ") : "";
-    stations.push({ type, name, members });
+    boundaries.push({ type, name, members });
   });
   // Enforce single membership: later lines win over earlier ones for the same node.
   const ownerIndex = new Map();
-  stations.forEach((station, index) => {
-    station.members.forEach((member) => ownerIndex.set(member, index));
+  boundaries.forEach((boundary, index) => {
+    boundary.members.forEach((member) => ownerIndex.set(member, index));
   });
-  stations.forEach((station, index) => {
-    station.members = station.members.filter((member) => ownerIndex.get(member) === index);
+  boundaries.forEach((boundary, index) => {
+    boundary.members = boundary.members.filter((member) => ownerIndex.get(member) === index);
   });
-  return stations.filter((station) => station.members.length);
+  return boundaries.filter((boundary) => boundary.members.length);
 }
 
-// Backwards-compatible station parser used by the renderer and simulation.
-export function parseStations(text, existingNodes) {
-  return parseStationText(text, existingNodes);
+// Backwards-compatible boundary parser used by the renderer and simulation.
+export function parseBoundaries(text, existingNodes) {
+  return parseBoundaryText(text, existingNodes);
 }
 
-// Serializes normalized station records using the existing TXT syntax.
-export function serializeStations(stations) {
-  return stations
+// Serializes normalized boundary records using the existing TXT syntax.
+export function serializeBoundaries(boundaries) {
+  return boundaries
     .map(({ type, members = [], name = "" }) => [type, members.join(","), name.trim()].filter(Boolean).join(" "))
     .join("\n");
 }
 
-// Parses route text. Each line is LABEL node,node,...; every line remains a
-// separate route, and nodes not present in `existingNodes` are dropped.
-export function parseRoutes(text, existingNodes) {
+// Parses group text. Each line is LABEL node,node,...; every line remains a
+// separate group, and nodes not present in `existingNodes` are dropped.
+export function parseGroups(text, existingNodes) {
   const nodeSet = new Set(existingNodes);
-  const routes = [];
+  const groups = [];
   text.split(/\r?\n/).forEach((line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
@@ -145,7 +145,16 @@ export function parseRoutes(text, existingNodes) {
       .map((id) => id.trim())
       .filter((id) => id && nodeSet.has(id));
     if (!nodes.length) return;
-    routes.push({ label: tokens[0], nodes });
+    groups.push({ label: tokens[0], nodes });
   });
-  return routes;
+  return groups;
+}
+
+export function serializeGroups(groups) {
+  return groups
+    .map(({ label = "", nodes = [] }, index) => [
+      label.trim() || (index < 26 ? String.fromCharCode(65 + index) : `GROUP-${index + 1}`),
+      nodes.join(","),
+    ].join(" "))
+    .join("\n");
 }

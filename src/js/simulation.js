@@ -9,7 +9,7 @@ import {
 import {
   MIN_NODE_RADIUS,
   LABEL_PADDING,
-  STATION_HULL_MARGIN,
+  BOUNDARY_HULL_MARGIN,
   CHARGE_STRENGTH,
   CHARGE_DISTANCE_MAX,
   CENTER_STRENGTH,
@@ -17,9 +17,9 @@ import {
   SPRING_LENGTH,
   VELOCITY_DECAY,
   COLLIDE_PADDING,
-  STATION_ATTRACTION_STRENGTH,
-  STATION_REPULSION_STRENGTH,
-  STATION_REPULSION_PADDING,
+  BOUNDARY_ATTRACTION_STRENGTH,
+  BOUNDARY_REPULSION_STRENGTH,
+  BOUNDARY_REPULSION_PADDING,
   ALPHA_DECAY,
   ALPHA_MIN,
 } from "./config.js";
@@ -132,8 +132,8 @@ export function clampToBounds(state, nodes, width, height, view = null) {
   });
 }
 
-export function getStationBounds(state, station) {
-  const points = station.members
+export function getBoundaryBounds(state, boundary) {
+  const points = boundary.members
     .map((name) => {
       const p = state.positions.get(name);
       return p ? { x: p.x, y: p.y, name } : null;
@@ -142,31 +142,31 @@ export function getStationBounds(state, station) {
   if (!points.length) return null;
 
   return {
-    left: Math.min(...points.map((point) => point.x - (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) - STATION_HULL_MARGIN,
-    right: Math.max(...points.map((point) => point.x + (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) + STATION_HULL_MARGIN,
-    top: Math.min(...points.map((point) => point.y - (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) - STATION_HULL_MARGIN,
-    bottom: Math.max(...points.map((point) => point.y + (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) + STATION_HULL_MARGIN,
+    left: Math.min(...points.map((point) => point.x - (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) - BOUNDARY_HULL_MARGIN,
+    right: Math.max(...points.map((point) => point.x + (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) + BOUNDARY_HULL_MARGIN,
+    top: Math.min(...points.map((point) => point.y - (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) - BOUNDARY_HULL_MARGIN,
+    bottom: Math.max(...points.map((point) => point.y + (state.nodeRadii.get(point.name) ?? MIN_NODE_RADIUS))) + BOUNDARY_HULL_MARGIN,
   };
 }
 
 // --- Custom d3-force forces -------------------------------------------------
 // Each factory returns a plain `(alpha) => void` function that mutates node
 // vx/vy directly, following d3's custom-force convention (see
-// https://d3js.org/d3-force#custom-forces). They close over the `stations`
+// https://d3js.org/d3-force#custom-forces). They close over the `boundaries`
 // array captured at the time updateSimulationForces() built them, and re-read
 // live positions from `state.positions` on every call.
 
-// Station clustering: pull each member toward its group's own live centroid so
-// stations visually cluster together (the charge/collide forces above still
+// Boundary clustering: pull each member toward its boundary's own live centroid so
+// boundaries visually cluster together (the charge/collide forces above still
 // keep them from collapsing into a single point).
-function createStationClusterForce(state, stations) {
+function createBoundaryClusterForce(state, boundaries) {
   return function force(alpha) {
-    stations.forEach((station) => {
-      if (station.members.length < 2) return;
+    boundaries.forEach((boundary) => {
+      if (boundary.members.length < 2) return;
       let cx = 0;
       let cy = 0;
       let count = 0;
-      station.members.forEach((name) => {
+      boundary.members.forEach((name) => {
         const n = state.positions.get(name);
         if (!n) return;
         cx += n.x;
@@ -176,33 +176,33 @@ function createStationClusterForce(state, stations) {
       if (count < 2) return;
       cx /= count;
       cy /= count;
-      station.members.forEach((name) => {
+      boundary.members.forEach((name) => {
         const n = state.positions.get(name);
         if (!n) return;
-        n.vx += (cx - n.x) * STATION_ATTRACTION_STRENGTH * alpha;
-        n.vy += (cy - n.y) * STATION_ATTRACTION_STRENGTH * alpha;
+        n.vx += (cx - n.x) * BOUNDARY_ATTRACTION_STRENGTH * alpha;
+        n.vy += (cy - n.y) * BOUNDARY_ATTRACTION_STRENGTH * alpha;
       });
     });
   };
 }
 
-// Keeps unrelated nodes outside station rectangles. This also separates two
-// stations because every member of the other station is treated as foreign.
-function createStationHullForce(state, stations, nodes) {
+// Keeps unrelated nodes outside boundary rectangles. This also separates two
+// boundaries because every member of the other boundary is treated as foreign.
+function createBoundaryHullForce(state, boundaries, nodes) {
   return function force(alpha) {
-    stations.forEach((station) => {
-      const bounds = getStationBounds(state, station);
+    boundaries.forEach((boundary) => {
+      const bounds = getBoundaryBounds(state, boundary);
       if (!bounds) return;
-      const members = new Set(station.members);
+      const members = new Set(boundary.members);
       nodes.forEach((name) => {
         if (members.has(name)) return;
         const n = state.positions.get(name);
         if (!n) return;
         const radius = state.nodeRadii.get(name) ?? MIN_NODE_RADIUS;
-        const left = bounds.left - radius - STATION_REPULSION_PADDING;
-        const right = bounds.right + radius + STATION_REPULSION_PADDING;
-        const top = bounds.top - radius - STATION_REPULSION_PADDING;
-        const bottom = bounds.bottom + radius + STATION_REPULSION_PADDING;
+        const left = bounds.left - radius - BOUNDARY_REPULSION_PADDING;
+        const right = bounds.right + radius + BOUNDARY_REPULSION_PADDING;
+        const top = bounds.top - radius - BOUNDARY_REPULSION_PADDING;
+        const bottom = bounds.bottom + radius + BOUNDARY_REPULSION_PADDING;
         if (n.x < left || n.x > right || n.y < top || n.y > bottom) return;
 
         const distances = [
@@ -214,7 +214,7 @@ function createStationHullForce(state, stations, nodes) {
         const nearest = distances.reduce((best, current) => (
           current.distance < best.distance ? current : best
         ));
-        const push = (nearest.distance + 1) * STATION_REPULSION_STRENGTH * alpha;
+        const push = (nearest.distance + 1) * BOUNDARY_REPULSION_STRENGTH * alpha;
         n.vx += nearest.x * push;
         n.vy += nearest.y * push;
       });
@@ -241,7 +241,7 @@ export function createSimulation() {
 // layoutNodes, start from their spawn position). `chargeStrength` lets the
 // caller override the default repulsion (e.g. from the UI slider); it should
 // be a negative number (more negative = stronger repulsion).
-export function updateSimulationForces(state, nodes, edges, stations, width, height, chargeStrength = CHARGE_STRENGTH) {
+export function updateSimulationForces(state, nodes, edges, boundaries, width, height, chargeStrength = CHARGE_STRENGTH) {
   const nodeObjects = nodes.map((name) => state.positions.get(name)).filter(Boolean);
   // Self-loops aren't part of the physical spring layout (they're drawn as a
   // fixed loop above the node), so they're excluded from the link force.
@@ -261,6 +261,6 @@ export function updateSimulationForces(state, nodes, edges, stations, width, hei
     .force("x", forceX(width / 2).strength(CENTER_STRENGTH))
     .force("y", forceY(height / 2).strength(CENTER_STRENGTH))
     .force("collide", forceCollide((d) => (state.nodeRadii.get(d.id) ?? MIN_NODE_RADIUS) + COLLIDE_PADDING))
-    .force("stationCluster", createStationClusterForce(state, stations))
-    .force("stationHull", createStationHullForce(state, stations, nodes));
+    .force("boundaryCluster", createBoundaryClusterForce(state, boundaries))
+    .force("boundaryHull", createBoundaryHullForce(state, boundaries, nodes));
 }

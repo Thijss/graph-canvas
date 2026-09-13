@@ -3,7 +3,7 @@
 2 3 blue
 3 4
 3 5
------STATIONS-----
+-----BOUNDARIES-----
 SUB 1 Substation
 CS 2,3 Control Station
 SS 4,5 Switching Station

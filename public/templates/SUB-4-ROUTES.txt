@@ -6,9 +6,9 @@
 10 11
 1 14
 14 15
------STATIONS-----
+-----BOUNDARIES-----
 SUB 1 Substation
------ROUTES-----
+-----GROUPS-----
 A 2,3
 B 6,7
 C 10,11
