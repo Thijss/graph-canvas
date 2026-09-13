@@ -1,21 +1,23 @@
-import { EDGE_TYPE_KEYWORDS, STATION_TYPE_PATTERN } from "./config.js";
+import { EDGE_COLORS, STATION_TYPE_PATTERN } from "./config.js";
+
+const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
 
 // Parses one edge's optional comma-separated labels into the normalized fields
-// used by the visual editor. Every edge has a primary type: unstyled edges and
-// conflicting primary types use `line`; other labels remain additional data.
+// used by the visual editor. Every edge has a primary color: unstyled edges
+// and conflicting colors use `line`; other labels remain additional data.
 function normalizeEdgeLabels(label) {
   const labels = (label ?? "")
     .split(",")
     .map((part) => part.trim())
     .filter(Boolean);
-  const edgeTypes = labels.filter((part) => EDGE_TYPE_KEYWORDS.includes(part.toLowerCase()));
-  const type = edgeTypes.length === 1 ? edgeTypes[0].toLowerCase() : "line";
+  const edgeColors = labels.filter((part) => EDGE_COLOR_TOKENS.includes(part.toLowerCase()));
+  const color = edgeColors.length === 1 ? edgeColors[0].toLowerCase() : "line";
   const open = labels.some((part) => part.toLowerCase() === "open");
-  const additionalLabels = edgeTypes.length === 1
-    ? labels.filter((part) => part.toLowerCase() !== type && part.toLowerCase() !== "open")
+  const additionalLabels = edgeColors.length === 1
+    ? labels.filter((part) => part.toLowerCase() !== color && part.toLowerCase() !== "open")
     : labels.filter((part) => part.toLowerCase() !== "open");
   return {
-    type,
+    color,
     open,
     labels: additionalLabels,
     label: labels.length ? labels.join(",") : undefined,
@@ -38,7 +40,7 @@ export function parseEdgeText(text) {
     const match = trimmed.match(/^(\S+)(?:\s+(\S+)(?:\s+([\s\S]*))?)?$/);
     const [, from, to, rest] = match;
     if (!to) {
-      floatingNodes.push({ from, to: "", type: "line", open: false, labels: [], line: lineIndex });
+      floatingNodes.push({ from, to: "", color: "line", open: false, labels: [], line: lineIndex });
       nodeSet.add(from);
       return;
     }
@@ -56,13 +58,13 @@ export function parseEdgeText(text) {
   return { edges, floatingNodes, nodes: [...nodeSet] };
 }
 
-// Serializes normalized edge records using explicit primary edge types in the
-// TXT edge syntax. Additional labels are emitted after the selected type.
+// Serializes normalized edge records using explicit primary colors in the TXT
+// edge syntax. Additional labels are emitted after the selected color.
 export function serializeEdges(edges) {
   return edges
-    .map(({ from, to, type, open = false, labels = [], label }) => {
+    .map(({ from, to, color, open = false, labels = [], label }) => {
       if (!to) return from;
-      const serializedLabels = [type, open ? "open" : undefined, ...labels].filter(Boolean);
+      const serializedLabels = [color, open ? "open" : undefined, ...labels].filter(Boolean);
       const fallbackLabel = serializedLabels.length ? serializedLabels.join(",") : label;
       return [from, to, fallbackLabel].filter(Boolean).join(" ");
     })

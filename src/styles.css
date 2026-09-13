@@ -206,7 +206,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-list[hidden] { display: none; }
 .edge-list-header {
   display: grid;
-  grid-template-columns: minmax(44px, .8fr) minmax(44px, .8fr) minmax(92px, 1fr) 42px minmax(70px, 1.3fr) 28px;
+  grid-template-columns: minmax(44px, .8fr) minmax(44px, .8fr) 44px 42px minmax(70px, 1.3fr) 28px;
   gap: 5px;
   padding: 0 5px 5px;
   color: var(--muted);
@@ -229,7 +229,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-empty-state[hidden] { display: none; }
 .edge-row {
   display: grid;
-  grid-template-columns: minmax(44px, .8fr) minmax(44px, .8fr) minmax(92px, 1fr) 42px minmax(70px, 1.3fr) 28px;
+  grid-template-columns: minmax(44px, .8fr) minmax(44px, .8fr) 44px 42px minmax(70px, 1.3fr) 28px;
   gap: 5px;
   align-items: end;
   padding: 5px;
@@ -266,6 +266,46 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   margin: 4px auto 0;
   accent-color: var(--accent);
 }
+.edge-color-control { position: relative; width: 100%; }
+.edge-color-button, .edge-color-option {
+  width: 100%;
+  height: 27px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  line-height: 1;
+}
+.edge-color-button::before, .edge-color-option::before {
+  display: block;
+  content: "";
+  border-top: 4px solid var(--edge-color);
+}
+.edge-color-button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px #2596be15;
+}
+.edge-color-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 8px 24px #26344d26;
+}
+.edge-color-popover[hidden] { display: none; }
+.edge-color-option { border: 0; }
+.edge-color-option:hover, .edge-color-option.is-selected { background: var(--soft); }
+.dark .edge-color-button, .dark .edge-color-option, .dark .edge-color-popover { background: #18252c; }
 .edge-field input:focus, .edge-field select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px #2596be15;

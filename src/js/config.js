@@ -79,15 +79,11 @@ export function getRouteColor(index) {
   return ROUTE_COLOR_PALETTE[index % ROUTE_COLOR_PALETTE.length];
 }
 
-// Special-case edge keywords: colored + hidden from the visible label. Keys double as
-// CSS class names and arrowhead marker ids; keep colors in sync with styles.css.
-export const KEYWORD_STYLES = [
-  { keyword: "transformer", className: "transformer", color: "#2f7de1" },
-  { keyword: "link", className: "link", color: "#2fa84f" },
-  { keyword: "x", className: "x", color: "#d84b4b" },
+// Edge colors are encoded by their legacy text tokens in saved graph files.
+// CSS classes and arrowhead marker ids remain stable for existing styles.
+export const EDGE_COLORS = [
+  { token: "line", className: "line", color: "#facc37" },
+  { token: "link", className: "link", color: "#2fa84f" },
+  { token: "transformer", className: "transformer", color: "#2f7de1" },
+  { token: "x", className: "x", color: "#d84b4b" },
 ];
-// Primary edge types exposed by the visual editor. `open` remains an
-// additional label because it modifies line appearance rather than defining
-// the connection type.
-export const EDGE_TYPE_KEYWORDS = ["line", "link", "transformer", "x"];
-export const LINE_EDGE_COLOR = "#facc37";

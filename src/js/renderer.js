@@ -11,15 +11,15 @@ import {
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { getRouteColor, getStationTypeColor, KEYWORD_STYLES, LINE_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
+import { EDGE_COLORS, getRouteColor, getStationTypeColor, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
 import { getNodeRadius, getStationBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
 const PARALLEL_EDGE_SPACING = 12;
 
-function hasConflictingLabels(edge) {
+function hasConflictingColors(edge) {
   const labels = new Set((edge.label ?? "").split(",").map((part) => part.trim().toLowerCase()));
-  return ["link", "transformer", "x"].filter((keyword) => labels.has(keyword)).length > 1;
+  return EDGE_COLORS.filter(({ token }) => token !== "line" && labels.has(token)).length > 1;
 }
 
 // `state` (positions/pinned nodes/etc.) and `handlers` (interaction callbacks,
@@ -34,21 +34,13 @@ export function render(state, edges, nodes, stations, routes, handlers) {
   stationMetaCount.textContent = stations.length;
   nodeCount.textContent = nodes.length;
   emptyState.hidden = nodes.length > 0;
-  const conflictingEdges = edges.filter(hasConflictingLabels);
+  const conflictingEdges = edges.filter(hasConflictingColors);
   currentConflictingEdges = conflictingEdges;
-  const hasConflictingLabelError = conflictingEdges.length > 0;
-  statusDot.classList.toggle("status-error", hasConflictingLabelError);
+  const hasConflictingColorError = conflictingEdges.length > 0;
+  statusDot.classList.toggle("status-error", hasConflictingColorError);
   updateEdgeErrors(conflictingEdges);
-  if (hasConflictingLabelError) {
-    statusText.replaceChildren(
-      "Error: combine only one of ",
-      createBoldStatusPart("link"),
-      ", ",
-      createBoldStatusPart("transformer"),
-      ", or ",
-      createBoldStatusPart("x"),
-      " per edge",
-    );
+  if (hasConflictingColorError) {
+    statusText.textContent = "Error: choose only one color per edge";
   } else {
     statusText.textContent = nodes.length ? "No issues" : "Ready to draw";
   }
@@ -58,8 +50,7 @@ export function render(state, edges, nodes, stations, routes, handlers) {
   const markerFor = (id, color) =>
     `<marker id="arrowhead-${id}" markerWidth="4" markerHeight="4" refX="3.5" refY="1.75" orient="auto"><path d="M0,0 L4,1.75 L0,3.5 z" fill="${color}"></path></marker>`;
   defs.innerHTML = [
-    markerFor("line", LINE_EDGE_COLOR),
-    ...KEYWORD_STYLES.map((style) => markerFor(style.className, style.color)),
+    ...EDGE_COLORS.map((style) => markerFor(style.className, style.color)),
   ].join("");
   graph.append(defs);
   const stationNodeColors = new Map();
@@ -81,16 +72,10 @@ export function render(state, edges, nodes, stations, routes, handlers) {
       route.nodes.forEach((member) => routeNodeColors.set(member, color));
     });
   }
-  const drawableEdges = edges.filter((edge) => !hasConflictingLabels(edge));
+  const drawableEdges = edges.filter((edge) => !hasConflictingColors(edge));
   const parallelOffsets = getParallelOffsets(drawableEdges);
   drawableEdges.forEach((edge) => drawEdge(state, edge, parallelOffsets.get(edge)));
   nodes.forEach((name) => drawNode(state, name, handlers, stationNodeColors, routeNodeColors));
-}
-
-function createBoldStatusPart(text) {
-  const part = document.createElement("strong");
-  part.textContent = text;
-  return part;
 }
 
 export function updateEdgeErrors(conflictingEdges = currentConflictingEdges) {
@@ -107,7 +92,7 @@ export function updateEdgeErrors(conflictingEdges = currentConflictingEdges) {
     const marker = document.createElement("span");
     marker.className = "editor-error";
     marker.setAttribute("aria-label", "Invalid label combination");
-    marker.title = "Only one of link, transformer, or x may be used per edge";
+    marker.title = "Only one color may be used per edge";
     marker.textContent = "×";
     marker.style.top = `${paddingTop + edge.line * lineHeight}px`;
     edgeErrors.append(marker);
@@ -173,7 +158,7 @@ function drawEdge(state, edge, parallelOffset = 0) {
   const visibleParts = parts.filter((part) => {
     if (/^line$/i.test(part)) return false;
     if (/open/i.test(part)) { line.classList.add("open"); return false; }
-    const match = KEYWORD_STYLES.find((style) => new RegExp(style.keyword, "i").test(part));
+    const match = EDGE_COLORS.find((style) => new RegExp(`^${style.token}$`, "i").test(part));
     if (match) {
       line.classList.add(match.className);
       colorKey = match.className; // last match wins, mirroring CSS cascade order
