@@ -35,6 +35,7 @@ and browser storage behavior without starting the development server:
 npm test                 # Run the unit tests once
 npm run test:watch       # Re-run tests while files change
 npm run test:coverage    # Run tests and write a coverage report
+npm run test:e2e         # Run browser smoke tests
 ```
 
 Coverage output is written to `coverage/`, which is ignored by Git. The
@@ -47,6 +48,17 @@ on observable behavior. Parser and configuration tests should remain
 independent of the DOM; tests for `localStorage` use Vitest's jsdom environment.
 Browser smoke tests are kept separate because they exercise the built
 application in a real browser.
+
+Playwright's Chromium browser must be installed once on a new machine:
+
+```bash
+npx playwright install chromium
+```
+
+The browser smoke tests start Vite automatically and cover only critical
+end-to-end flows: loading the editor, entering graph data, restoring it after
+a refresh, and exporting a text file. They do not replace manual testing of
+visual layout, dragging, zooming, and other detailed interactions.
 
 ## Source layout
 
