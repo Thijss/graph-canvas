@@ -129,6 +129,18 @@ function zoomFromCenter(deltaY) {
   applyViewBox();
 }
 
+graph.addEventListener("wheel", (event) => {
+  if (!event.ctrlKey) return;
+
+  event.preventDefault();
+  const bounds = graph.getBoundingClientRect();
+  state.view = computeZoomedView(state.view, event.deltaY, {
+    x: event.clientX - bounds.left,
+    y: event.clientY - bounds.top,
+  });
+  applyViewBox();
+}, { passive: false });
+
 // Dragging empty canvas space pans the view. Node drag handles its own
 // pointerdown (see renderer.js's drawNode) and doesn't stop propagation, so
 // bail out here whenever the event originated on a node.
