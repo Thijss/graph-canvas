@@ -4,7 +4,7 @@ import { MIN_ZOOM, MAX_ZOOM } from "./config.js";
 // current view + wheel event data and get back a new view to apply
 // themselves (see main.js), the same pattern used by simulation.js.
 
-// Computes the next { scale, x, y } view after a wheel/pinch delta, keeping
+// Computes the next { scale, x, y } view after a wheel delta, keeping
 // the point currently under the cursor visually fixed (so zooming feels
 // anchored to the pointer instead of jumping to re-center on each step).
 // `cursor` is the pointer's position in screen px relative to the graph

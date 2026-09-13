@@ -62,7 +62,6 @@ import { draw, restartSimulation } from "./engine.js";
 import { updateBorderBump, clearBorderBump, updateEdgeErrors } from "./renderer.js";
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
-import { createPinchZoomController } from "./gestures.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 import { addEdge, syncEdgeEditor } from "./edge-editor.js";
 import { addStation, syncStationEditor } from "./station-editor.js";
@@ -124,36 +123,16 @@ function zoomFromCenter(deltaY) {
   applyViewBox();
 }
 
-const pinchZoom = createPinchZoomController({ graph, graphWrap, state, applyViewBox });
-
-// Trackpad pinch-to-zoom is reported by the browser as a wheel event with
-// ctrlKey set (there's no separate "pinch" event on the web platform), so the
-// same handler also covers ctrl+scroll-wheel zooming on non-trackpad input.
-graphWrap.addEventListener(
-  "wheel",
-  (event) => {
-    if (!event.ctrlKey) return;
-    event.preventDefault();
-    const bounds = graph.getBoundingClientRect();
-    const cursor = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
-    state.view = computeZoomedView(state.view, event.deltaY, cursor);
-    applyViewBox();
-  },
-  { passive: false },
-);
-
 // Dragging empty canvas space pans the view. Node drag handles its own
 // pointerdown (see renderer.js's drawNode) and doesn't stop propagation, so
 // bail out here whenever the event originated on a node.
 graph.addEventListener("pointerdown", (event) => {
   if (event.target.closest("[data-node]")) return;
-  if (pinchZoom.pointerDown(event)) return;
   state.panning = { pointerId: event.pointerId, lastX: event.clientX, lastY: event.clientY };
   graphWrap.classList.add("panning");
 });
 
 window.addEventListener("pointermove", (event) => {
-  if (pinchZoom.pointerMove(event)) return;
   if (state.panning && event.pointerId === state.panning.pointerId) {
     const dx = event.clientX - state.panning.lastX;
     const dy = event.clientY - state.panning.lastY;
@@ -198,8 +177,7 @@ window.addEventListener("pointermove", (event) => {
     draw(); // physics off: just re-render the dragged node at its new spot
   }
 });
-window.addEventListener("pointerup", (event) => {
-  pinchZoom.pointerUp(event);
+window.addEventListener("pointerup", () => {
   if (state.panning) {
     state.panning = null;
     graphWrap.classList.remove("panning");
@@ -215,9 +193,6 @@ window.addEventListener("pointerup", (event) => {
   state.dragging = null;
   clearBorderBump();
   restartSimulation(0.3); // gently settle the released node back into place
-});
-window.addEventListener("pointercancel", (event) => {
-  pinchZoom.pointerCancel(event);
 });
 
 clearButton.addEventListener("click", () => {
