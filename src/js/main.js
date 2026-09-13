@@ -70,6 +70,7 @@ import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, dow
 import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
+import { wireEditorModeToggle } from "./editors/editor-mode.js";
 
 let exportFormat = "txt";
 
@@ -480,60 +481,36 @@ addEdgeButton.addEventListener("click", addEdge);
 addBoundaryButton.addEventListener("click", addBoundary);
 addGroupButton.addEventListener("click", addGroup);
 
-function setEdgeEditorMode(mode) {
-  const isRaw = mode === "raw";
-  edgeEditor.classList.toggle("is-raw", isRaw);
-  edgeEditor.setAttribute("aria-hidden", String(!isRaw));
-  edgeEditor.tabIndex = isRaw ? 0 : -1;
-  edgeList.hidden = isRaw;
-  addEdgeButton.hidden = isRaw;
-  visualEdgeModeButton.classList.toggle("is-active", !isRaw);
-  rawEdgeModeButton.classList.toggle("is-active", isRaw);
-  visualEdgeModeButton.setAttribute("aria-pressed", String(!isRaw));
-  rawEdgeModeButton.setAttribute("aria-pressed", String(isRaw));
-  if (isRaw) edgeEditor.focus();
-  else syncEdgeEditor();
-}
-visualEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("visual"));
-rawEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("raw"));
-
-function setBoundaryEditorMode(mode) {
-  const isText = mode === "text";
-  boundaryEditor.classList.toggle("is-text", isText);
-  boundaryEditor.setAttribute("aria-hidden", String(!isText));
-  boundaryEditor.tabIndex = isText ? 0 : -1;
-  boundaryList.hidden = isText;
-  addBoundaryButton.hidden = isText;
-  boundaryVisualModeButton.classList.toggle("is-active", !isText);
-  boundaryTextModeButton.classList.toggle("is-active", isText);
-  boundaryVisualModeButton.setAttribute("aria-pressed", String(!isText));
-  boundaryTextModeButton.setAttribute("aria-pressed", String(isText));
-  if (isText) {
-    updateBoundarySourceText();
-    boundaryEditor.focus();
-  }
-  else syncBoundaryEditor();
-}
-boundaryVisualModeButton.addEventListener("click", () => setBoundaryEditorMode("visual"));
-boundaryTextModeButton.addEventListener("click", () => setBoundaryEditorMode("text"));
-function setGroupEditorMode(mode) {
-  const isText = mode === "text";
-  groupEditor.classList.toggle("is-text", isText);
-  groupEditor.setAttribute("aria-hidden", String(!isText));
-  groupEditor.tabIndex = isText ? 0 : -1;
-  groupList.hidden = isText;
-  addGroupButton.hidden = isText;
-  groupVisualModeButton.classList.toggle("is-active", !isText);
-  groupTextModeButton.classList.toggle("is-active", isText);
-  groupVisualModeButton.setAttribute("aria-pressed", String(!isText));
-  groupTextModeButton.setAttribute("aria-pressed", String(isText));
-  if (isText) {
-    updateGroupSourceText();
-    groupEditor.focus();
-  } else syncGroupEditor();
-}
-groupVisualModeButton.addEventListener("click", () => setGroupEditorMode("visual"));
-groupTextModeButton.addEventListener("click", () => setGroupEditorMode("text"));
+wireEditorModeToggle({
+  editor: edgeEditor,
+  list: edgeList,
+  addButton: addEdgeButton,
+  visualButton: visualEdgeModeButton,
+  sourceButton: rawEdgeModeButton,
+  sourceMode: "raw",
+  syncFromSource: syncEdgeEditor,
+  syncToSource: () => {},
+});
+wireEditorModeToggle({
+  editor: boundaryEditor,
+  list: boundaryList,
+  addButton: addBoundaryButton,
+  visualButton: boundaryVisualModeButton,
+  sourceButton: boundaryTextModeButton,
+  sourceMode: "text",
+  syncFromSource: syncBoundaryEditor,
+  syncToSource: updateBoundarySourceText,
+});
+wireEditorModeToggle({
+  editor: groupEditor,
+  list: groupList,
+  addButton: addGroupButton,
+  visualButton: groupVisualModeButton,
+  sourceButton: groupTextModeButton,
+  sourceMode: "text",
+  syncFromSource: syncGroupEditor,
+  syncToSource: updateGroupSourceText,
+});
 document.querySelectorAll(".panel-section-toggle").forEach((toggle) => {
   const toggleSection = () => {
     const section = toggle.closest(".panel-section");
