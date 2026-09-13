@@ -42,14 +42,6 @@ export function loadLayoutMode() {
   }
 }
 
-export function saveLayoutMode(mode) {
-  try {
-    localStorage.setItem(LAYOUT_MODE_KEY, mode);
-  } catch {
-    // ignore — persistence is a nice-to-have, not a requirement
-  }
-}
-
 export function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "{}");

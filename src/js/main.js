@@ -64,7 +64,7 @@ import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./per
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 import { addEdge, syncEdgeEditor } from "./edge-editor.js";
-import { addStation, syncStationEditor } from "./station-editor.js";
+import { addStation, syncStationEditor, updateStationSourceText } from "./station-editor.js";
 
 let exportFormat = "txt";
 
@@ -485,7 +485,10 @@ function setStationEditorMode(mode) {
   stationTextModeButton.classList.toggle("is-active", isText);
   stationVisualModeButton.setAttribute("aria-pressed", String(!isText));
   stationTextModeButton.setAttribute("aria-pressed", String(isText));
-  if (isText) stationEditor.focus();
+  if (isText) {
+    updateStationSourceText();
+    stationEditor.focus();
+  }
   else syncStationEditor();
 }
 stationVisualModeButton.addEventListener("click", () => setStationEditorMode("visual"));

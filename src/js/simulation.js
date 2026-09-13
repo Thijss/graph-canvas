@@ -18,8 +18,6 @@ import {
   VELOCITY_DECAY,
   COLLIDE_PADDING,
   STATION_ATTRACTION_STRENGTH,
-  SUBSTATION_VERTICAL_STRENGTH,
-  SUBSTATION_TARGET_RATIO,
   STATION_REPULSION_STRENGTH,
   STATION_REPULSION_PADDING,
   ALPHA_DECAY,
@@ -188,22 +186,6 @@ function createStationClusterForce(state, stations) {
   };
 }
 
-// Gives substations a higher resting position without pinning them there, so
-// their hulls naturally float above the other station types.
-function createSubstationTopForce(state, stations, height) {
-  const targetY = height * SUBSTATION_TARGET_RATIO;
-  return function force(alpha) {
-    stations.forEach((station) => {
-      if (station.type !== "SUB") return;
-      station.members.forEach((name) => {
-        const n = state.positions.get(name);
-        if (!n) return;
-        n.vy += (targetY - n.y) * SUBSTATION_VERTICAL_STRENGTH * alpha;
-      });
-    });
-  };
-}
-
 // Keeps unrelated nodes outside station rectangles. This also separates two
 // stations because every member of the other station is treated as foreign.
 function createStationHullForce(state, stations, nodes) {
@@ -280,6 +262,5 @@ export function updateSimulationForces(state, nodes, edges, stations, width, hei
     .force("y", forceY(height / 2).strength(CENTER_STRENGTH))
     .force("collide", forceCollide((d) => (state.nodeRadii.get(d.id) ?? MIN_NODE_RADIUS) + COLLIDE_PADDING))
     .force("stationCluster", createStationClusterForce(state, stations))
-    .force("substationTop", createSubstationTopForce(state, stations, height))
     .force("stationHull", createStationHullForce(state, stations, nodes));
 }

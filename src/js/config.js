@@ -7,8 +7,6 @@ export const SPRING_LENGTH = 150; // ideal edge length
 export const VELOCITY_DECAY = 0.3; // d3's per-tick "friction" (lower = livelier motion, more momentum)
 export const COLLIDE_PADDING = 6; // extra gap the collision force enforces beyond each node's own radius
 export const STATION_ATTRACTION_STRENGTH = 0.01; // pulls station members toward their group's live centroid
-export const SUBSTATION_VERTICAL_STRENGTH = 0.08; // strongly keeps substations toward the top of the canvas
-export const SUBSTATION_TARGET_RATIO = 0.14; // target substation center as a fraction of canvas height
 export const STATION_REPULSION_STRENGTH = 3; // keeps unrelated nodes outside station rectangles
 export const STATION_REPULSION_PADDING = 12; // starts pushing unrelated nodes before they touch a hull
 export const ALPHA_DECAY = 0.05; // how fast the simulation cools down (higher = settles sooner)
@@ -47,8 +45,7 @@ export function getPaletteColor(index) {
 
 // Canonical station color keywords (COLOR-1..COLOR-10) let the visual station
 // editor assign an exact palette color directly instead of relying on order of
-// first appearance. Custom/legacy type words (e.g. "SUB", used by the physics
-// layout for special substation positioning) keep using order-based palette
+// first appearance. Custom/legacy type words keep using order-based palette
 // assignment for backward compatibility with existing saved graphs.
 const CANONICAL_STATION_COLOR_PATTERN = /^COLOR-([1-9]|10)$/;
 

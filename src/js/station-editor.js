@@ -86,9 +86,8 @@ function createNodesField(members, onChange) {
 // Builds the station color selector: clicking the swatch dot opens a small
 // popover of the 10 fixed palette colors as clickable circles. A hidden input
 // holds the actual station type value used for reading/serializing rows.
-// Legacy/custom type words (e.g. "SUB", used by the physics layout for
-// special substation positioning) are preserved verbatim until the user picks
-// a palette color, so switching to Visual mode never silently discards or
+// Legacy/custom type words are preserved verbatim until the user picks a
+// palette color, so switching to Visual mode never silently discards or
 // recolors data from an existing saved graph.
 function createColorField(value, previewColor, onChange) {
   const wrapper = document.createElement("div");
@@ -177,7 +176,7 @@ function createColorField(value, previewColor, onChange) {
   });
 
   updateSwatch();
-  control.append(swatchButton, popover);
+  control.append(hiddenInput, swatchButton, popover);
   wrapper.append(control);
   return { wrapper, input: hiddenInput };
 }
@@ -209,18 +208,20 @@ function createStationRow(station, index, onChange, previewColor) {
     onChange();
   });
   row._getMembers = nodes.getValues;
+  row._getType = () => type.input.value;
+  row._getName = () => name.input.value;
   return row;
 }
 
 function readRows() {
   return [...stationList.querySelectorAll(".station-row")].map((row) => {
-    const [type, name] = row.querySelectorAll(".station-type input[type=hidden], .station-name input");
+    if (!row._getType || !row._getMembers || !row._getName) return null;
     return {
-      type: type.value.trim(),
+      type: row._getType().trim(),
       members: row._getMembers(),
-      name: name.value.trim(),
+      name: row._getName().trim(),
     };
-  }).filter((station) => station.type || station.members.length || station.name);
+  }).filter((station) => station && (station.members.length || station.name));
 }
 
 // Mirrors the renderer's station-color assignment (see renderer.js) so the
@@ -236,14 +237,30 @@ function computeStationPreviewColors(stations) {
   return colors;
 }
 
+function colorGroupLabel(index) {
+  return String.fromCharCode("A".charCodeAt(0) + index);
+}
+
+function serializeVisualStations(stations) {
+  const typeColors = computeStationPreviewColors(stations);
+  const colorLabels = new Map();
+  typeColors.forEach((color) => {
+    if (!colorLabels.has(color)) colorLabels.set(color, colorGroupLabel(colorLabels.size));
+  });
+  return serializeStations(stations.map((station) => ({
+    ...station,
+    type: colorLabels.get(typeColors.get(station.type)),
+  })));
+}
+
 function updateListState() {
   const hasRows = stationList.querySelectorAll(".station-row").length > 0;
   stationEmptyState.hidden = hasRows;
   stationListHeader.hidden = !hasRows;
 }
 
-function updateSourceText() {
-  stationEditor.value = serializeStations(readRows());
+export function updateStationSourceText() {
+  stationEditor.value = serializeVisualStations(readRows());
   updateListState();
   stationEditor.dispatchEvent(new Event("input", { bubbles: true }));
 }
@@ -255,14 +272,14 @@ export function syncStationEditor() {
   stationList.replaceChildren(
     stationListHeader,
     stationEmptyState,
-    ...stations.map((station, index) => createStationRow(station, index, updateSourceText, previewColors.get(station.type))),
+    ...stations.map((station, index) => createStationRow(station, index, updateStationSourceText, previewColors.get(station.type))),
   );
   updateListState();
 }
 
 export function addStation() {
   const index = stationList.children.length;
-  const row = createStationRow({ type: "", members: [], name: "" }, index, updateSourceText);
+  const row = createStationRow({ type: "", members: [], name: "" }, index, updateStationSourceText);
   stationList.append(row);
   updateListState();
   row.querySelector("input")?.focus();
