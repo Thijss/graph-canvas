@@ -18,13 +18,77 @@ function createField(label, value, className) {
   return { wrapper, input };
 }
 
+function createNodesField(members, onChange) {
+  const wrapper = document.createElement("label");
+  wrapper.className = "station-field station-nodes";
+
+  const caption = document.createElement("span");
+  caption.textContent = "Nodes";
+  const editor = document.createElement("div");
+  editor.className = "station-node-editor";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Node + Enter";
+  input.title = "Type a node ID and press Enter to add it";
+  input.setAttribute("aria-label", "Nodes");
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  editor.append(input);
+  wrapper.append(caption, editor);
+
+  const values = [...members];
+  const renderNodes = (notify = true) => {
+    editor.querySelectorAll(".station-node-chip").forEach((chip) => chip.remove());
+    values.forEach((node) => {
+      const chip = document.createElement("span");
+      chip.className = "station-node-chip";
+      chip.textContent = node;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "station-node-remove";
+      remove.setAttribute("aria-label", `Remove node ${node}`);
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        values.splice(values.indexOf(node), 1);
+        renderNodes();
+      });
+      chip.append(remove);
+      editor.insertBefore(chip, input);
+    });
+    if (notify) onChange();
+  };
+  const addNode = (value) => {
+    const node = value.trim();
+    if (!node || values.includes(node)) return;
+    values.push(node);
+    renderNodes();
+  };
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      addNode(input.value);
+      input.value = "";
+    } else if (event.key === "Backspace" && !input.value && values.length) {
+      values.pop();
+      renderNodes();
+    }
+  });
+  input.addEventListener("input", () => {
+    if (!input.value.includes(",")) return;
+    input.value.split(",").forEach(addNode);
+    input.value = "";
+  });
+  renderNodes(false);
+  return { wrapper, getValues: () => [...values], input };
+}
+
 function createStationRow(station, index, onChange) {
   const row = document.createElement("div");
   row.className = "station-row";
   row.dataset.stationIndex = String(index);
 
-  const type = createField("Type", station.type ?? "", "station-type");
-  const nodes = createField("Nodes", station.members.join(", "), "station-nodes");
+  const type = createField("Color group", station.type ?? "", "station-type");
+  const nodes = createNodesField(station.members, onChange);
   const name = createField("Name", station.name ?? "", "station-name");
 
   const deleteButton = document.createElement("button");
@@ -39,20 +103,21 @@ function createStationRow(station, index, onChange) {
   actions.append(deleteButton);
   row.append(type.wrapper, nodes.wrapper, name.wrapper, actions);
 
-  [type.input, nodes.input, name.input].forEach((input) => input.addEventListener("input", onChange));
+  [type.input, name.input].forEach((input) => input.addEventListener("input", onChange));
   deleteButton.addEventListener("click", () => {
     row.remove();
     onChange();
   });
+  row._getMembers = nodes.getValues;
   return row;
 }
 
 function readRows() {
   return [...stationList.querySelectorAll(".station-row")].map((row) => {
-    const [type, members, name] = row.querySelectorAll("input");
+    const [type, name] = row.querySelectorAll(".station-type input, .station-name input");
     return {
       type: type.value.trim(),
-      members: members.value.split(",").map((member) => member.trim()).filter(Boolean),
+      members: row._getMembers(),
       name: name.value.trim(),
     };
   }).filter((station) => station.type || station.members.length || station.name);

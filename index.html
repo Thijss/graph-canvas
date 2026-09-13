@@ -50,7 +50,7 @@
                 <div class="edge-list-header" id="edgeListHeader" aria-hidden="true">
                   <span>From</span>
                   <span>To</span>
-                  <span>Type</span>
+                  <span>Color group</span>
                   <span>Open</span>
                   <span>Labels</span>
                   <span></span>
@@ -69,11 +69,10 @@
               <div>
                 <span class="eyebrow">02 / Group</span>
                 <h2>Stations</h2>
-                <p class="section-description">Stations with the same type share the same color.</p>
-                <div class="edge-mode-toggle station-mode-toggle" role="group" aria-label="Station editor mode">
-                  <button class="edge-mode-button is-active" id="stationVisualModeButton" type="button" aria-pressed="true">Visual</button>
-                  <button class="edge-mode-button" id="stationTextModeButton" type="button" aria-pressed="false">Text</button>
-                </div>
+              </div>
+              <div class="edge-mode-toggle station-mode-toggle" role="group" aria-label="Station editor mode">
+                <button class="edge-mode-button is-active" id="stationVisualModeButton" type="button" aria-pressed="true">Visual</button>
+                <button class="edge-mode-button" id="stationTextModeButton" type="button" aria-pressed="false">Text</button>
               </div>
             </div>
             <div class="station-editor" id="stationEditorPanel">
@@ -89,6 +88,7 @@
               <button class="button station-add-button" id="addStationButton" type="button">+ Add station</button>
             </div>
             <textarea id="stationEditor" class="station-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
+            <p class="section-description">Stations in the same color group share the same color.</p>
           </section>
 
           <section class="panel-section">
