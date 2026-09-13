@@ -1,9 +1,31 @@
-import { STATION_TYPE_PATTERN } from "./config.js";
+import { EDGE_TYPE_KEYWORDS, STATION_TYPE_PATTERN } from "./config.js";
 
-// Parses raw edge-list text: lines with 2+ values are edges, a lone value is a
-// standalone/floating node with no connections. Pure function — callers pass
-// in the raw text, so this module has no dependency on the DOM.
-export function parseGraph(text) {
+// Parses one edge's optional comma-separated labels into the normalized fields
+// used by the visual editor. Every edge has a primary type: unstyled edges and
+// conflicting primary types use `line`; other labels remain additional data.
+function normalizeEdgeLabels(label) {
+  const labels = (label ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const edgeTypes = labels.filter((part) => EDGE_TYPE_KEYWORDS.includes(part.toLowerCase()));
+  const type = edgeTypes.length === 1 ? edgeTypes[0].toLowerCase() : "line";
+  const open = labels.some((part) => part.toLowerCase() === "open");
+  const additionalLabels = edgeTypes.length === 1
+    ? labels.filter((part) => part.toLowerCase() !== type && part.toLowerCase() !== "open")
+    : labels.filter((part) => part.toLowerCase() !== "open");
+  return {
+    type,
+    open,
+    labels: additionalLabels,
+    label: labels.length ? labels.join(",") : undefined,
+  };
+}
+
+// Parses raw edge-list text into normalized edge records. Lines with 2+ values
+// are edges, while a lone value is a standalone/floating node. Pure function —
+// callers pass in the raw text, so this module has no dependency on the DOM.
+export function parseEdgeText(text) {
   const edges = [];
   const nodeSet = new Set();
   text.split(/\r?\n/).forEach((line, lineIndex) => {
@@ -18,12 +40,35 @@ export function parseGraph(text) {
       nodeSet.add(from);
       return;
     }
-    const edge = { from, to, label: rest ? rest.trim() : undefined, line: lineIndex };
+    const normalizedLabels = normalizeEdgeLabels(rest);
+    const edge = {
+      from,
+      to,
+      ...normalizedLabels,
+      line: lineIndex,
+    };
     edges.push(edge);
     nodeSet.add(edge.from);
     nodeSet.add(edge.to);
   });
   return { edges, nodes: [...nodeSet] };
+}
+
+// Serializes normalized edge records using explicit primary edge types in the
+// TXT edge syntax. Additional labels are emitted after the selected type.
+export function serializeEdges(edges) {
+  return edges
+    .map(({ from, to, type, open = false, labels = [], label }) => {
+      const serializedLabels = [type, open ? "open" : undefined, ...labels].filter(Boolean);
+      const fallbackLabel = serializedLabels.length ? serializedLabels.join(",") : label;
+      return [from, to, fallbackLabel].filter(Boolean).join(" ");
+    })
+    .join("\n");
+}
+
+// Backwards-compatible graph parser used by the renderer and simulation.
+export function parseGraph(text) {
+  return parseEdgeText(text);
 }
 
 // Parses raw station-group text. Each line: TYPE node,node,... [name] — TYPE is

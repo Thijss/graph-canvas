@@ -69,4 +69,8 @@ export const KEYWORD_STYLES = [
   { keyword: "link", className: "link", color: "#2fa84f" },
   { keyword: "x", className: "x", color: "#d84b4b" },
 ];
-export const DEFAULT_EDGE_COLOR = "#facc37";
+// Primary edge types exposed by the visual editor. `open` remains an
+// additional label because it modifies line appearance rather than defining
+// the connection type.
+export const EDGE_TYPE_KEYWORDS = ["line", "link", "transformer", "x"];
+export const LINE_EDGE_COLOR = "#facc37";

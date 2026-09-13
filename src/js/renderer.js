@@ -11,7 +11,7 @@ import {
   statusDot,
   directedToggle,
 } from "./dom.js";
-import { getPaletteColor, getRouteColor, KEYWORD_STYLES, DEFAULT_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
+import { getPaletteColor, getRouteColor, KEYWORD_STYLES, LINE_EDGE_COLOR, MIN_NODE_RADIUS, STATION_FILL_OPACITY } from "./config.js";
 import { getNodeRadius, getStationBounds } from "./simulation.js";
 
 let currentConflictingEdges = [];
@@ -58,7 +58,7 @@ export function render(state, edges, nodes, stations, routes, handlers) {
   const markerFor = (id, color) =>
     `<marker id="arrowhead-${id}" markerWidth="4" markerHeight="4" refX="3.5" refY="1.75" orient="auto"><path d="M0,0 L4,1.75 L0,3.5 z" fill="${color}"></path></marker>`;
   defs.innerHTML = [
-    markerFor("default", DEFAULT_EDGE_COLOR),
+    markerFor("line", LINE_EDGE_COLOR),
     ...KEYWORD_STYLES.map((style) => markerFor(style.className, style.color)),
   ].join("");
   graph.append(defs);
@@ -169,8 +169,9 @@ function drawEdge(state, edge, parallelOffset = 0) {
 
   // Labels are comma-separated; each part can be plain text or a special keyword.
   const parts = (edge.label ?? "").split(",").map((part) => part.trim()).filter(Boolean);
-  let colorKey = "default";
+  let colorKey = "line";
   const visibleParts = parts.filter((part) => {
+    if (/^line$/i.test(part)) return false;
     if (/open/i.test(part)) { line.classList.add("open"); return false; }
     const match = KEYWORD_STYLES.find((style) => new RegExp(style.keyword, "i").test(part));
     if (match) {

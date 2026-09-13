@@ -1,5 +1,9 @@
 import {
   edgeEditor,
+  edgeList,
+  addEdgeButton,
+  visualEdgeModeButton,
+  rawEdgeModeButton,
   stationEditor,
   routeEditor,
   graph,
@@ -58,6 +62,7 @@ import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./per
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { createPinchZoomController } from "./gestures.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
+import { addEdge, syncEdgeEditor } from "./edge-editor.js";
 
 let exportFormat = "txt";
 
@@ -94,6 +99,7 @@ function scheduleEditorRedraw() {
   editorDrawTimer = window.setTimeout(() => {
     editorDrawTimer = null;
     restartSimulation();
+    if (edgeEditor.classList.contains("is-raw")) syncEdgeEditor();
   }, 500);
 }
 function cancelScheduledEditorRedraw() {
@@ -215,6 +221,7 @@ clearButton.addEventListener("click", () => {
   edgeEditor.value = "";
   stationEditor.value = "";
   routeEditor.value = "";
+  syncEdgeEditor();
   persistEditors();
   state.positions.clear();
   state.pinnedNodes.clear();
@@ -270,6 +277,7 @@ async function loadTemplate(templateName) {
     const templateText = await response.text();
     const { edgesText, stationsText, routesText } = splitGraphText(templateText);
     edgeEditor.value = edgesText.trim();
+    syncEdgeEditor();
     stationEditor.value = stationsText.trim();
     routeEditor.value = routesText.trim();
     persistEditors();
@@ -354,6 +362,7 @@ fileInput.addEventListener("change", async () => {
 
     cancelScheduledEditorRedraw();
     edgeEditor.value = edgesText.trim();
+    syncEdgeEditor();
     stationEditor.value = stationsText.trim();
     routeEditor.value = routesText.trim();
     persistEditors();
@@ -463,6 +472,25 @@ const { edgesText, stationsText, routesText } = loadSavedEditors();
 if (edgesText !== null) edgeEditor.value = edgesText;
 if (stationsText !== null) stationEditor.value = stationsText;
 if (routesText !== null) routeEditor.value = routesText;
+syncEdgeEditor();
+addEdgeButton.addEventListener("click", addEdge);
+
+function setEdgeEditorMode(mode) {
+  const isRaw = mode === "raw";
+  edgeEditor.classList.toggle("is-raw", isRaw);
+  edgeEditor.setAttribute("aria-hidden", String(!isRaw));
+  edgeEditor.tabIndex = isRaw ? 0 : -1;
+  edgeList.hidden = isRaw;
+  addEdgeButton.hidden = isRaw;
+  visualEdgeModeButton.classList.toggle("is-active", !isRaw);
+  rawEdgeModeButton.classList.toggle("is-active", isRaw);
+  visualEdgeModeButton.setAttribute("aria-pressed", String(!isRaw));
+  rawEdgeModeButton.setAttribute("aria-pressed", String(isRaw));
+  if (isRaw) edgeEditor.focus();
+  else syncEdgeEditor();
+}
+visualEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("visual"));
+rawEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("raw"));
 const settings = loadSettings();
 document.documentElement.classList.toggle("dark", settings.darkMode);
 themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");

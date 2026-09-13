@@ -39,14 +39,29 @@
                 <span class="eyebrow">01 / Define</span>
                 <h2>Edges</h2>
               </div>
+              <div class="edge-mode-toggle" role="group" aria-label="Edge editor mode">
+                <button class="edge-mode-button is-active" id="visualEdgeModeButton" type="button" aria-pressed="true">Visual</button>
+                <button class="edge-mode-button" id="rawEdgeModeButton" type="button" aria-pressed="false">Text</button>
+              </div>
             </div>
             <input id="fileInput" type="file" accept=".txt,text/plain" hidden />
-            <div class="editor-status-wrap">
-              <textarea id="edgeEditor" spellcheck="false" aria-label="Graph connections" placeholder="1 2 link,open
-2 3 transformer
-3 4 x"></textarea>
-              <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
+            <div class="edge-editor" id="edgeEditorPanel">
+              <div class="edge-list" id="edgeList" aria-live="polite">
+                <div class="edge-list-header" id="edgeListHeader" aria-hidden="true">
+                  <span>From</span>
+                  <span>To</span>
+                  <span>Type</span>
+                  <span>Open</span>
+                  <span>Labels</span>
+                  <span></span>
+                </div>
+                <div class="edge-empty-state" id="edgeEmptyState">No edges yet. Add an edge to start building your graph.</div>
+              </div>
+              <button class="button edge-add-button" id="addEdgeButton" type="button">+ Add edge</button>
             </div>
+            <datalist id="edgeNodeSuggestions"></datalist>
+            <textarea id="edgeEditor" class="edge-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
+            <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
           </section>
 
           <section class="panel-section">
