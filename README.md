@@ -23,13 +23,9 @@ resulting `dist/` directory.
 
 ## Development
 
-Install the development dependencies and run the JavaScript linter with:
-
-```bash
-npm install
-npm run lint
-npm run build
-```
+See [DEVELOPMENT.md](DEVELOPMENT.md) for setup details, architecture,
+module boundaries, data flow, file-format conventions, and contribution
+guidance.
 
 ## Privacy & security
 
