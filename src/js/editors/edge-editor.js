@@ -1,7 +1,7 @@
 import { EDGE_COLORS } from "../config.js";
 import { edgeEditor, edgeEmptyState, edgeList, edgeListHeader, edgeNodeSuggestions } from "../dom.js";
 import { parseEdgeText, serializeEdges } from "../parser.js";
-import { createPopoverPicker } from "./popover-picker.js";
+import { createPopoverPicker } from "./editor-controls.js";
 
 function createField(label, value, className, withSuggestions = false) {
   const wrapper = document.createElement("label");

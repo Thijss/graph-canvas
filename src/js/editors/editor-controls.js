@@ -86,3 +86,74 @@ export function createPopoverPicker({
   control.append(input, button, popover);
   return { control, input, update };
 }
+
+export function createNodeListField({
+  members,
+  onChange,
+  wrapperClass,
+  editorClass,
+  chipClass,
+  removeClass,
+}) {
+  const wrapper = document.createElement("label");
+  wrapper.className = wrapperClass;
+  const caption = document.createElement("span");
+  caption.textContent = "Nodes";
+  const editor = document.createElement("div");
+  editor.className = editorClass;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Node ID, then [Enter]";
+  input.title = "Type a node ID and press Enter to add it";
+  input.setAttribute("aria-label", "Nodes");
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  editor.append(input);
+  wrapper.append(caption, editor);
+
+  const values = [...members];
+  const chipSelector = chipClass.split(/\s+/).map((className) => `.${className}`).join("");
+  const renderNodes = (notify = true) => {
+    editor.querySelectorAll(chipSelector).forEach((chip) => chip.remove());
+    values.forEach((node) => {
+      const chip = document.createElement("span");
+      chip.className = chipClass;
+      chip.textContent = node;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = removeClass;
+      remove.setAttribute("aria-label", `Remove node ${node}`);
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        values.splice(values.indexOf(node), 1);
+        renderNodes();
+      });
+      chip.append(remove);
+      editor.insertBefore(chip, input);
+    });
+    if (notify) onChange();
+  };
+  const addNode = (value) => {
+    const node = value.trim();
+    if (!node || values.includes(node)) return;
+    values.push(node);
+    renderNodes();
+  };
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      addNode(input.value);
+      input.value = "";
+    } else if (event.key === "Backspace" && !input.value && values.length) {
+      values.pop();
+      renderNodes();
+    }
+  });
+  input.addEventListener("input", () => {
+    if (!input.value.includes(",")) return;
+    input.value.split(",").forEach(addNode);
+    input.value = "";
+  });
+  renderNodes(false);
+  return { wrapper, getValues: () => [...values], input };
+}

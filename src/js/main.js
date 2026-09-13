@@ -71,6 +71,7 @@ import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
 import { wireEditorModeToggle } from "./editors/editor-mode.js";
+import { wireDialog } from "./dialogs.js";
 
 let exportFormat = "txt";
 
@@ -293,10 +294,13 @@ async function loadTemplate(templateName) {
   state.pinnedNodes.clear();
   restartSimulation();
 }
-templateButton.addEventListener("click", () => templateDialog.showModal());
+wireDialog({
+  dialog: templateDialog,
+  openButton: templateButton,
+  closeButton: templateDialogClose,
+});
 let helpLoaded = false;
-helpButton.addEventListener("click", async () => {
-  helpDialog.showModal();
+async function loadHelp() {
   if (helpLoaded) return;
   try {
     const response = await fetch("content/help.html");
@@ -306,10 +310,12 @@ helpButton.addEventListener("click", async () => {
   } catch {
     helpContent.textContent = "Could not load help content.";
   }
-});
-helpDialogClose.addEventListener("click", () => helpDialog.close());
-helpDialog.addEventListener("click", (event) => {
-  if (event.target === helpDialog) helpDialog.close();
+}
+wireDialog({
+  dialog: helpDialog,
+  openButton: helpButton,
+  closeButton: helpDialogClose,
+  onOpen: loadHelp,
 });
 openButton.addEventListener("click", () => fileInput.click());
 saveButton.addEventListener("click", () => {
@@ -377,7 +383,6 @@ fileInput.addEventListener("change", async () => {
     statusText.textContent = `Couldn't open file: ${error.message}`;
   }
 });
-templateDialogClose.addEventListener("click", () => templateDialog.close());
 templateList.addEventListener("click", (event) => {
   const option = event.target.closest("[data-template]");
   if (option) {
@@ -385,16 +390,12 @@ templateList.addEventListener("click", (event) => {
     loadTemplate(option.dataset.template);
   }
 });
-templateDialog.addEventListener("click", (event) => {
-  if (event.target === templateDialog) templateDialog.close();
+wireDialog({
+  dialog: disclaimerDialog,
+  openButton: disclaimerButton,
+  closeButton: disclaimerDialogClose,
 });
-disclaimerButton.addEventListener("click", () => disclaimerDialog.showModal());
-disclaimerDialogClose.addEventListener("click", () => disclaimerDialog.close());
-disclaimerDialog.addEventListener("click", (event) => {
-  if (event.target === disclaimerDialog) disclaimerDialog.close();
-});
-async function showLicense() {
-  licenseDialog.showModal();
+async function loadLicense() {
   try {
     const response = await fetch("LICENSE");
     if (!response.ok) throw new Error("Could not load license");
@@ -403,10 +404,11 @@ async function showLicense() {
     licenseContent.textContent = "Could not load the license.";
   }
 }
-licenseButton.addEventListener("click", showLicense);
-licenseDialogClose.addEventListener("click", () => licenseDialog.close());
-licenseDialog.addEventListener("click", (event) => {
-  if (event.target === licenseDialog) licenseDialog.close();
+wireDialog({
+  dialog: licenseDialog,
+  openButton: licenseButton,
+  closeButton: licenseDialogClose,
+  onOpen: loadLicense,
 });
 edgeEditor.addEventListener("input", scheduleEditorRedraw);
 edgeEditor.addEventListener("scroll", () => updateEdgeErrors());
