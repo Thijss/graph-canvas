@@ -157,3 +157,20 @@ export function createNodeListField({
   renderNodes(false);
   return { wrapper, getValues: () => [...values], input };
 }
+
+export function updateEditorListState({ list, rowSelector, emptyState, listHeader }) {
+  const hasRows = list.querySelectorAll(rowSelector).length > 0;
+  emptyState.hidden = hasRows;
+  listHeader.hidden = !hasRows;
+}
+
+export function createDeleteButton({ className, itemLabel, index, onDelete }) {
+  const deleteButton = document.createElement("button");
+  deleteButton.className = className;
+  deleteButton.type = "button";
+  deleteButton.title = `Delete ${itemLabel}`;
+  deleteButton.setAttribute("aria-label", `Delete ${itemLabel} ${index + 1}`);
+  deleteButton.textContent = "×";
+  deleteButton.addEventListener("click", onDelete);
+  return deleteButton;
+}

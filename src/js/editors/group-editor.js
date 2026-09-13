@@ -1,7 +1,12 @@
 import { GROUP_COLOR_PALETTE, getGroupColor } from "../config.js";
 import { edgeEditor, groupEditor, groupEmptyState, groupList, groupListHeader } from "../dom.js";
 import { parseEdgeText, parseGroups, serializeGroups } from "../parser.js";
-import { createNodeListField, createPopoverPicker } from "./editor-controls.js";
+import {
+  createDeleteButton,
+  createNodeListField,
+  createPopoverPicker,
+  updateEditorListState,
+} from "./editor-controls.js";
 
 function createColorField(value, index, onChange) {
   const wrapper = document.createElement("div");
@@ -44,18 +49,17 @@ function createGroupRow(group, index, onChange) {
     chipClass: "boundary-node-chip group-node-chip",
     removeClass: "boundary-node-remove group-node-remove",
   });
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "group-delete-button";
-  deleteButton.type = "button";
-  deleteButton.title = "Delete group";
-  deleteButton.setAttribute("aria-label", `Delete group ${index + 1}`);
-  deleteButton.textContent = "×";
+  const deleteButton = createDeleteButton({
+    className: "group-delete-button",
+    itemLabel: "group",
+    index,
+    onDelete: () => {
+      row.remove();
+      onChange();
+    },
+  });
   const color = createColorField(group.label, index, onChange);
   row.append(color.wrapper, nodes.wrapper, deleteButton);
-  deleteButton.addEventListener("click", () => {
-    row.remove();
-    onChange();
-  });
   row._getLabel = () => color.input.value;
   row._getMembers = nodes.getValues;
   return row;
@@ -68,15 +72,14 @@ function readRows() {
   })).filter((group) => group.nodes.length);
 }
 
-function updateListState() {
-  const hasRows = groupList.querySelectorAll(".group-row").length > 0;
-  groupEmptyState.hidden = hasRows;
-  groupListHeader.hidden = !hasRows;
-}
-
 export function updateGroupSourceText() {
   groupEditor.value = serializeGroups(readRows());
-  updateListState();
+  updateEditorListState({
+    list: groupList,
+    rowSelector: ".group-row",
+    emptyState: groupEmptyState,
+    listHeader: groupListHeader,
+  });
   groupEditor.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -88,7 +91,12 @@ export function syncGroupEditor() {
     groupEmptyState,
     ...groups.map((group, index) => createGroupRow(group, index, updateGroupSourceText)),
   );
-  updateListState();
+  updateEditorListState({
+    list: groupList,
+    rowSelector: ".group-row",
+    emptyState: groupEmptyState,
+    listHeader: groupListHeader,
+  });
 }
 
 export function addGroup() {
@@ -96,6 +104,11 @@ export function addGroup() {
   const label = index < 26 ? String.fromCharCode(65 + index) : `GROUP-${index + 1}`;
   const row = createGroupRow({ label, nodes: [] }, index, updateGroupSourceText);
   groupList.append(row);
-  updateListState();
+  updateEditorListState({
+    list: groupList,
+    rowSelector: ".group-row",
+    emptyState: groupEmptyState,
+    listHeader: groupListHeader,
+  });
   row.querySelector("input")?.focus();
 }

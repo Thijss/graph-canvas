@@ -1,7 +1,7 @@
 import { EDGE_COLORS } from "../config.js";
 import { edgeEditor, edgeEmptyState, edgeList, edgeListHeader, edgeNodeSuggestions } from "../dom.js";
 import { parseEdgeText, serializeEdges } from "../parser.js";
-import { createPopoverPicker } from "./editor-controls.js";
+import { createDeleteButton, createPopoverPicker, updateEditorListState } from "./editor-controls.js";
 
 function createField(label, value, className, withSuggestions = false) {
   const wrapper = document.createElement("label");
@@ -93,12 +93,15 @@ function createEdgeRow(edge, index, onChange) {
 
   const actions = document.createElement("div");
   actions.className = "edge-actions";
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "edge-delete-button";
-  deleteButton.type = "button";
-  deleteButton.title = "Delete edge";
-  deleteButton.setAttribute("aria-label", `Delete edge ${index + 1}`);
-  deleteButton.textContent = "×";
+  const deleteButton = createDeleteButton({
+    className: "edge-delete-button",
+    itemLabel: "edge",
+    index,
+    onDelete: () => {
+      row.remove();
+      onChange();
+    },
+  });
   actions.append(deleteButton);
 
   const error = document.createElement("span");
@@ -132,10 +135,6 @@ function createEdgeRow(edge, index, onChange) {
     window.setTimeout(() => {
       if (!row.contains(document.activeElement)) delete row._editingSnapshot;
     });
-  });
-  deleteButton.addEventListener("click", () => {
-    row.remove();
-    onChange();
   });
   update(false);
   return row;
@@ -173,12 +172,6 @@ function restoreRow(row, values) {
   label.value = values.label;
 }
 
-function updateListState() {
-  const hasRows = edgeList.querySelectorAll(".edge-row").length > 0;
-  edgeEmptyState.hidden = hasRows;
-  edgeListHeader.hidden = !hasRows;
-}
-
 function updateNodeSuggestions() {
   const ids = new Set();
   edgeList.querySelectorAll(".edge-row").forEach((row) => {
@@ -198,13 +191,23 @@ export function syncEdgeEditor() {
   const { edges, floatingNodes } = parseEdgeText(edgeEditor.value);
   const rows = [...edges, ...floatingNodes].sort((a, b) => a.line - b.line);
   edgeList.replaceChildren(edgeListHeader, edgeEmptyState, ...rows.map((edge, index) => createEdgeRow(edge, index, updateSourceText)));
-  updateListState();
+  updateEditorListState({
+    list: edgeList,
+    rowSelector: ".edge-row",
+    emptyState: edgeEmptyState,
+    listHeader: edgeListHeader,
+  });
   updateNodeSuggestions();
 }
 
 function updateSourceText() {
   edgeEditor.value = serializeEdges(readRows());
-  updateListState();
+  updateEditorListState({
+    list: edgeList,
+    rowSelector: ".edge-row",
+    emptyState: edgeEmptyState,
+    listHeader: edgeListHeader,
+  });
   updateNodeSuggestions();
   edgeEditor.dispatchEvent(new Event("input", { bubbles: true }));
 }
@@ -213,7 +216,12 @@ export function addEdge() {
   const index = edgeList.children.length;
   const row = createEdgeRow({ from: "", to: "", color: "yellow", style: "solid", label: "" }, index, updateSourceText);
   edgeList.append(row);
-  updateListState();
+  updateEditorListState({
+    list: edgeList,
+    rowSelector: ".edge-row",
+    emptyState: edgeEmptyState,
+    listHeader: edgeListHeader,
+  });
   row.querySelector("input")?.focus();
 }
 

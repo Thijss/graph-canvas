@@ -1,7 +1,12 @@
 import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "../config.js";
 import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "../dom.js";
 import { parseEdgeText, parseBoundaryText, serializeBoundaries } from "../parser.js";
-import { createNodeListField, createPopoverPicker } from "./editor-controls.js";
+import {
+  createDeleteButton,
+  createNodeListField,
+  createPopoverPicker,
+  updateEditorListState,
+} from "./editor-controls.js";
 
 function createField(label, value, className) {
   const wrapper = document.createElement("label");
@@ -74,12 +79,15 @@ function createBoundaryRow(boundary, index, onChange, previewColor) {
   });
   const name = createField("Name", boundary.name ?? "", "boundary-name");
 
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "boundary-delete-button";
-  deleteButton.type = "button";
-  deleteButton.title = "Delete boundary";
-  deleteButton.setAttribute("aria-label", `Delete boundary ${index + 1}`);
-  deleteButton.textContent = "×";
+  const deleteButton = createDeleteButton({
+    className: "boundary-delete-button",
+    itemLabel: "boundary",
+    index,
+    onDelete: () => {
+      row.remove();
+      onChange();
+    },
+  });
 
   const actions = document.createElement("div");
   actions.className = "boundary-actions";
@@ -87,10 +95,6 @@ function createBoundaryRow(boundary, index, onChange, previewColor) {
   row.append(type.wrapper, nodes.wrapper, name.wrapper, actions);
 
   name.input.addEventListener("input", onChange);
-  deleteButton.addEventListener("click", () => {
-    row.remove();
-    onChange();
-  });
   row._getMembers = nodes.getValues;
   row._getType = () => type.input.value;
   row._getName = () => name.input.value;
@@ -137,15 +141,14 @@ function serializeVisualBoundaries(boundaries) {
   })));
 }
 
-function updateListState() {
-  const hasRows = boundaryList.querySelectorAll(".boundary-row").length > 0;
-  boundaryEmptyState.hidden = hasRows;
-  boundaryListHeader.hidden = !hasRows;
-}
-
 export function updateBoundarySourceText() {
   boundaryEditor.value = serializeVisualBoundaries(readRows());
-  updateListState();
+  updateEditorListState({
+    list: boundaryList,
+    rowSelector: ".boundary-row",
+    emptyState: boundaryEmptyState,
+    listHeader: boundaryListHeader,
+  });
   boundaryEditor.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -158,13 +161,23 @@ export function syncBoundaryEditor() {
     boundaryEmptyState,
     ...boundaries.map((boundary, index) => createBoundaryRow(boundary, index, updateBoundarySourceText, previewColors.get(boundary.type))),
   );
-  updateListState();
+  updateEditorListState({
+    list: boundaryList,
+    rowSelector: ".boundary-row",
+    emptyState: boundaryEmptyState,
+    listHeader: boundaryListHeader,
+  });
 }
 
 export function addBoundary() {
   const index = boundaryList.children.length;
   const row = createBoundaryRow({ type: "", members: [], name: "" }, index, updateBoundarySourceText);
   boundaryList.append(row);
-  updateListState();
+  updateEditorListState({
+    list: boundaryList,
+    rowSelector: ".boundary-row",
+    emptyState: boundaryEmptyState,
+    listHeader: boundaryListHeader,
+  });
   row.querySelector("input")?.focus();
 }
