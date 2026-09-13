@@ -27,6 +27,7 @@ function normalizeEdgeLabels(label) {
 // callers pass in the raw text, so this module has no dependency on the DOM.
 export function parseEdgeText(text) {
   const edges = [];
+  const floatingNodes = [];
   const nodeSet = new Set();
   text.split(/\r?\n/).forEach((line, lineIndex) => {
     const trimmed = line.trim();
@@ -37,6 +38,7 @@ export function parseEdgeText(text) {
     const match = trimmed.match(/^(\S+)(?:\s+(\S+)(?:\s+([\s\S]*))?)?$/);
     const [, from, to, rest] = match;
     if (!to) {
+      floatingNodes.push({ from, to: "", type: "line", open: false, labels: [], line: lineIndex });
       nodeSet.add(from);
       return;
     }
@@ -51,7 +53,7 @@ export function parseEdgeText(text) {
     nodeSet.add(edge.from);
     nodeSet.add(edge.to);
   });
-  return { edges, nodes: [...nodeSet] };
+  return { edges, floatingNodes, nodes: [...nodeSet] };
 }
 
 // Serializes normalized edge records using explicit primary edge types in the
@@ -59,6 +61,7 @@ export function parseEdgeText(text) {
 export function serializeEdges(edges) {
   return edges
     .map(({ from, to, type, open = false, labels = [], label }) => {
+      if (!to) return from;
       const serializedLabels = [type, open ? "open" : undefined, ...labels].filter(Boolean);
       const fallbackLabel = serializedLabels.length ? serializedLabels.join(",") : label;
       return [from, to, fallbackLabel].filter(Boolean).join(" ");

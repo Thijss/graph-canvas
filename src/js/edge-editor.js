@@ -82,12 +82,12 @@ function createEdgeRow(edge, index, onChange) {
   row.append(from.wrapper, to.wrapper, type.wrapper, open.wrapper, labels.wrapper, actions, error);
 
   const update = (notify = true) => {
-    const hasPartialEndpoints = Boolean((from.input.value && !to.input.value) || (to.input.value && !from.input.value));
+    const hasPartialEndpoints = Boolean(to.input.value && !from.input.value);
     const styleLabels = [type.input.value, ...labels.input.value.split(",").map((label) => label.trim().toLowerCase())]
       .filter((label) => ["link", "transformer", "x"].includes(label));
     const hasConflictingStyles = new Set(styleLabels).size > 1;
     const message = hasPartialEndpoints
-      ? "Add both a from and to node."
+      ? "Add a from node."
       : hasConflictingStyles
         ? "Choose only one of link, transformer, or x."
         : "";
@@ -168,8 +168,9 @@ function updateNodeSuggestions() {
 }
 
 export function syncEdgeEditor() {
-  const { edges } = parseEdgeText(edgeEditor.value);
-  edgeList.replaceChildren(edgeListHeader, edgeEmptyState, ...edges.map((edge, index) => createEdgeRow(edge, index, updateSourceText)));
+  const { edges, floatingNodes } = parseEdgeText(edgeEditor.value);
+  const rows = [...edges, ...floatingNodes].sort((a, b) => a.line - b.line);
+  edgeList.replaceChildren(edgeListHeader, edgeEmptyState, ...rows.map((edge, index) => createEdgeRow(edge, index, updateSourceText)));
   updateListState();
   updateNodeSuggestions();
 }
