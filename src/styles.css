@@ -137,6 +137,7 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 .sidebar { display: flex; flex-direction: column; background: white; border-right: 1px solid var(--line); }
 .panel-section { padding: 29px 25px 24px; border-bottom: 1px solid var(--line); }
 .section-heading { justify-content: space-between; gap: 10px; }
+.section-heading > div:first-child { flex: 1; }
 .edge-mode-toggle {
   display: flex;
   gap: 3px;
@@ -159,10 +160,12 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   background: white;
   box-shadow: 0 1px 3px #26344d1a;
 }
+.station-mode-toggle { width: max-content; margin-top: 9px; margin-left: auto; }
 .section-heading.compact { justify-content: flex-start; }
 .topbar-file-actions { display: flex; gap: 6px; margin-right: 72px; }
 .eyebrow { display: block; color: var(--accent-dark); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 h2 { margin-top: 4px; font-size: 20px; letter-spacing: -.04em; }
+.section-description { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .edge-count { color: var(--muted); font-size: 11px; }
 .help-text { max-width: 260px; margin: 14px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .help-text.help-subheading { margin-top: 14px; font-weight: 700; color: var(--ink); }
@@ -321,6 +324,72 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 #edgeEditor::placeholder, #stationEditor::placeholder, #routeEditor::placeholder { color: #aab2bf; }
 #stationEditor { min-height: 110px; margin-top: 4px; }
 #routeEditor { min-height: 110px; margin-top: 4px; }
+.station-editor { margin-top: 4px; }
+.station-list { display: grid; gap: 0; }
+.station-list[hidden] { display: none; }
+.station-list-header, .station-row {
+  display: grid;
+  grid-template-columns: minmax(58px, .8fr) minmax(80px, 1.3fr) minmax(70px, 1.5fr) 28px;
+  gap: 5px;
+  align-items: end;
+}
+.station-list-header {
+  padding: 0 5px 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.station-list-header span:last-child { visibility: hidden; }
+.station-row {
+  padding: 5px;
+  border-bottom: 1px solid var(--line);
+}
+.station-field { min-width: 0; }
+.station-field > span { display: none; }
+.station-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  outline: none;
+  color: var(--ink);
+  background: white;
+  font-size: 11px;
+}
+.station-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px #2596be15;
+}
+.station-actions { display: flex; align-items: center; }
+.station-delete-button {
+  width: 28px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+}
+.station-delete-button:hover { color: #d84b4b; background: #d84b4b12; }
+.station-empty-state {
+  padding: 18px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+.station-empty-state[hidden] { display: none; }
+.station-add-button { width: 100%; margin-top: 7px; }
+#stationEditor.station-editor-source { display: none; }
+#stationEditor.station-editor-source.is-text { display: block; margin-top: 4px; }
+.dark .station-field input { color: var(--ink); background: #18252c; }
 .editor-hint { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; color: var(--muted); font-size: 10px; }
 .options { padding-top: 23px; }
 .switch-row { justify-content: space-between; gap: 18px; margin-top: 20px; }
@@ -488,4 +557,16 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   .edge-open-field { grid-column: 2; }
   .edge-labels { grid-column: 1 / span 2; }
   .edge-actions { grid-column: 3; grid-row: 1 / span 3; align-self: center; flex-direction: column; }
+  .station-list-header, .station-row {
+    grid-template-columns: 1fr 1fr 28px;
+    gap: 8px;
+  }
+  .station-list-header span:nth-child(1) { grid-column: 1; }
+  .station-list-header span:nth-child(2) { grid-column: 2; }
+  .station-list-header span:nth-child(3) { grid-column: 1 / span 2; }
+  .station-list-header span:nth-child(4) { grid-column: 3; }
+  .station-type { grid-column: 1; }
+  .station-nodes { grid-column: 2; }
+  .station-name { grid-column: 1 / span 2; }
+  .station-actions { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
 }

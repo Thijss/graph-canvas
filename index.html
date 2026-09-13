@@ -69,11 +69,26 @@
               <div>
                 <span class="eyebrow">02 / Group</span>
                 <h2>Stations</h2>
+                <p class="section-description">Stations with the same type share the same color.</p>
+                <div class="edge-mode-toggle station-mode-toggle" role="group" aria-label="Station editor mode">
+                  <button class="edge-mode-button is-active" id="stationVisualModeButton" type="button" aria-pressed="true">Visual</button>
+                  <button class="edge-mode-button" id="stationTextModeButton" type="button" aria-pressed="false">Text</button>
+                </div>
               </div>
             </div>
-            <textarea id="stationEditor" spellcheck="false" aria-label="Station groups" placeholder="SUB  1,2  Substation
-CS   3    Control Station
-SS   4    Switching Station"></textarea>
+            <div class="station-editor" id="stationEditorPanel">
+              <div class="station-list" id="stationList" aria-live="polite">
+                <div class="station-list-header" id="stationListHeader" aria-hidden="true">
+                  <span>Type</span>
+                  <span>Nodes</span>
+                  <span>Name</span>
+                  <span></span>
+                </div>
+                <div class="station-empty-state" id="stationEmptyState">No stations yet. Add a station to group your nodes.</div>
+              </div>
+              <button class="button station-add-button" id="addStationButton" type="button">+ Add station</button>
+            </div>
+            <textarea id="stationEditor" class="station-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
           </section>
 
           <section class="panel-section">

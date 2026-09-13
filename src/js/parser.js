@@ -71,15 +71,15 @@ export function parseGraph(text) {
   return parseEdgeText(text);
 }
 
-// Parses raw station-group text. Each line: TYPE node,node,... [name] — TYPE is
-// the first token (a word containing letters, digits, hyphens, or underscores),
-// the second token is the comma-separated member list (no spaces inside it),
-// and anything after it is the optional station name. Member ids not present in
-// `existingNodes` are dropped. Every input line remains a separate station,
-// even when multiple lines use the same type. A node can belong to at most one
-// station; if it's referenced by more than one line, the last line wins. Pure
-// function — no DOM dependency, same rationale as parseGraph.
-export function parseStations(text, existingNodes) {
+// Parses raw station-group text into normalized station records. Each line:
+// TYPE node,node,... [name] — TYPE is the first token (a word containing
+// letters, digits, hyphens, or underscores), the second token is the
+// comma-separated member list, and anything after it is the optional station
+// name. Member ids not present in `existingNodes` are dropped. Every input line
+// remains a separate station, even when multiple lines use the same type. A
+// node can belong to at most one station; if it's referenced by more than one
+// line, the last line wins.
+export function parseStationText(text, existingNodes) {
   const nodeSet = new Set(existingNodes);
   const stations = [];
   text.split(/\r?\n/).forEach((line) => {
@@ -107,6 +107,18 @@ export function parseStations(text, existingNodes) {
     station.members = station.members.filter((member) => ownerIndex.get(member) === index);
   });
   return stations.filter((station) => station.members.length);
+}
+
+// Backwards-compatible station parser used by the renderer and simulation.
+export function parseStations(text, existingNodes) {
+  return parseStationText(text, existingNodes);
+}
+
+// Serializes normalized station records using the existing TXT syntax.
+export function serializeStations(stations) {
+  return stations
+    .map(({ type, members = [], name = "" }) => [type, members.join(","), name.trim()].filter(Boolean).join(" "))
+    .join("\n");
 }
 
 // Parses route text. Each line is LABEL node,node,...; every line remains a

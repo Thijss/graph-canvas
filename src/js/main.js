@@ -5,6 +5,10 @@ import {
   visualEdgeModeButton,
   rawEdgeModeButton,
   stationEditor,
+  stationList,
+  addStationButton,
+  stationVisualModeButton,
+  stationTextModeButton,
   routeEditor,
   graph,
   graphWrap,
@@ -63,6 +67,7 @@ import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { createPinchZoomController } from "./gestures.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
 import { addEdge, syncEdgeEditor } from "./edge-editor.js";
+import { addStation, syncStationEditor } from "./station-editor.js";
 
 let exportFormat = "txt";
 
@@ -100,6 +105,7 @@ function scheduleEditorRedraw() {
     editorDrawTimer = null;
     restartSimulation();
     if (edgeEditor.classList.contains("is-raw")) syncEdgeEditor();
+    if (stationEditor.classList.contains("is-text")) syncStationEditor();
   }, 500);
 }
 function cancelScheduledEditorRedraw() {
@@ -222,6 +228,7 @@ clearButton.addEventListener("click", () => {
   stationEditor.value = "";
   routeEditor.value = "";
   syncEdgeEditor();
+  syncStationEditor();
   persistEditors();
   state.positions.clear();
   state.pinnedNodes.clear();
@@ -279,6 +286,7 @@ async function loadTemplate(templateName) {
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
     stationEditor.value = stationsText.trim();
+    syncStationEditor();
     routeEditor.value = routesText.trim();
     persistEditors();
   } catch {
@@ -364,6 +372,7 @@ fileInput.addEventListener("change", async () => {
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
     stationEditor.value = stationsText.trim();
+    syncStationEditor();
     routeEditor.value = routesText.trim();
     persistEditors();
     state.positions.clear();
@@ -473,7 +482,9 @@ if (edgesText !== null) edgeEditor.value = edgesText;
 if (stationsText !== null) stationEditor.value = stationsText;
 if (routesText !== null) routeEditor.value = routesText;
 syncEdgeEditor();
+syncStationEditor();
 addEdgeButton.addEventListener("click", addEdge);
+addStationButton.addEventListener("click", addStation);
 
 function setEdgeEditorMode(mode) {
   const isRaw = mode === "raw";
@@ -491,6 +502,23 @@ function setEdgeEditorMode(mode) {
 }
 visualEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("visual"));
 rawEdgeModeButton.addEventListener("click", () => setEdgeEditorMode("raw"));
+
+function setStationEditorMode(mode) {
+  const isText = mode === "text";
+  stationEditor.classList.toggle("is-text", isText);
+  stationEditor.setAttribute("aria-hidden", String(!isText));
+  stationEditor.tabIndex = isText ? 0 : -1;
+  stationList.hidden = isText;
+  addStationButton.hidden = isText;
+  stationVisualModeButton.classList.toggle("is-active", !isText);
+  stationTextModeButton.classList.toggle("is-active", isText);
+  stationVisualModeButton.setAttribute("aria-pressed", String(!isText));
+  stationTextModeButton.setAttribute("aria-pressed", String(isText));
+  if (isText) stationEditor.focus();
+  else syncStationEditor();
+}
+stationVisualModeButton.addEventListener("click", () => setStationEditorMode("visual"));
+stationTextModeButton.addEventListener("click", () => setStationEditorMode("text"));
 const settings = loadSettings();
 document.documentElement.classList.toggle("dark", settings.darkMode);
 themeToggle.setAttribute("aria-label", settings.darkMode ? "Enable light mode" : "Enable dark mode");
