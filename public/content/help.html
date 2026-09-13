@@ -1,49 +1,18 @@
-<!-- Help content loaded into the help dialog. -->
 <section class="help-section">
-  <h3>Define the graph</h3>
-  <p>An edge connects two nodes in the graph. Edges are defined by specifying the starting node, the ending node, and an optional label.</p>
-  <p><code class="help-example">1&nbsp;&nbsp;2&nbsp;&nbsp;blue,dotted,backup</code></p>
-  <p>Color and style are optional. They default to yellow and solid. Additional labels can be combined, separated by commas. For parallel edges, just repeat the definition.</p>
-  <p>Colors modify the appearance of the edge:</p>
-
+  <h3>Visual editors</h3>
+  <p>Use <strong>Visual</strong> mode to build your graph with editable rows. Each editor also has a <strong>Text</strong> mode for direct editing.</p>
 </section>
 <section class="help-section">
-  <h3>Boundaries</h3>
-  <p>Nodes can be boundaryed. This will color-code and add a hull around the boundaryed nodes.</p>
-  <p>Syntax:</p>
-  <p><code class="help-example">BOUNDARY&nbsp;&nbsp;node,node,...&nbsp;&nbsp;name</code></p>
-  <p><code>BOUNDARY</code> can be any word containing letters, numbers, hyphens, or underscores.</p>
-  <p>Each line defines a separate boundary; boundaries with the same type share a color.</p>
-  <p>Example:</p>
-  <p><code class="help-example">COLOR-A&nbsp;&nbsp;1,2&nbsp;&nbsp;Example boundary</code></p>
-  <p>Use the <strong>Show Boundaries</strong> toggle to hide or show borders around boundaries.</p>
-
+  <h3>Edges</h3>
+  <p>An edge connects a <strong>From</strong> node to a <strong>To</strong> node. Set its color, line style, and optional label in the row.</p>
 </section>
 <section class="help-section">
-  <h3>Mark groups</h3>
-  <p>Groups color their member nodes.</p>
-  <p>Syntax:</p>
-  <p><code class="help-example">LABEL&nbsp;&nbsp;node1,node2</code></p>
-  <p>Use the <strong>Show Groups</strong> toggle to hide or show group coloring.</p>
+  <h3>Boundaries and groups</h3>
+  <p>Boundaries organize nodes inside a colored hull. Groups color their member nodes without adding a hull.</p>
+  <p>Nodes can belong to multiple boundaries or groups. Boundaries with the same type share a color.</p>
 </section>
 <section class="help-section">
-  <h3>Templates</h3>
-  <p>Click Templates in the top menu to browse the built-in graph examples.</p>
-  <p>Selecting a template replaces the current Edges and Boundaries editor contents with the template data.</p>
-</section>
-<section class="help-section">
-  <h3>Move around</h3>
-  <p>Drag nodes to reposition them, drag empty canvas space to pan, and use the zoom buttons to zoom.</p>
-</section>
-<section class="help-section">
-  <h3>Change the layout</h3>
-  <p>Choose Physics, DAG, or Custom and adjust the available controls.</p>
-</section>
-<section class="help-section">
-  <h3>Save your work</h3>
-  <p>Use Import to open a TXT graph file and Export to save TXT, PNG, or SVG.</p>
-</section>
-<section class="help-section">
-  <h3>Toggle the theme</h3>
-  <p>Click the PGM logo to switch between light and dark mode.</p>
+  <h3>Canvas modes</h3>
+  <p><strong>Physics</strong> arranges connected nodes automatically. <strong>DAG</strong> lays out directed graphs in levels. <strong>Custom</strong> lets you position nodes freely.</p>
+  <p>Use the canvas toggles to show or hide directions, boundaries, and groups.</p>
 </section>

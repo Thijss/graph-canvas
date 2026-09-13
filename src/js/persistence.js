@@ -52,7 +52,7 @@ export function loadSettings() {
       layoutMode,
       showBoundaryHulls: saved.showBoundaryHulls !== false,
       showGroups: saved.showGroups !== false,
-      showArrows: saved.showArrows !== false,
+      showArrows: saved.showArrows === true,
       darkMode: saved.darkMode === true,
       repulsion: typeof saved.repulsion === "string" && /^-?\d+$/.test(saved.repulsion)
         ? saved.repulsion
@@ -66,7 +66,7 @@ export function loadSettings() {
       layoutMode: loadLayoutMode(),
       showBoundaryHulls: true,
       showGroups: true,
-      showArrows: true,
+      showArrows: false,
       repulsion: "4000",
       dagLevelSpacing: 120,
     };

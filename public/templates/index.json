@@ -22,5 +22,11 @@
     "title": "30 node network",
     "description": "A 30-node network.",
     "file": "30-NODE.txt"
+  },
+  {
+    "id": "people-relationships",
+    "title": "People and relationships",
+    "description": "A small social network showing family, friends, and colleagues.",
+    "file": "PEOPLE-RELATIONSHIPS.txt"
   }
 ]

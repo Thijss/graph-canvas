@@ -86,8 +86,7 @@ export function parseGraph(text) {
 // comma-separated member list, and anything after it is the optional boundary
 // name. Member ids not present in `existingNodes` are dropped. Every input line
 // remains a separate boundary, even when multiple lines use the same type. A
-// node can belong to at most one boundary; if it's referenced by more than one
-// line, the last line wins.
+// Nodes may belong to multiple boundaries.
 export function parseBoundaryText(text, existingNodes) {
   const nodeSet = new Set(existingNodes);
   const boundaries = [];
@@ -106,14 +105,6 @@ export function parseBoundaryText(text, existingNodes) {
     const nameTokens = tokens.slice(2);
     const name = nameTokens.length ? nameTokens.join(" ") : "";
     boundaries.push({ type, name, members });
-  });
-  // Enforce single membership: later lines win over earlier ones for the same node.
-  const ownerIndex = new Map();
-  boundaries.forEach((boundary, index) => {
-    boundary.members.forEach((member) => ownerIndex.set(member, index));
-  });
-  boundaries.forEach((boundary, index) => {
-    boundary.members = boundary.members.filter((member) => ownerIndex.get(member) === index);
   });
   return boundaries.filter((boundary) => boundary.members.length);
 }

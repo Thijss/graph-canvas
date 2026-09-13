@@ -1,0 +1,18 @@
+Alice Bob red,partner
+Alice Carol blue,sibling
+Bob Carol blue,sibling
+Alice David green,friend
+Carol Eva green,friend
+David Eva green,friend
+Bob Frank dotted,colleague
+Frank Grace dotted,colleague
+Grace Helen dotted,colleague
+Eva Helen dotted,colleague
+Helen Ian yellow,mentor
+Ian Jack yellow,friend
+-----BOUNDARIES-----
+FAMILY Alice,Bob,Carol Family
+WORK Bob,Eva,Frank,Grace,Helen Work
+-----GROUPS-----
+FRIENDS Alice,Carol,David,Eva Friends
+COLLEAGUES Bob,Eva,Frank,Grace,Helen Colleagues
