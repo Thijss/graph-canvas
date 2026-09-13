@@ -75,11 +75,6 @@ export function serializeEdges(edges) {
     .join("\n");
 }
 
-// Backwards-compatible graph parser used by the renderer and simulation.
-export function parseGraph(text) {
-  return parseEdgeText(text);
-}
-
 // Parses raw boundary text into normalized boundary records. Each line:
 // TYPE node,node,... [name] — TYPE is the first token (a word containing
 // letters, digits, hyphens, or underscores), the second token is the
@@ -107,11 +102,6 @@ export function parseBoundaryText(text, existingNodes) {
     boundaries.push({ type, name, members });
   });
   return boundaries.filter((boundary) => boundary.members.length);
-}
-
-// Backwards-compatible boundary parser used by the renderer and simulation.
-export function parseBoundaries(text, existingNodes) {
-  return parseBoundaryText(text, existingNodes);
 }
 
 // Serializes normalized boundary records using the existing TXT syntax.

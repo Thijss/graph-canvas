@@ -1,6 +1,6 @@
 import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "../config.js";
 import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "../dom.js";
-import { parseGraph, parseBoundaryText, serializeBoundaries } from "../parser.js";
+import { parseEdgeText, parseBoundaryText, serializeBoundaries } from "../parser.js";
 import { createPopoverPicker } from "./popover-picker.js";
 
 function createField(label, value, className) {
@@ -207,7 +207,7 @@ export function updateBoundarySourceText() {
 }
 
 export function syncBoundaryEditor() {
-  const { nodes } = parseGraph(edgeEditor.value);
+  const { nodes } = parseEdgeText(edgeEditor.value);
   const boundaries = parseBoundaryText(boundaryEditor.value, nodes);
   const previewColors = computeBoundaryPreviewColors(boundaries);
   boundaryList.replaceChildren(

@@ -1,6 +1,6 @@
 import { graph, repulsionSlider, edgeEditor, boundaryEditor, groupEditor } from "./dom.js";
 import { state } from "./state.js";
-import { parseGraph, parseBoundaries, parseGroups } from "./parser.js";
+import { parseEdgeText, parseBoundaryText, parseGroups } from "./parser.js";
 import { layoutNodes, layoutTopDown, createSimulation, updateSimulationForces, clampToBounds } from "./simulation.js";
 import { render } from "./renderer.js";
 
@@ -18,8 +18,8 @@ let currentGraph = { edges: [], nodes: [], boundaries: [], groups: [] };
 let currentSize = { width: 800, height: 520 };
 
 function readGraph() {
-  const { edges, nodes } = parseGraph(edgeEditor.value);
-  const boundaries = parseBoundaries(boundaryEditor.value, nodes);
+  const { edges, nodes } = parseEdgeText(edgeEditor.value);
+  const boundaries = parseBoundaryText(boundaryEditor.value, nodes);
   const groups = parseGroups(groupEditor.value, nodes);
   return { edges, nodes, boundaries, groups };
 }

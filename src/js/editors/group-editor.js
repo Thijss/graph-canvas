@@ -1,6 +1,6 @@
 import { GROUP_COLOR_PALETTE, getGroupColor } from "../config.js";
 import { edgeEditor, groupEditor, groupEmptyState, groupList, groupListHeader } from "../dom.js";
-import { parseGraph, parseGroups, serializeGroups } from "../parser.js";
+import { parseEdgeText, parseGroups, serializeGroups } from "../parser.js";
 import { createPopoverPicker } from "./popover-picker.js";
 
 function createNodesField(members, onChange) {
@@ -137,7 +137,7 @@ export function updateGroupSourceText() {
 }
 
 export function syncGroupEditor() {
-  const { nodes } = parseGraph(edgeEditor.value);
+  const { nodes } = parseEdgeText(edgeEditor.value);
   const groups = parseGroups(groupEditor.value, nodes);
   groupList.replaceChildren(
     groupListHeader,
