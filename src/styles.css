@@ -4,8 +4,8 @@
   --muted: #778294;
   --line: #e5e9ef;
   --soft: #f6f8fb;
-  --accent: #2596be;
-  --accent-dark: #1d7898;
+  --accent: #09d5ad;
+  --accent-dark: #078f7a;
   --orange: #f27856;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -24,10 +24,11 @@ button { cursor: pointer; }
 .brand { gap: 13px; }
 .brand-actions { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
 .brand-mark {
-  display: grid; place-items: center; width: 50px; height: 36px; padding: 0; border: 0; border-radius: 10px;
-  color: white; font-size: 12px; font-weight: 800; letter-spacing: .08em;
-  background: linear-gradient(135deg, #2596be, #1d7898);
-  box-shadow: 0 5px 12px #2596be38;
+  display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0;
+  background: transparent;
+}
+.brand-mark img {
+  display: block; width: 42px; height: 42px; object-fit: contain;
 }
 .dark {
   --ink: #e8f0f4;
@@ -96,7 +97,7 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   display: grid; gap: 5px; width: 100%; padding: 15px; border: 1px solid var(--line);
   border-radius: 9px; color: var(--ink); background: white; text-align: left; transition: .18s ease;
 }
-.template-option:hover { border-color: var(--accent); background: #eef9fc; }
+.template-option:hover { border-color: var(--accent); background: #e8fbf7; }
 .template-option span { color: var(--muted); font-size: 11px; line-height: 1.5; }
 .save-dialog form { margin-top: 24px; }
 .save-label { display: block; color: var(--muted); font-size: 12px; }
@@ -104,7 +105,7 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line);
   border-radius: 8px; outline: none; color: var(--ink); background: #fbfcfe; font-size: 12px;
 }
-.save-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #2596be15; }
+.save-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #09d5ad15; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 .disclaimer-button {
   display: inline-block; text-decoration: none;
@@ -224,7 +225,7 @@ h2 { margin-top: 4px; font-size: 20px; letter-spacing: -.04em; }
 .keyword-preview-dotted { color: #697587; border-top-style: dotted; }
 .keyword-preview-red { color: #d84b4b; }
 .keyword-hint { color: var(--muted); }
-code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); background: #e7f5fa; font-size: 11px; }
+code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); background: #e8fbf7; font-size: 11px; }
 #edgeEditor, #boundaryEditor, #groupEditor {
   display: block; width: 100%; min-height: 230px; resize: vertical; padding: 13px 14px;
   border: 1px solid var(--line); border-radius: 8px; outline: none; color: var(--ink);
@@ -313,7 +314,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-style-button:focus-visible {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2596be15;
+  box-shadow: 0 0 0 3px #09d5ad15;
 }
 .edge-style-popover {
   position: absolute;
@@ -353,7 +354,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-color-button:focus-visible {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2596be15;
+  box-shadow: 0 0 0 3px #09d5ad15;
 }
 .edge-color-popover {
   position: absolute;
@@ -375,7 +376,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .dark .edge-color-button, .dark .edge-color-option, .dark .edge-color-popover { background: #18252c; }
 .edge-field input:focus, .edge-field select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2596be15;
+  box-shadow: 0 0 0 3px #09d5ad15;
 }
 .edge-row.is-invalid { border-color: #d84b4b; }
 .edge-row.is-invalid .edge-field input { border-color: #d84b4b; }
@@ -426,7 +427,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   line-height: 1;
   pointer-events: none;
 }
-#edgeEditor:focus, #boundaryEditor:focus, #groupEditor:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #2596be15; }
+#edgeEditor:focus, #boundaryEditor:focus, #groupEditor:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #09d5ad15; }
 .dark #edgeEditor:focus, .dark #boundaryEditor:focus, .dark #groupEditor:focus { background: #142027; }
 #edgeEditor::placeholder, #boundaryEditor::placeholder, #groupEditor::placeholder { color: #aab2bf; }
 #boundaryEditor { min-height: 110px; margin-top: 4px; }
@@ -525,7 +526,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 }
 .boundary-field input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2596be15;
+  box-shadow: 0 0 0 3px #09d5ad15;
 }
 .boundary-color-control {
   position: relative;
@@ -595,7 +596,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 }
 .boundary-node-editor:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px #2596be15;
+  box-shadow: 0 0 0 3px #09d5ad15;
 }
 .boundary-node-editor input {
   flex: 1 1 48px;
@@ -614,7 +615,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   padding: 3px 5px;
   border-radius: 4px;
   color: var(--accent-dark);
-  background: #e7f5fa;
+  background: #e8fbf7;
   font-size: 10px;
   line-height: 1.2;
 }
@@ -730,7 +731,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .graph-wrap.panning { cursor: grabbing; }
 #graph { width: 100%; height: 100%; min-height: 520px; overflow: visible; }
 .empty-state { position: absolute; top: 50%; left: 50%; width: 280px; transform: translate(-50%, -50%); text-align: center; }
-.empty-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 14px; color: var(--accent-dark); background: #e7f5fa; font-size: 29px; }
+.empty-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 14px; color: var(--accent-dark); background: #e8fbf7; font-size: 29px; }
 .empty-state h3 { font-size: 15px; }
 .empty-state p { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .canvas-tip { position: absolute; right: 18px; bottom: 15px; color: #aab2bf; font-size: 10px; }
