@@ -52,6 +52,9 @@ button { cursor: pointer; }
 .dark #edgeEditor,
 .dark #boundaryEditor,
 .dark #groupEditor { color: var(--ink); background: #142027; }
+.dark #edgeEditor:focus,
+.dark #boundaryEditor:focus,
+.dark #groupEditor:focus { color: var(--ink); background: #142027; }
 .dark .graph-wrap { background-color: #18252c; background-image: radial-gradient(#30434d 1px, transparent 1px); }
 .dark .node-circle { fill: #18252c; stroke: #d7e5eb; }
 .dark .edge-label,
@@ -158,17 +161,27 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
   background: white;
   box-shadow: 0 1px 3px #26344d1a;
 }
+.dark .edge-mode-button.is-active {
+  color: var(--ink);
+  background: #30434d;
+  box-shadow: 0 1px 3px #0006;
+}
 .boundary-mode-toggle { width: max-content; margin-left: auto; }
 .section-heading.compact { justify-content: flex-start; }
-.panel-section.is-collapsed > :not(.section-heading) { display: none; }
+.panel-section.is-collapsed > :not(.section-heading) { display: none !important; }
 .panel-section-toggle {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
   flex: 0 0 auto;
+  min-width: 16px;
   padding: 0 2px;
   color: var(--muted);
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
+  user-select: none;
   transition: transform .18s ease, color .18s ease;
 }
 .panel-section-toggle:hover { color: var(--ink); }
@@ -414,6 +427,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   pointer-events: none;
 }
 #edgeEditor:focus, #boundaryEditor:focus, #groupEditor:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px #2596be15; }
+.dark #edgeEditor:focus, .dark #boundaryEditor:focus, .dark #groupEditor:focus { background: #142027; }
 #edgeEditor::placeholder, #boundaryEditor::placeholder, #groupEditor::placeholder { color: #aab2bf; }
 #boundaryEditor { min-height: 110px; margin-top: 4px; }
 #groupEditor { min-height: 110px; margin-top: 4px; }

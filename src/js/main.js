@@ -530,7 +530,10 @@ document.querySelectorAll(".panel-section-toggle").forEach((toggle) => {
     const title = section.querySelector("h2")?.textContent ?? "section";
     toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${title} section`);
   };
-  toggle.addEventListener("click", toggleSection);
+  toggle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    toggleSection();
+  });
   toggle.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
