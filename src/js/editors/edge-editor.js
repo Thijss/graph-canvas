@@ -1,6 +1,7 @@
-import { EDGE_COLORS } from "./config.js";
-import { edgeEditor, edgeEmptyState, edgeList, edgeListHeader, edgeNodeSuggestions } from "./dom.js";
-import { parseEdgeText, serializeEdges } from "./parser.js";
+import { EDGE_COLORS } from "../config.js";
+import { edgeEditor, edgeEmptyState, edgeList, edgeListHeader, edgeNodeSuggestions } from "../dom.js";
+import { parseEdgeText, serializeEdges } from "../parser.js";
+import { createPopoverPicker } from "./popover-picker.js";
 
 function createField(label, value, className, withSuggestions = false) {
   const wrapper = document.createElement("label");
@@ -26,67 +27,28 @@ function createColorField(value) {
 
   const caption = document.createElement("span");
   caption.textContent = "Color";
-  const control = document.createElement("div");
-  control.className = "edge-color-control";
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.value = EDGE_COLORS.some(({ token }) => token === value) ? value : "yellow";
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "edge-color-button";
-  button.setAttribute("aria-haspopup", "listbox");
-  button.setAttribute("aria-expanded", "false");
-  const popover = document.createElement("div");
-  popover.className = "edge-color-popover";
-  popover.setAttribute("role", "listbox");
-  popover.hidden = true;
-
-  const updateSelectedColor = () => {
-    const selected = EDGE_COLORS.find(({ token }) => token === input.value) ?? EDGE_COLORS[0];
-    button.style.setProperty("--edge-color", selected.color);
-    button.setAttribute("aria-label", `Color ${selected.color}`);
-    popover.querySelectorAll("button").forEach((option) => {
-      const isSelected = option.dataset.value === input.value;
-      option.classList.toggle("is-selected", isSelected);
-      option.setAttribute("aria-selected", String(isSelected));
-    });
-  };
-  const closePopover = () => {
-    popover.hidden = true;
-    button.setAttribute("aria-expanded", "false");
-    document.removeEventListener("pointerdown", handleOutsideClick, true);
-  };
-  const handleOutsideClick = (event) => {
-    if (!control.contains(event.target)) closePopover();
-  };
-  button.addEventListener("click", () => {
-    if (popover.hidden) {
-      popover.hidden = false;
-      button.setAttribute("aria-expanded", "true");
-      document.addEventListener("pointerdown", handleOutsideClick, true);
-    } else {
-      closePopover();
-    }
+  const picker = createPopoverPicker({
+    value: EDGE_COLORS.some(({ token }) => token === value) ? value : "yellow",
+    controlClass: "edge-color-control",
+    buttonClass: "edge-color-button",
+    popoverClass: "edge-color-popover",
+    optionClass: "edge-color-option",
+    options: EDGE_COLORS.map(({ token, color }) => ({
+      value: token,
+      ariaLabel: `Color ${color}`,
+      setup: (option) => option.style.setProperty("--edge-color", color),
+    })),
+    getButtonLabel: (currentValue) => {
+      const selected = EDGE_COLORS.find(({ token }) => token === currentValue) ?? EDGE_COLORS[0];
+      return `Color ${selected.color}`;
+    },
+    updateButton: (button, currentValue) => {
+      const selected = EDGE_COLORS.find(({ token }) => token === currentValue) ?? EDGE_COLORS[0];
+      button.style.setProperty("--edge-color", selected.color);
+    },
+    dispatchEvents: ["input", "change"],
   });
-  EDGE_COLORS.forEach(({ token, color }) => {
-    const option = document.createElement("button");
-    option.type = "button";
-    option.className = "edge-color-option";
-    option.dataset.value = token;
-    option.setAttribute("role", "option");
-    option.setAttribute("aria-label", `Color ${color}`);
-    option.style.setProperty("--edge-color", color);
-    option.addEventListener("click", () => {
-      input.value = token;
-      updateSelectedColor();
-      closePopover();
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-    popover.append(option);
-  });
-  updateSelectedColor();
-  control.append(input, button, popover);
+  const { control, input } = picker;
   wrapper.append(caption, control);
   return { wrapper, input };
 }
@@ -97,65 +59,23 @@ function createStyleField(value) {
 
   const caption = document.createElement("span");
   caption.textContent = "Style";
-  const control = document.createElement("div");
-  control.className = "edge-style-control";
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.value = value === true ? "dotted" : value === "dotted" ? "dotted" : "solid";
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "edge-style-button";
-  button.setAttribute("aria-haspopup", "listbox");
-  button.setAttribute("aria-expanded", "false");
-  const popover = document.createElement("div");
-  popover.className = "edge-style-popover";
-  popover.setAttribute("role", "listbox");
-  popover.hidden = true;
-
-  const updateSelectedStyle = () => {
-    button.dataset.style = input.value;
-    button.setAttribute("aria-label", input.value === "dotted" ? "Style dotted line" : "Style solid line");
-    popover.querySelectorAll("button").forEach((option) => {
-      const isSelected = option.dataset.value === input.value;
-      option.classList.toggle("is-selected", isSelected);
-      option.setAttribute("aria-selected", String(isSelected));
-    });
-  };
-  const closePopover = () => {
-    popover.hidden = true;
-    button.setAttribute("aria-expanded", "false");
-    document.removeEventListener("pointerdown", handleOutsideClick, true);
-  };
-  const handleOutsideClick = (event) => {
-    if (!control.contains(event.target)) closePopover();
-  };
-  button.addEventListener("click", () => {
-    if (popover.hidden) {
-      popover.hidden = false;
-      button.setAttribute("aria-expanded", "true");
-      document.addEventListener("pointerdown", handleOutsideClick, true);
-    } else {
-      closePopover();
-    }
+  const picker = createPopoverPicker({
+    value: value === true ? "dotted" : value === "dotted" ? "dotted" : "solid",
+    controlClass: "edge-style-control",
+    buttonClass: "edge-style-button",
+    popoverClass: "edge-style-popover",
+    optionClass: "edge-style-option",
+    options: [["solid", "Solid line"], ["dotted", "Dotted line"]].map(([optionValue, label]) => ({
+      value: optionValue,
+      ariaLabel: label,
+    })),
+    getButtonLabel: (currentValue) => currentValue === "dotted" ? "Style dotted line" : "Style solid line",
+    updateButton: (button, currentValue) => {
+      button.dataset.style = currentValue;
+    },
+    dispatchEvents: ["input", "change"],
   });
-  [["solid", "Solid line"], ["dotted", "Dotted line"]].forEach(([optionValue, label]) => {
-    const option = document.createElement("button");
-    option.type = "button";
-    option.className = "edge-style-option";
-    option.dataset.value = optionValue;
-    option.setAttribute("role", "option");
-    option.setAttribute("aria-label", label);
-    option.addEventListener("click", () => {
-      input.value = optionValue;
-      updateSelectedStyle();
-      closePopover();
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-    popover.append(option);
-  });
-  updateSelectedStyle();
-  control.append(input, button, popover);
+  const { control, input } = picker;
   wrapper.append(caption, control);
   return { wrapper, input };
 }

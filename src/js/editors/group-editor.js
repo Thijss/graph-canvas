@@ -1,6 +1,7 @@
-import { GROUP_COLOR_PALETTE, getGroupColor } from "./config.js";
-import { edgeEditor, groupEditor, groupEmptyState, groupList, groupListHeader } from "./dom.js";
-import { parseGraph, parseGroups, serializeGroups } from "./parser.js";
+import { GROUP_COLOR_PALETTE, getGroupColor } from "../config.js";
+import { edgeEditor, groupEditor, groupEmptyState, groupList, groupListHeader } from "../dom.js";
+import { parseGraph, parseGroups, serializeGroups } from "../parser.js";
+import { createPopoverPicker } from "./popover-picker.js";
 
 function createNodesField(members, onChange) {
   const wrapper = document.createElement("label");
@@ -68,64 +69,29 @@ function createNodesField(members, onChange) {
 function createColorField(value, index, onChange) {
   const wrapper = document.createElement("div");
   wrapper.className = "boundary-field group-field group-color";
-  const control = document.createElement("div");
-  control.className = "boundary-color-control";
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.value = value || `GROUP-${(index % GROUP_COLOR_PALETTE.length) + 1}`;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "boundary-color-swatch";
-  button.setAttribute("aria-haspopup", "listbox");
-  button.setAttribute("aria-expanded", "false");
-  const popover = document.createElement("div");
-  popover.className = "boundary-color-popover";
-  popover.setAttribute("role", "listbox");
-  popover.hidden = true;
-  const options = GROUP_COLOR_PALETTE.map((color, optionIndex) => {
-    const option = document.createElement("button");
-    option.type = "button";
-    option.className = "boundary-color-option";
-    option.style.background = color;
-    option.setAttribute("role", "option");
-    option.setAttribute("aria-label", `Group color ${optionIndex + 1}`);
-    option.dataset.value = `GROUP-${optionIndex + 1}`;
-    popover.append(option);
-    return option;
+  const picker = createPopoverPicker({
+    value: value || `GROUP-${(index % GROUP_COLOR_PALETTE.length) + 1}`,
+    controlClass: "boundary-color-control",
+    buttonClass: "boundary-color-swatch",
+    popoverClass: "boundary-color-popover",
+    optionClass: "boundary-color-option",
+    options: GROUP_COLOR_PALETTE.map((color, optionIndex) => ({
+      value: `GROUP-${optionIndex + 1}`,
+      ariaLabel: `Group color ${optionIndex + 1}`,
+      setup: (option) => { option.style.background = color; },
+    })),
+    normalizeValue: (currentValue) => currentValue.toUpperCase(),
+    getButtonLabel: (currentValue) => {
+      const match = /^GROUP-([1-9]|10)$/i.exec(currentValue);
+      return `Group color ${match ? Number(match[1]) : index + 1}`;
+    },
+    updateButton: (button, currentValue) => {
+      const match = /^GROUP-([1-9]|10)$/i.exec(currentValue);
+      button.style.background = getGroupColor(match ? Number(match[1]) - 1 : index);
+    },
+    onSelect: () => onChange(),
   });
-  const update = () => {
-    const match = /^GROUP-([1-9]|10)$/i.exec(input.value);
-    const colorIndex = match ? Number(match[1]) - 1 : index;
-    button.style.background = getGroupColor(colorIndex);
-    button.setAttribute("aria-label", `Group color ${colorIndex + 1}`);
-    options.forEach((option) => {
-      const selected = option.dataset.value === input.value.toUpperCase();
-      option.classList.toggle("is-selected", selected);
-      option.setAttribute("aria-selected", String(selected));
-    });
-  };
-  const close = () => {
-    popover.hidden = true;
-    button.setAttribute("aria-expanded", "false");
-    document.removeEventListener("pointerdown", outside, true);
-  };
-  const outside = (event) => {
-    if (!control.contains(event.target)) close();
-  };
-  button.addEventListener("click", () => {
-    popover.hidden = !popover.hidden;
-    button.setAttribute("aria-expanded", String(!popover.hidden));
-    if (!popover.hidden) document.addEventListener("pointerdown", outside, true);
-    else document.removeEventListener("pointerdown", outside, true);
-  });
-  options.forEach((option) => option.addEventListener("click", () => {
-    input.value = option.dataset.value;
-    update();
-    close();
-    onChange();
-  }));
-  update();
-  control.append(input, button, popover);
+  const { control, input } = picker;
   wrapper.append(control);
   return { wrapper, input };
 }

@@ -1,6 +1,7 @@
-import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "./config.js";
-import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "./dom.js";
-import { parseGraph, parseBoundaryText, serializeBoundaries } from "./parser.js";
+import { COLOR_PALETTE, getBoundaryTypeColor, isCanonicalBoundaryColorType } from "../config.js";
+import { edgeEditor, boundaryEditor, boundaryEmptyState, boundaryList, boundaryListHeader } from "../dom.js";
+import { parseGraph, parseBoundaryText, serializeBoundaries } from "../parser.js";
+import { createPopoverPicker } from "./popover-picker.js";
 
 function createField(label, value, className) {
   const wrapper = document.createElement("label");
@@ -93,92 +94,32 @@ function createColorField(value, previewColor, onChange) {
   const wrapper = document.createElement("div");
   wrapper.className = "boundary-field boundary-type";
 
-  const control = document.createElement("div");
-  control.className = "boundary-color-control";
-
-  const hiddenInput = document.createElement("input");
-  hiddenInput.type = "hidden";
-  hiddenInput.value = value || "COLOR-1";
-
-  const swatchButton = document.createElement("button");
-  swatchButton.type = "button";
-  swatchButton.className = "boundary-color-swatch";
-  swatchButton.setAttribute("aria-haspopup", "listbox");
-  swatchButton.setAttribute("aria-expanded", "false");
-
-  const popover = document.createElement("div");
-  popover.className = "boundary-color-popover";
-  popover.setAttribute("role", "listbox");
-  popover.hidden = true;
-
-  const options = COLOR_PALETTE.map((color, i) => {
-    const optionValue = `COLOR-${i + 1}`;
-    const option = document.createElement("button");
-    option.type = "button";
-    option.className = "boundary-color-option";
-    option.style.background = color;
-    option.setAttribute("role", "option");
-    option.setAttribute("aria-label", `Color ${i + 1}`);
-    option.dataset.value = optionValue;
-    popover.append(option);
-    return option;
+  const picker = createPopoverPicker({
+    value: value || "COLOR-1",
+    controlClass: "boundary-color-control",
+    buttonClass: "boundary-color-swatch",
+    popoverClass: "boundary-color-popover",
+    optionClass: "boundary-color-option",
+    options: COLOR_PALETTE.map((color, i) => ({
+      value: `COLOR-${i + 1}`,
+      ariaLabel: `Color ${i + 1}`,
+      setup: (option) => { option.style.background = color; },
+    })),
+    getButtonLabel: (currentValue) => {
+      const currentIsCanonical = isCanonicalBoundaryColorType(currentValue);
+      return `Color boundary: ${currentIsCanonical ? `Color ${currentValue.split("-")[1]}` : currentValue}`;
+    },
+    updateButton: (button, currentValue) => {
+      const currentIsCanonical = isCanonicalBoundaryColorType(currentValue);
+      button.style.background = currentIsCanonical
+        ? getBoundaryTypeColor(currentValue, 0)
+        : previewColor || "#aab2bf";
+    },
+    onSelect: () => onChange(),
   });
-
-  const updateSwatch = () => {
-    const currentIsCanonical = isCanonicalBoundaryColorType(hiddenInput.value);
-    swatchButton.style.background = currentIsCanonical
-      ? getBoundaryTypeColor(hiddenInput.value, 0)
-      : previewColor || "#aab2bf";
-    swatchButton.setAttribute(
-      "aria-label",
-      `Color boundary: ${currentIsCanonical ? `Color ${hiddenInput.value.split("-")[1]}` : hiddenInput.value}`,
-    );
-    options.forEach((option) => {
-      const isSelected = option.dataset.value === hiddenInput.value;
-      option.classList.toggle("is-selected", isSelected);
-      option.setAttribute("aria-selected", String(isSelected));
-    });
-  };
-
-  function closePopover() {
-    popover.hidden = true;
-    swatchButton.setAttribute("aria-expanded", "false");
-    document.removeEventListener("pointerdown", handleOutsideClick, true);
-    document.removeEventListener("keydown", handleKeydown, true);
-  }
-  function handleOutsideClick(event) {
-    if (!control.contains(event.target)) closePopover();
-  }
-  function handleKeydown(event) {
-    if (event.key === "Escape") {
-      closePopover();
-      swatchButton.focus();
-    }
-  }
-  function openPopover() {
-    popover.hidden = false;
-    swatchButton.setAttribute("aria-expanded", "true");
-    document.addEventListener("pointerdown", handleOutsideClick, true);
-    document.addEventListener("keydown", handleKeydown, true);
-  }
-
-  swatchButton.addEventListener("click", () => {
-    if (popover.hidden) openPopover();
-    else closePopover();
-  });
-  options.forEach((option) => {
-    option.addEventListener("click", () => {
-      hiddenInput.value = option.dataset.value;
-      updateSwatch();
-      closePopover();
-      onChange();
-    });
-  });
-
-  updateSwatch();
-  control.append(hiddenInput, swatchButton, popover);
+  const { control, input } = picker;
   wrapper.append(control);
-  return { wrapper, input: hiddenInput };
+  return { wrapper, input };
 }
 
 function createBoundaryRow(boundary, index, onChange, previewColor) {

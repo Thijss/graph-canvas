@@ -67,9 +67,9 @@ import { updateBorderBump, clearBorderBump, updateEdgeErrors } from "./renderer.
 import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
 import { computeZoomedView, viewBoxString, screenToNodeSpace } from "./zoom.js";
 import { readGraphFile, splitGraphText, downloadGraphFile, downloadGraphPng, downloadGraphSvg } from "./file-io.js";
-import { addEdge, syncEdgeEditor } from "./edge-editor.js";
-import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./boundary-editor.js";
-import { addGroup, syncGroupEditor, updateGroupSourceText } from "./group-editor.js";
+import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
+import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
+import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
 
 let exportFormat = "txt";
 
