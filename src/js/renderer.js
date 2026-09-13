@@ -8,7 +8,6 @@ import {
   nodeCount,
   edgeCount,
   statusText,
-  statusDot,
   directedToggle,
 } from "./dom.js";
 import { EDGE_COLORS, getGroupColor, getBoundaryTypeColor, MIN_NODE_RADIUS, BOUNDARY_FILL_OPACITY } from "./config.js";
@@ -37,7 +36,6 @@ export function render(state, edges, nodes, boundaries, groups, handlers) {
   const conflictingEdges = edges.filter(hasConflictingColors);
   currentConflictingEdges = conflictingEdges;
   const hasConflictingColorError = conflictingEdges.length > 0;
-  statusDot.classList.toggle("status-error", hasConflictingColorError);
   updateEdgeErrors(conflictingEdges);
   if (hasConflictingColorError) {
     statusText.textContent = "Error: choose only one color per edge";

@@ -702,7 +702,8 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   box-shadow: 0 1px 2px #0003;
   cursor: pointer;
 }
-.sidebar-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; padding: 19px 25px; color: var(--muted); font-size: 11px; }
+.sidebar-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; padding: 19px 25px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #58c38b; box-shadow: 0 0 0 3px #58c38b1d; }
 .status-dot.status-error { background: #d84b4b; box-shadow: 0 0 0 3px #d84b4b2b; }
 
