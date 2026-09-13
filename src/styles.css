@@ -259,13 +259,50 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   background: white;
   font-size: 11px;
 }
-.edge-open-field { text-align: center; }
-.edge-open-field input {
-  width: 16px;
-  height: 16px;
-  margin: 4px auto 0;
-  accent-color: var(--accent);
+.edge-style-control { position: relative; width: 100%; }
+.edge-style-button, .edge-style-option {
+  width: 100%;
+  height: 27px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  line-height: 1;
 }
+.edge-style-button::before, .edge-style-option::before {
+  display: block;
+  content: "";
+  border-top: 3px solid #000;
+}
+.edge-style-button[data-style="dotted"]::before,
+.edge-style-option[data-value="dotted"]::before {
+  border-top-style: dotted;
+}
+.edge-style-button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px #2596be15;
+}
+.edge-style-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 8px 24px #26344d26;
+}
+.edge-style-popover[hidden] { display: none; }
+.edge-style-option { border: 0; }
+.edge-style-option:hover, .edge-style-option.is-selected { background: var(--soft); }
+.dark .edge-style-button, .dark .edge-style-option, .dark .edge-style-popover { background: #18252c; }
 .edge-color-control { position: relative; width: 100%; }
 .edge-color-button, .edge-color-option {
   width: 100%;
@@ -634,10 +671,10 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .node-label { fill: var(--ink); font-size: 12px; font-weight: 750; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
 .edge-line { fill: none; stroke: #facc37; stroke-width: 3.6; }
 .edge-line.self { stroke: var(--accent); }
-.edge-line.transformer { stroke: #2f7de1; }
-.edge-line.link { stroke: #2fa84f; }
-.edge-line.open { stroke-dasharray: 6 5; }
-.edge-line.x { stroke: #d84b4b; }
+.edge-line.blue { stroke: #2f7de1; }
+.edge-line.green { stroke: #2fa84f; }
+.edge-line.dotted { stroke-dasharray: 6 5; }
+.edge-line.red { stroke: #d84b4b; }
 .edge-label { fill: #697587; font-size: 11px; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 5px; stroke-linejoin: round; }
 .station-hull { fill-opacity: .3; stroke-width: 2; stroke-dasharray: 5 5; }
 .station-label { font-size: 11px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 4px; stroke-linejoin: round; }

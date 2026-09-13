@@ -30,7 +30,7 @@ function createColorField(value) {
   control.className = "edge-color-control";
   const input = document.createElement("input");
   input.type = "hidden";
-  input.value = EDGE_COLORS.some(({ token }) => token === value) ? value : "line";
+  input.value = EDGE_COLORS.some(({ token }) => token === value) ? value : "yellow";
   const button = document.createElement("button");
   button.type = "button";
   button.className = "edge-color-button";
@@ -91,18 +91,73 @@ function createColorField(value) {
   return { wrapper, input };
 }
 
-function createOpenField(value) {
+function createStyleField(value) {
   const wrapper = document.createElement("label");
-  wrapper.className = "edge-field edge-open-field";
+  wrapper.className = "edge-field edge-style-field";
 
   const caption = document.createElement("span");
-  caption.textContent = "Open";
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = Boolean(value);
-  checkbox.setAttribute("aria-label", "Open");
-  wrapper.append(caption, checkbox);
-  return { wrapper, input: checkbox };
+  caption.textContent = "Style";
+  const control = document.createElement("div");
+  control.className = "edge-style-control";
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.value = value === true ? "dotted" : value === "dotted" ? "dotted" : "solid";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "edge-style-button";
+  button.setAttribute("aria-haspopup", "listbox");
+  button.setAttribute("aria-expanded", "false");
+  const popover = document.createElement("div");
+  popover.className = "edge-style-popover";
+  popover.setAttribute("role", "listbox");
+  popover.hidden = true;
+
+  const updateSelectedStyle = () => {
+    button.dataset.style = input.value;
+    button.setAttribute("aria-label", input.value === "dotted" ? "Style dotted line" : "Style solid line");
+    popover.querySelectorAll("button").forEach((option) => {
+      const isSelected = option.dataset.value === input.value;
+      option.classList.toggle("is-selected", isSelected);
+      option.setAttribute("aria-selected", String(isSelected));
+    });
+  };
+  const closePopover = () => {
+    popover.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+    document.removeEventListener("pointerdown", handleOutsideClick, true);
+  };
+  const handleOutsideClick = (event) => {
+    if (!control.contains(event.target)) closePopover();
+  };
+  button.addEventListener("click", () => {
+    if (popover.hidden) {
+      popover.hidden = false;
+      button.setAttribute("aria-expanded", "true");
+      document.addEventListener("pointerdown", handleOutsideClick, true);
+    } else {
+      closePopover();
+    }
+  });
+  [["solid", "Solid line"], ["dotted", "Dotted line"]].forEach(([optionValue, label]) => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "edge-style-option";
+    option.dataset.value = optionValue;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-label", label);
+    option.addEventListener("click", () => {
+      input.value = optionValue;
+      updateSelectedStyle();
+      closePopover();
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    popover.append(option);
+  });
+  updateSelectedStyle();
+  control.append(input, button, popover);
+  wrapper.append(caption, control);
+  return { wrapper, input };
 }
 
 function createEdgeRow(edge, index, onChange) {
@@ -113,8 +168,8 @@ function createEdgeRow(edge, index, onChange) {
   const from = createField("From", edge.from ?? "", "edge-from", true);
   const to = createField("To", edge.to ?? "", "edge-to", true);
   const color = createColorField(edge.color);
-  const open = createOpenField(edge.open);
-  const labels = createField("Labels", edge.labels.join(", "), "edge-labels");
+  const style = createStyleField(edge.style);
+  const label = createField("Label", edge.label ?? "", "edge-labels");
 
   const actions = document.createElement("div");
   actions.className = "edge-actions";
@@ -129,14 +184,14 @@ function createEdgeRow(edge, index, onChange) {
   const error = document.createElement("span");
   error.className = "edge-error-message";
   error.setAttribute("role", "alert");
-  row.append(from.wrapper, to.wrapper, color.wrapper, open.wrapper, labels.wrapper, actions, error);
+  row.append(from.wrapper, to.wrapper, color.wrapper, style.wrapper, label.wrapper, actions, error);
 
   const update = (notify = true) => {
     const hasPartialEndpoints = Boolean(to.input.value && !from.input.value);
-    const additionalColors = labels.input.value.split(",")
+    const additionalColors = label.input.value.split(",")
       .map((label) => label.trim().toLowerCase())
-      .filter((label) => EDGE_COLORS.some(({ token }) => token === label && token !== "line"));
-    const hasConflictingColors = color.input.value !== "line" && additionalColors.length > 0;
+      .filter((label) => EDGE_COLORS.some(({ token }) => token === label && token !== "yellow"));
+    const hasConflictingColors = color.input.value !== "yellow" && additionalColors.length > 0;
     const message = hasPartialEndpoints
       ? "Add a from node."
       : hasConflictingColors
@@ -148,8 +203,8 @@ function createEdgeRow(edge, index, onChange) {
     if (notify) onChange();
   };
   row._refresh = update;
-  [from.input, to.input, color.input, open.input, labels.input].forEach((input) => input.addEventListener("input", update));
-  color.input.addEventListener("change", update);
+  [from.input, to.input, color.input, style.input, label.input].forEach((input) => input.addEventListener("input", update));
+  [color.input, style.input].forEach((input) => input.addEventListener("change", update));
   row.addEventListener("focusin", () => {
     if (!row._editingSnapshot) row._editingSnapshot = readRowValues(row);
   });
@@ -169,32 +224,33 @@ function createEdgeRow(edge, index, onChange) {
 function readRows() {
   return [...edgeList.querySelectorAll(".edge-row")].map((row) => {
     const inputs = row.querySelectorAll("input, select");
-    const [from, to, color, open, labels] = inputs;
+    const [from, to, color, style, label] = inputs;
     return {
       from: from.value.trim(),
       to: to.value.trim(),
       color: color.value,
-      open: open.checked,
-      labels: labels.value
+      style: style.value,
+      label: label.value
         .split(",")
-        .map((label) => label.trim())
-        .filter((label) => label && label.toLowerCase() !== color.value.toLowerCase()),
+        .map((part) => part.trim())
+        .filter((part) => part && part.toLowerCase() !== color.value.toLowerCase())
+        .join(","),
     };
-  }).filter((edge) => edge.from || edge.to || edge.labels.length);
+  }).filter((edge) => edge.from || edge.to || edge.label);
 }
 
 function readRowValues(row) {
-  const [from, to, color, open, labels] = row.querySelectorAll("input, select");
-  return { from: from.value, color: color.value, to: to.value, open: open.checked, labels: labels.value };
+  const [from, to, color, style, label] = row.querySelectorAll("input, select");
+  return { from: from.value, color: color.value, to: to.value, style: style.value, label: label.value };
 }
 
 function restoreRow(row, values) {
-  const [from, to, color, open, labels] = row.querySelectorAll("input, select");
+  const [from, to, color, style, label] = row.querySelectorAll("input, select");
   from.value = values.from;
   color.value = values.color;
   to.value = values.to;
-  open.checked = values.open;
-  labels.value = values.labels;
+  style.value = values.style;
+  label.value = values.label;
 }
 
 function updateListState() {
@@ -235,7 +291,7 @@ function updateSourceText() {
 
 export function addEdge() {
   const index = edgeList.children.length;
-  const row = createEdgeRow({ from: "", to: "", color: "line", open: false, labels: [] }, index, updateSourceText);
+  const row = createEdgeRow({ from: "", to: "", color: "yellow", style: "solid", label: "" }, index, updateSourceText);
   edgeList.append(row);
   updateListState();
   row.querySelector("input")?.focus();

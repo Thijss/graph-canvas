@@ -18,8 +18,8 @@ let currentConflictingEdges = [];
 const PARALLEL_EDGE_SPACING = 12;
 
 function hasConflictingColors(edge) {
-  const labels = new Set((edge.label ?? "").split(",").map((part) => part.trim().toLowerCase()));
-  return EDGE_COLORS.filter(({ token }) => token !== "line" && labels.has(token)).length > 1;
+  const labels = (edge.label ?? "").split(",").map((part) => part.trim().toLowerCase());
+  return EDGE_COLORS.filter(({ token }) => labels.includes(token)).length > 1;
 }
 
 // `state` (positions/pinned nodes/etc.) and `handlers` (interaction callbacks,
@@ -152,21 +152,11 @@ function drawEdge(state, edge, parallelOffset = 0) {
   const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
   line.classList.add("edge-line");
 
-  // Labels are comma-separated; each part can be plain text or a special keyword.
-  const parts = (edge.label ?? "").split(",").map((part) => part.trim()).filter(Boolean);
-  let colorKey = "line";
-  const visibleParts = parts.filter((part) => {
-    if (/^line$/i.test(part)) return false;
-    if (/open/i.test(part)) { line.classList.add("open"); return false; }
-    const match = EDGE_COLORS.find((style) => new RegExp(`^${style.token}$`, "i").test(part));
-    if (match) {
-      line.classList.add(match.className);
-      colorKey = match.className; // last match wins, mirroring CSS cascade order
-      return false;
-    }
-    return true;
-  });
-  const displayLabel = visibleParts.join(", ");
+  const selectedColor = EDGE_COLORS.find(({ token }) => token === edge.color) ?? EDGE_COLORS[0];
+  line.classList.add(selectedColor.className);
+  if (edge.style === "dotted") line.classList.add("dotted");
+  const colorKey = selectedColor.className;
+  const displayLabel = edge.label ?? "";
   if (edge.from === edge.to) {
     line.classList.add("self");
     const scale = startRadius / MIN_NODE_RADIUS;

@@ -79,11 +79,9 @@ export function getRouteColor(index) {
   return ROUTE_COLOR_PALETTE[index % ROUTE_COLOR_PALETTE.length];
 }
 
-// Edge colors are encoded by their legacy text tokens in saved graph files.
-// CSS classes and arrowhead marker ids remain stable for existing styles.
 export const EDGE_COLORS = [
-  { token: "line", className: "line", color: "#facc37" },
-  { token: "link", className: "link", color: "#2fa84f" },
-  { token: "transformer", className: "transformer", color: "#2f7de1" },
-  { token: "x", className: "x", color: "#d84b4b" },
+  { token: "yellow", className: "yellow", color: "#facc37" },
+  { token: "blue", className: "blue", color: "#2f7de1" },
+  { token: "green", className: "green", color: "#2fa84f" },
+  { token: "red", className: "red", color: "#d84b4b" },
 ];

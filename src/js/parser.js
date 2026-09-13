@@ -2,25 +2,25 @@ import { EDGE_COLORS, STATION_TYPE_PATTERN } from "./config.js";
 
 const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
 
-// Parses one edge's optional comma-separated labels into the normalized fields
-// used by the visual editor. Every edge has a primary color: unstyled edges
-// and conflicting colors use `line`; other labels remain additional data.
+// Parses one edge's optional comma-separated values into the normalized fields
+// used by the visual editor. Yellow and solid are the implicit defaults.
 function normalizeEdgeLabels(label) {
   const labels = (label ?? "")
     .split(",")
     .map((part) => part.trim())
     .filter(Boolean);
   const edgeColors = labels.filter((part) => EDGE_COLOR_TOKENS.includes(part.toLowerCase()));
-  const color = edgeColors.length === 1 ? edgeColors[0].toLowerCase() : "line";
-  const open = labels.some((part) => part.toLowerCase() === "open");
-  const additionalLabels = edgeColors.length === 1
-    ? labels.filter((part) => part.toLowerCase() !== color && part.toLowerCase() !== "open")
-    : labels.filter((part) => part.toLowerCase() !== "open");
+  const styleValues = labels.filter((part) => ["solid", "dotted"].includes(part.toLowerCase()));
+  const color = edgeColors.length === 1 ? edgeColors[0].toLowerCase() : "yellow";
+  const style = styleValues.length === 1 ? styleValues[0].toLowerCase() : "solid";
+  const additionalLabels = labels.filter((part) => (
+    part.toLowerCase() !== color
+    && !["solid", "dotted"].includes(part.toLowerCase())
+  ));
   return {
     color,
-    open,
-    labels: additionalLabels,
-    label: labels.length ? labels.join(",") : undefined,
+    style,
+    label: additionalLabels.join(","),
   };
 }
 
@@ -36,11 +36,11 @@ export function parseEdgeText(text) {
     if (!trimmed) return;
     // Only "from" and "to" are single whitespace-delimited tokens; everything
     // after that is the raw label, so it may freely contain spaces/commas
-    // (e.g. "transformer, open").
+    // (e.g. "blue, dotted, backup").
     const match = trimmed.match(/^(\S+)(?:\s+(\S+)(?:\s+([\s\S]*))?)?$/);
     const [, from, to, rest] = match;
     if (!to) {
-      floatingNodes.push({ from, to: "", color: "line", open: false, labels: [], line: lineIndex });
+      floatingNodes.push({ from, to: "", color: "yellow", style: "solid", label: "", line: lineIndex });
       nodeSet.add(from);
       return;
     }
@@ -62,9 +62,13 @@ export function parseEdgeText(text) {
 // edge syntax. Additional labels are emitted after the selected color.
 export function serializeEdges(edges) {
   return edges
-    .map(({ from, to, color, open = false, labels = [], label }) => {
+    .map(({ from, to, color = "yellow", style = "solid", label = "" }) => {
       if (!to) return from;
-      const serializedLabels = [color, open ? "open" : undefined, ...labels].filter(Boolean);
+      const serializedLabels = [
+        color !== "yellow" ? color : undefined,
+        style !== "solid" ? style : undefined,
+        ...label.split(",").map((part) => part.trim()).filter(Boolean),
+      ].filter(Boolean);
       const fallbackLabel = serializedLabels.length ? serializedLabels.join(",") : label;
       return [from, to, fallbackLabel].filter(Boolean).join(" ");
     })
