@@ -2,7 +2,6 @@
   <title id="title">GraphCanvas</title>
   <desc id="desc">An inverted tree graph with one root node at the bottom.</desc>
 
-  <rect width="512" height="512" rx="112" fill="#ffffff"/>
   <rect x="48" y="48" width="416" height="416" rx="72" fill="none" stroke="#15527a" stroke-width="16"/>
 
   <g fill="none" stroke="#2f80b7" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
