@@ -5,29 +5,46 @@
     <summary>Text mode (advanced)</summary>
     <p>Enter one item per line. A single node name adds a standalone node. Two node names create an edge; add comma-separated options after them.</p>
     <ul>
-      <li><code>A</code> adds a standalone node.</li>
-      <li><code>A B</code> connects <code>A</code> to <code>B</code> with the default yellow, solid line.</li>
+      <li><code>1</code> adds a standalone node.</li>
+      <li><code>1 2</code> connects <code>1</code> to <code>2</code> with the default yellow, solid line.</li>
       <li>
-        Set the edge color, for example <code>A B blue</code>.
+        Set the edge color, for example <code>1 2 blue</code>.
         <ul>
           <li>Available colors: <code>yellow</code>, <code>blue</code>, <code>green</code>, and <code>red</code>.</li>
         </ul>
       </li>
       <li>
-        Set the line style, for example <code>A B dotted</code>.
+        Set the line style, for example <code>1 2 dotted</code>.
         <ul>
           <li>Available line styles: <code>solid</code> and <code>dotted</code>.</li>
         </ul>
       </li>
-      <li><code>A B red,dotted,important</code> combines a color, line style, and label.</li>
+      <li><code>1 2 red,dotted,important</code> combines a color, line style, and label.</li>
     </ul>
   </details>
 
 </section>
 <section class="help-section">
   <h3>Boundaries and groups</h3>
-  <p>Boundaries organize nodes inside a colored hull. Groups color their member nodes without adding a hull.</p>
-  <p>Nodes can belong to multiple boundaries or groups.</p>
+  <p>
+    Boundaries organize nodes inside a colored hull. Groups color their member nodes without adding a hull.<br>
+    Nodes can belong to multiple boundaries or groups.
+  </p>
+  <details class="help-syntax">
+    <summary>Boundary text mode (advanced)</summary>
+    <p>
+      Enter one boundary per line using a TYPE, a comma-separated list of nodes, and an optional name.<br>
+      Every unique TYPE on subsequent rows will convert to a different color (up to 10).<br>
+      Rows with a shared TYPE will have the same color.
+    </p>
+    <ul>
+      <li><code>A 1,2</code> draws a boundary around nodes <code>1</code> and <code>2</code>.</li>
+      <li><code>B 3,4</code> then adds a <strong>separate</strong> boundary with a <strong>new</strong> color to nodes <code>3</code> and <code>4</code>.</li>
+      <li><code>B 5,6</code> then adds a <strong>separate</strong> boundary with the <strong>same</strong> color to nodes <code>5</code> and <code>6</code>.</li>
+      <li><code>B 5,6 My Nodes</code>supports names with spaces.</li>
+      <li>Only nodes defined in the Edges editor can be added to a boundary.</li>
+    </ul>
+  </details>
 </section>
 <section class="help-section">
   <h3>Canvas modes</h3>
