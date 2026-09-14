@@ -4,6 +4,7 @@
 const EDGES_KEY = "graph-editor:edges";
 const BOUNDARIES_KEY = "graph-editor:boundaries";
 const GROUPS_KEY = "graph-editor:groups";
+const EDITOR_MODES_KEY = "graph-editor:editor-modes";
 const LAYOUT_MODE_KEY = "graph-editor:layout-mode";
 const SETTINGS_KEY = "graph-editor:settings";
 
@@ -28,6 +29,27 @@ export function saveEditors(edgesText, boundariesText, groupsText) {
     localStorage.setItem(EDGES_KEY, edgesText);
     localStorage.setItem(BOUNDARIES_KEY, boundariesText);
     localStorage.setItem(GROUPS_KEY, groupsText);
+  } catch {
+    // ignore — persistence is a nice-to-have, not a requirement
+  }
+}
+
+export function loadEditorModes() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(EDITOR_MODES_KEY) ?? "{}");
+    return {
+      edges: saved.edges === "raw" ? "raw" : "visual",
+      boundaries: saved.boundaries === "text" ? "text" : "visual",
+      groups: saved.groups === "text" ? "text" : "visual",
+    };
+  } catch {
+    return { edges: "visual", boundaries: "visual", groups: "visual" };
+  }
+}
+
+export function saveEditorModes(modes) {
+  try {
+    localStorage.setItem(EDITOR_MODES_KEY, JSON.stringify(modes));
   } catch {
     // ignore — persistence is a nice-to-have, not a requirement
   }
