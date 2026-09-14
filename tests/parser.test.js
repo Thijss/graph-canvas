@@ -41,6 +41,21 @@ describe("parseEdgeText", () => {
       nodes: ["A", "B", "C"],
     });
   });
+
+  it("supports spaces in quoted endpoint names", () => {
+    expect(parseEdgeText('"Node A" "Node B" blue,important')).toEqual({
+      edges: [{
+        from: "Node A",
+        to: "Node B",
+        color: "blue",
+        style: "solid",
+        label: "important",
+        line: 0,
+      }],
+      floatingNodes: [],
+      nodes: ["Node A", "Node B"],
+    });
+  });
 });
 
 describe("edge and boundary serialization", () => {
@@ -50,6 +65,17 @@ describe("edge and boundary serialization", () => {
       { from: "B", to: "C", color: "red", style: "dotted", label: "important" },
       { from: "D", to: "" },
     ])).toBe("A B\nB C red,dotted,important\nD");
+  });
+
+  it("quotes endpoint names containing spaces", () => {
+    const edges = [
+      { from: "Node A", to: "Node B", color: "yellow", style: "solid", label: "" },
+      { from: "Standalone node", to: "" },
+    ];
+    expect(serializeEdges(edges)).toBe('"Node A" "Node B"\n"Standalone node"');
+    expect(parseEdgeText(serializeEdges(edges)).edges).toEqual([
+      { from: "Node A", to: "Node B", color: "yellow", style: "solid", label: "", line: 0 },
+    ]);
   });
 
   it("filters boundary members that are not graph nodes", () => {
