@@ -13,12 +13,12 @@ All rights reserved; copying, modifying, distributing, publishing, sublicensing,
 This is a Vite-powered static site. Start the development server with:
 
 ```
-npm run dev
+pnpm dev
 ```
 
 Then open the URL shown by Vite.
 
-Create a production build with `npm run build`; GitHub Pages deploys the
+Create a production build with `pnpm build`; GitHub Pages deploys the
 resulting `dist/` directory.
 
 ## Development
