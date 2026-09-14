@@ -11,17 +11,17 @@ file export. There is no backend or application server.
 Install dependencies and start the development server:
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Run the available checks before submitting changes:
 
 ```bash
-npm run lint
-npm test
-npm run test:coverage
-npm run build
+pnpm lint
+pnpm test
+pnpm test:coverage
+pnpm build
 ```
 
 The site is deployed as a static build from `dist/`.
@@ -32,10 +32,10 @@ Unit tests use Vitest. They cover pure parsing, serialization, configuration,
 and browser storage behavior without starting the development server:
 
 ```bash
-npm test                 # Run the unit tests once
-npm run test:watch       # Re-run tests while files change
-npm run test:coverage    # Run tests and write a coverage report
-npm run test:e2e         # Run browser smoke tests
+pnpm test                 # Run the unit tests once
+pnpm test:watch           # Re-run tests while files change
+pnpm test:coverage        # Run tests and write a coverage report
+pnpm test:e2e             # Run browser smoke tests
 ```
 
 Coverage output is written to `coverage/`, which is ignored by Git. The
@@ -52,7 +52,7 @@ application in a real browser.
 Playwright's Chromium browser must be installed once on a new machine:
 
 ```bash
-npx playwright install chromium
+pnpm exec playwright install chromium
 ```
 
 The browser smoke tests start Vite automatically and cover only critical
