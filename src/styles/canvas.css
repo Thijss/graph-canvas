@@ -22,7 +22,7 @@
 .graph-wrap { position: relative; flex: 1; min-height: 520px; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background-color: white; background-image: radial-gradient(#dce1ea 1px, transparent 1px); background-size: 22px 22px; box-shadow: 0 8px 30px #26344d08; transition: box-shadow 140ms ease-out; cursor: grab; }
 .graph-wrap.panning { cursor: grabbing; }
 #graph { width: 100%; height: 100%; min-height: 520px; overflow: visible; }
-.empty-state { position: absolute; top: 50%; left: 50%; width: 280px; transform: translate(-50%, -50%); text-align: center; }
+.empty-state { position: absolute; top: 50%; left: 50%; width: min(380px, calc(100% - 32px)); transform: translate(-50%, -50%); text-align: center; }
 .empty-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 14px; color: var(--accent-dark); background: #e8fbf7; font-size: 29px; }
 .empty-state h3 { font-size: 15px; }
 .empty-state p { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.5; }
@@ -56,4 +56,3 @@
 .edge-label { fill: #697587; font-size: 11px; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 5px; stroke-linejoin: round; }
 .boundary-hull { fill-opacity: .3; stroke-width: 2; stroke-dasharray: 5 5; }
 .boundary-label { font-size: 11px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 4px; stroke-linejoin: round; }
-
