@@ -24,6 +24,19 @@ function normalizeEdgeLabels(label) {
   };
 }
 
+function parseEndpoint(token) {
+  if (!token.startsWith("\"")) return token;
+  try {
+    return JSON.parse(token);
+  } catch {
+    return token;
+  }
+}
+
+function serializeEndpoint(value) {
+  return /[\s"\\]/.test(value) ? JSON.stringify(value) : value;
+}
+
 // Parses raw edge-list text into normalized edge records. Lines with 2+ values
 // are edges, while a lone value is a standalone/floating node. Pure function —
 // callers pass in the raw text, so this module has no dependency on the DOM.
@@ -35,10 +48,13 @@ export function parseEdgeText(text) {
     const trimmed = line.trim();
     if (!trimmed) return;
     // Only "from" and "to" are single whitespace-delimited tokens; everything
-    // after that is the raw label, so it may freely contain spaces/commas
-    // (e.g. "blue, dotted, backup").
-    const match = trimmed.match(/^(\S+)(?:\s+(\S+)(?:\s+([\s\S]*))?)?$/);
-    const [, from, to, rest] = match;
+    // after that is the raw label, so it may freely contain spaces/commas.
+    // Quoted endpoints may contain spaces (e.g. `"Node A" B`).
+    const match = trimmed.match(/^(("(?:\\.|[^"\\])*"|[^\s]+))(?:\s+(("(?:\\.|[^"\\])*"|[^\s]+))(?:\s+([\s\S]*))?)?$/);
+    if (!match) return;
+    const [, fromToken, , toToken, , rest] = match;
+    const from = parseEndpoint(fromToken);
+    const to = toToken ? parseEndpoint(toToken) : "";
     if (!to) {
       floatingNodes.push({ from, to: "", color: "yellow", style: "solid", label: "", line: lineIndex });
       nodeSet.add(from);
@@ -63,14 +79,14 @@ export function parseEdgeText(text) {
 export function serializeEdges(edges) {
   return edges
     .map(({ from, to, color = "yellow", style = "solid", label = "" }) => {
-      if (!to) return from;
+      if (!to) return serializeEndpoint(from);
       const serializedLabels = [
         color !== "yellow" ? color : undefined,
         style !== "solid" ? style : undefined,
         ...label.split(",").map((part) => part.trim()).filter(Boolean),
       ].filter(Boolean);
       const fallbackLabel = serializedLabels.length ? serializedLabels.join(",") : label;
-      return [from, to, fallbackLabel].filter(Boolean).join(" ");
+      return [serializeEndpoint(from), serializeEndpoint(to), fallbackLabel].filter(Boolean).join(" ");
     })
     .join("\n");
 }
