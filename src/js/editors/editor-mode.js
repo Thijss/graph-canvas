@@ -7,6 +7,8 @@ export function wireEditorModeToggle({
   sourceMode,
   syncFromSource,
   syncToSource,
+  initialMode = "visual",
+  onModeChange,
 }) {
   const setMode = (mode) => {
     const isSourceMode = mode === sourceMode;
@@ -25,8 +27,10 @@ export function wireEditorModeToggle({
     } else {
       syncFromSource();
     }
+    onModeChange?.(mode);
   };
 
   visualButton.addEventListener("click", () => setMode("visual"));
   sourceButton.addEventListener("click", () => setMode(sourceMode));
+  setMode(initialMode);
 }

@@ -30,6 +30,19 @@ test("persists graph input after a refresh", async ({ page }) => {
   await expect(page.locator("#edgeCount")).toHaveText("2");
 });
 
+test("persists each editor mode after a refresh", async ({ page }) => {
+  await page.locator("#rawEdgeModeButton").click();
+  await page.locator("#boundaryTextModeButton").click();
+
+  await page.reload();
+
+  await expect(page.locator("#edgeEditor")).toHaveClass(/is-raw/);
+  await expect(page.locator("#boundaryEditor")).toHaveClass(/is-text/);
+  await expect(page.locator("#groupEditor")).not.toHaveClass(/is-text/);
+  await expect(page.locator("#rawEdgeModeButton")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#boundaryTextModeButton")).toHaveAttribute("aria-pressed", "true");
+});
+
 test("exports graph data as a text file", async ({ page }) => {
   await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");

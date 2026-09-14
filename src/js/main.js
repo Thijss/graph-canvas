@@ -51,7 +51,14 @@ import {
 import { state } from "./state.js";
 import { draw, restartSimulation } from "./graph/engine.js";
 import { updateEdgeErrors } from "./graph/renderer.js";
-import { loadSavedEditors, saveEditors, loadSettings, saveSettings } from "./persistence.js";
+import {
+  loadSavedEditors,
+  saveEditors,
+  loadEditorModes,
+  saveEditorModes,
+  loadSettings,
+  saveSettings,
+} from "./persistence.js";
 import { readGraphFile, splitGraphText } from "./io/file-io.js";
 import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
@@ -299,6 +306,11 @@ dagSpacingSlider.addEventListener("input", () => {
   restartSimulation(0);
 });
 const { edgesText, boundariesText, groupsText } = loadSavedEditors();
+let editorModes = loadEditorModes();
+const persistEditorMode = (section, mode) => {
+  editorModes = { ...editorModes, [section]: mode };
+  saveEditorModes(editorModes);
+};
 if (edgesText !== null) edgeEditor.value = edgesText;
 if (boundariesText !== null) boundaryEditor.value = boundariesText;
 if (groupsText !== null) groupEditor.value = groupsText;
@@ -318,6 +330,8 @@ wireEditorModeToggle({
   sourceMode: "raw",
   syncFromSource: syncEdgeEditor,
   syncToSource: () => {},
+  initialMode: editorModes.edges,
+  onModeChange: (mode) => persistEditorMode("edges", mode),
 });
 wireEditorModeToggle({
   editor: boundaryEditor,
@@ -328,6 +342,8 @@ wireEditorModeToggle({
   sourceMode: "text",
   syncFromSource: syncBoundaryEditor,
   syncToSource: updateBoundarySourceText,
+  initialMode: editorModes.boundaries,
+  onModeChange: (mode) => persistEditorMode("boundaries", mode),
 });
 wireEditorModeToggle({
   editor: groupEditor,
@@ -338,6 +354,8 @@ wireEditorModeToggle({
   sourceMode: "text",
   syncFromSource: syncGroupEditor,
   syncToSource: updateGroupSourceText,
+  initialMode: editorModes.groups,
+  onModeChange: (mode) => persistEditorMode("groups", mode),
 });
 document.querySelectorAll(".panel-section-toggle").forEach((toggle) => {
   const toggleSection = () => {
