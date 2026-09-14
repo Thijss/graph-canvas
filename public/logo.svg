@@ -1,20 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 312 297" role="img" aria-labelledby="title">
-  <title>GraphCanvas</title>
-  <g fill="none" stroke="#b7f000" stroke-width="13">
-    <path d="M51 39h224v224H51z"/>
-    <path d="M107 39v224M163 39v224M219 39v224"/>
-    <path d="M51 96h224M51 152h224M51 208h224"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">GraphCanvas</title>
+  <desc id="desc">An inverted tree graph with one root node at the bottom.</desc>
+
+  <rect width="512" height="512" rx="112" fill="#ffffff"/>
+  <rect x="48" y="48" width="416" height="416" rx="72" fill="none" stroke="#15527a" stroke-width="16"/>
+
+  <g fill="none" stroke="#2f80b7" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
+    <path d="M256 408V306"/>
+    <path d="m256 306-104-92M256 306l104-92"/>
+    <path d="m152 214-64-72M152 214l64-72M360 214l-64-72M360 214l64-72"/>
   </g>
 
-  <g fill="none" stroke="#09d5ad" stroke-width="13" stroke-linecap="butt" stroke-linejoin="miter">
-    <path d="M51 39v169M51 96h168M219 96v167h58M51 208h168M51 152h112"/>
-  </g>
-
-  <g fill="#09d5ad">
-    <circle cx="51" cy="39" r="23"/>
-    <circle cx="219" cy="96" r="23"/>
-    <circle cx="163" cy="152" r="23"/>
-    <circle cx="51" cy="208" r="23"/>
-    <circle cx="277" cy="265" r="23"/>
+  <g fill="#15527a" stroke="#ffffff" stroke-width="10">
+    <circle cx="256" cy="408" r="25"/>
+    <circle cx="152" cy="214" r="25"/>
+    <circle cx="360" cy="214" r="25"/>
+    <circle cx="88" cy="142" r="25"/>
+    <circle cx="216" cy="142" r="25"/>
+    <circle cx="296" cy="142" r="25"/>
+    <circle cx="424" cy="142" r="25"/>
   </g>
 </svg>
