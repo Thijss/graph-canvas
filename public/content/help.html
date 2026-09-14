@@ -1,10 +1,28 @@
 <section class="help-section">
-  <h3>Editing modes</h3>
-  <p>Use <strong>Visual</strong> mode to build your graph with editable rows. Each editor also has a <strong>Text</strong> mode for direct editing.</p>
-</section>
-<section class="help-section">
   <h3>Define edges</h3>
   <p>An edge connects a <strong>From</strong> node to a <strong>To</strong> node. Set its color, line style, and optional label in the row.</p>
+    <details class="help-syntax">
+    <summary>Text mode (advanced)</summary>
+    <p>Enter one item per line. A single node name adds a standalone node. Two node names create an edge; add comma-separated options after them.</p>
+    <ul>
+      <li><code>A</code> adds a standalone node.</li>
+      <li><code>A B</code> connects <code>A</code> to <code>B</code> with the default yellow, solid line.</li>
+      <li>
+        Set the edge color, for example <code>A B blue</code>.
+        <ul>
+          <li>Available colors: <code>yellow</code>, <code>blue</code>, <code>green</code>, and <code>red</code>.</li>
+        </ul>
+      </li>
+      <li>
+        Set the line style, for example <code>A B dotted</code>.
+        <ul>
+          <li>Available line styles: <code>solid</code> and <code>dotted</code>.</li>
+        </ul>
+      </li>
+      <li><code>A B red,dotted,important</code> combines a color, line style, and label.</li>
+    </ul>
+  </details>
+
 </section>
 <section class="help-section">
   <h3>Boundaries and groups</h3>

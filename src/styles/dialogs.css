@@ -46,6 +46,10 @@
 .help-content p + p { margin-top: 12px; }
 .help-section + .help-section { margin-top: 22px; }
 .help-section h3 { margin-bottom: 8px; color: var(--ink); font-size: 15px; }
+.help-syntax { margin-top: 12px; }
+.help-syntax summary { cursor: pointer; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.help-syntax summary::marker { color: var(--muted); }
+.help-syntax > p { margin-top: 8px; }
 .help-example { display: inline-block; margin-left: 12px; }
 .help-subsection-title { margin-top: 14px; color: var(--ink); }
 .help-section ul { margin: 8px 0 0; padding-left: 18px; }
@@ -60,4 +64,3 @@
   background: var(--soft); font: 11px/1.6 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   white-space: pre-wrap;
 }
-
