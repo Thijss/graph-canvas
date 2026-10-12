@@ -20,11 +20,6 @@ export function splitGraphText(text) {
   };
 }
 
-export async function readGraphFile(file) {
-  if (!/\.txt$/i.test(file.name)) throw new Error("Please choose a .txt file");
-  return splitGraphText(await file.text());
-}
-
 export function downloadGraphFile(edgesText, boundariesText, groupsText, filename) {
   let content = edgesText ? `${edgesText}\n` : "";
   if (boundariesText) content += `-----BOUNDARIES-----\n${boundariesText}\n`;

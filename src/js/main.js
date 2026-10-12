@@ -27,8 +27,10 @@ import {
   dagSpacingControl,
   clearButton,
   templateButton,
-  openButton,
-  fileInput,
+  edgeImportRow,
+  importPanel,
+  importButton,
+  importText,
   templateDialog,
   templateDialogClose,
   templateList,
@@ -59,7 +61,7 @@ import {
   loadSettings,
   saveSettings,
 } from "./persistence.js";
-import { readGraphFile, splitGraphText } from "./io/file-io.js";
+import { splitGraphText } from "./io/file-io.js";
 import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
@@ -213,30 +215,36 @@ wireDialog({
   closeButton: helpDialogClose,
   onOpen: loadHelp,
 });
-openButton.addEventListener("click", () => fileInput.click());
 setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText });
-fileInput.addEventListener("change", async () => {
-  const [file] = fileInput.files;
-  fileInput.value = "";
-  if (!file) return;
-
-  try {
-    const { edgesText, boundariesText, groupsText } = await readGraphFile(file);
-
-    cancelScheduledEditorRedraw();
-    edgeEditor.value = edgesText.trim();
-    syncEdgeEditor();
-    boundaryEditor.value = boundariesText.trim();
-    syncBoundaryEditor();
-    groupEditor.value = groupsText.trim();
-    syncGroupEditor();
-    persistEditors();
-    state.positions.clear();
-    state.pinnedNodes.clear();
-    restartSimulation();
-  } catch (error) {
-    statusText.textContent = `Couldn't open file: ${error.message}`;
+importButton.addEventListener("click", () => {
+  if (!edgeImportRow.classList.contains("is-expanded")) {
+    edgeImportRow.classList.add("is-expanded");
+    importPanel.inert = false;
+    importPanel.setAttribute("aria-hidden", "false");
+    importText.focus();
+    return;
   }
+  if (importText.value.trim().length === 0) {
+    importText.focus();
+    return;
+  }
+  const { edgesText, boundariesText, groupsText } = splitGraphText(importText.value);
+
+  cancelScheduledEditorRedraw();
+  edgeEditor.value = edgesText.trim();
+  syncEdgeEditor();
+  boundaryEditor.value = boundariesText.trim();
+  syncBoundaryEditor();
+  groupEditor.value = groupsText.trim();
+  syncGroupEditor();
+  persistEditors();
+  state.positions.clear();
+  state.pinnedNodes.clear();
+  restartSimulation();
+  importText.value = "";
+  edgeImportRow.classList.remove("is-expanded");
+  importPanel.inert = true;
+  importPanel.setAttribute("aria-hidden", "true");
 });
 templateList.addEventListener("click", (event) => {
   const option = event.target.closest("[data-template]");
