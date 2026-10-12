@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   normalizeTxtImportEdgeAliases,
+  normalizeTxtImportStringList,
   parseBoundaryText,
   parseEdgeText,
   parseGroups,
@@ -8,6 +9,77 @@ import {
   serializeEdges,
   serializeGroups,
 } from "../src/js/graph/parser.js";
+
+describe("normalizeTxtImportStringList", () => {
+  it("converts comma-separated strings across lines into graph text", () => {
+    expect(normalizeTxtImportStringList('"1 2", "3 4 open",\n"3 5 blue"'))
+      .toBe("1 2\n3 4 open\n3 5 blue");
+  });
+
+  it("allows surrounding whitespace and a trailing comma", () => {
+    expect(normalizeTxtImportStringList(' \r\n"1 2",\r\n"3 4", \r\n'))
+      .toBe("1 2\n3 4");
+    expect(normalizeTxtImportStringList('"1 2",')).toBe("1 2");
+  });
+
+  it("preserves commas inside edge options and decodes escaped endpoints", () => {
+    expect(normalizeTxtImportStringList(
+      '"\\"Node A\\" \\"Node B\\" blue,dotted,backup", "C D open"',
+    )).toBe('"Node A" "Node B" blue,dotted,backup\nC D open');
+  });
+
+  it("leaves ordinary TXT and quoted node names unchanged", () => {
+    const text = '"Node A" "Node B" blue,dotted\n"Standalone node"\nA B open';
+    expect(normalizeTxtImportStringList(text)).toBe(text);
+    expect(normalizeTxtImportStringList('"Standalone node"')).toBe('"Standalone node"');
+    expect(normalizeTxtImportStringList("A B\nC D")).toBe("A B\nC D");
+  });
+
+  it("ignores full-line and inline comments in a string list", () => {
+    expect(normalizeTxtImportStringList([
+      "# this is a comment, hello!",
+      '"S10 20 4,transformer", #asdasd',
+      '  "20 30 5,transformer", "30 40 6,transformer" # last edge',
+    ].join("\n"))).toBe(
+      "S10 20 4,transformer\n20 30 5,transformer\n30 40 6,transformer",
+    );
+  });
+
+  it("ignores comments in ordinary TXT while preserving hashes in quoted nodes", () => {
+    expect(normalizeTxtImportStringList(
+      '# Heading\r\n"Node #1" B open # comment\r\nB C link # another',
+    )).toBe('\r\n"Node #1" B open \r\nB C link ');
+  });
+
+  it("preserves hashes and escaped quotes inside list entries", () => {
+    expect(normalizeTxtImportStringList(
+      '"\\"Node #1\\" B blue,label #1", "B C label \\"#2\\"" # comment',
+    )).toBe('"Node #1" B blue,label #1\nB C label "#2"');
+  });
+
+  it("allows a trailing comma before a comment", () => {
+    expect(normalizeTxtImportStringList('"A B", "C D", # done'))
+      .toBe("A B\nC D");
+  });
+
+  it("treats comment-only input as empty text, including commas in comments", () => {
+    expect(normalizeTxtImportStringList("# this is a comment, hello!")).toBe("");
+  });
+
+  it("rejects malformed lists instead of importing them as graph text", () => {
+    expect(() => normalizeTxtImportStringList('"A B", "C D'))
+      .toThrow(SyntaxError);
+    expect(() => normalizeTxtImportStringList('"A B",, "C D"'))
+      .toThrow(SyntaxError);
+  });
+
+  it("rejects non-string entries", () => {
+    for (const entry of ["42", "null", "{}", '["C D"]']) {
+      expect(() => normalizeTxtImportStringList(`"A B", ${entry}`))
+        .toThrow("Import list must contain only strings.");
+    }
+  });
+});
 
 describe("normalizeTxtImportEdgeAliases", () => {
   it("maps PGM edge labels without changing node names", () => {
