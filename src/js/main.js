@@ -53,6 +53,7 @@ import {
 import { state } from "./state.js";
 import { draw, restartSimulation } from "./graph/engine.js";
 import { updateEdgeErrors } from "./graph/renderer.js";
+import { normalizeTxtImportEdgeAliases } from "./graph/parser.js";
 import {
   loadSavedEditors,
   saveEditors,
@@ -231,7 +232,7 @@ importButton.addEventListener("click", () => {
   const { edgesText, boundariesText, groupsText } = splitGraphText(importText.value);
 
   cancelScheduledEditorRedraw();
-  edgeEditor.value = edgesText.trim();
+  edgeEditor.value = normalizeTxtImportEdgeAliases(edgesText).trim();
   syncEdgeEditor();
   boundaryEditor.value = boundariesText.trim();
   syncBoundaryEditor();

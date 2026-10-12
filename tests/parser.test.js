@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  normalizeTxtImportEdgeAliases,
   parseBoundaryText,
   parseEdgeText,
   parseGroups,
@@ -7,6 +8,35 @@ import {
   serializeEdges,
   serializeGroups,
 } from "../src/js/graph/parser.js";
+
+describe("normalizeTxtImportEdgeAliases", () => {
+  it("maps PGM edge labels without changing node names", () => {
+    expect(normalizeTxtImportEdgeAliases(
+      "A B open\nC D transformer\nE F link\nopen transformer link",
+    )).toBe("A B dotted\nC D blue\nE F green\nopen transformer green");
+  });
+
+  it("maps aliases in comma-separated labels case-insensitively", () => {
+    expect(normalizeTxtImportEdgeAliases("A B OPEN,Transformer,LINK"))
+      .toBe("A B dotted,blue,green");
+  });
+
+  it("preserves quoted endpoints, standalone nodes, and unrelated labels", () => {
+    expect(normalizeTxtImportEdgeAliases(
+      '"open transformer" "link node" open, transformer, backup link\nopen\nA B reopened,hyperlink,transformers',
+    )).toBe('"open transformer" "link node" dotted, blue, backup link\nopen\nA B reopened,hyperlink,transformers');
+  });
+
+  it("parses normalized aliases as edge styles and colors", () => {
+    const { edges } = parseEdgeText(normalizeTxtImportEdgeAliases(
+      "A B open,transformer,backup\nB C link",
+    ));
+    expect(edges).toEqual([
+      { from: "A", to: "B", color: "blue", style: "dotted", label: "backup", line: 0 },
+      { from: "B", to: "C", color: "green", style: "solid", label: "", line: 1 },
+    ]);
+  });
+});
 
 describe("parseEdgeText", () => {
   it("parses edges, labels, and floating nodes", () => {
