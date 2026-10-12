@@ -27,6 +27,8 @@ import {
   dagSpacingControl,
   clearButton,
   templateButton,
+  edgeImportRow,
+  importPanel,
   importButton,
   importText,
   templateDialog,
@@ -214,12 +216,18 @@ wireDialog({
   onOpen: loadHelp,
 });
 setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText });
-importText.addEventListener("input", () => {
-  importButton.disabled = importText.value.trim().length === 0;
-});
-
 importButton.addEventListener("click", () => {
-  if (importText.value.trim().length === 0) return;
+  if (!edgeImportRow.classList.contains("is-expanded")) {
+    edgeImportRow.classList.add("is-expanded");
+    importPanel.inert = false;
+    importPanel.setAttribute("aria-hidden", "false");
+    importText.focus();
+    return;
+  }
+  if (importText.value.trim().length === 0) {
+    importText.focus();
+    return;
+  }
   const { edgesText, boundariesText, groupsText } = splitGraphText(importText.value);
 
   cancelScheduledEditorRedraw();
@@ -234,7 +242,9 @@ importButton.addEventListener("click", () => {
   state.pinnedNodes.clear();
   restartSimulation();
   importText.value = "";
-  importButton.disabled = true;
+  edgeImportRow.classList.remove("is-expanded");
+  importPanel.inert = true;
+  importPanel.setAttribute("aria-hidden", "true");
 });
 templateList.addEventListener("click", (event) => {
   const option = event.target.closest("[data-template]");
