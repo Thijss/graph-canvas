@@ -11,6 +11,7 @@ import {
 
 beforeEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 describe("editor persistence", () => {
@@ -29,6 +30,19 @@ describe("editor persistence", () => {
       edgesText: "A B",
       boundariesText: "TEAM A,B",
       groupsText: "People A,B",
+    });
+    expect(localStorage.length).toBe(0);
+  });
+
+  it("does not load editor text saved in localStorage", () => {
+    localStorage.setItem("graph-editor:edges", "Shared A B");
+    localStorage.setItem("graph-editor:boundaries", "SHARED A,B");
+    localStorage.setItem("graph-editor:groups", "Shared A,B");
+
+    expect(loadSavedEditors()).toEqual({
+      edgesText: null,
+      boundariesText: null,
+      groupsText: null,
     });
   });
 });

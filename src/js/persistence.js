@@ -1,5 +1,5 @@
-// Persists the editor text (edges + boundaries + groups) to
-// localStorage, so a page refresh restores what the user typed. Node
+// Persists the editor text (edges + boundaries + groups) to sessionStorage,
+// so a page refresh in the same tab restores what the user typed. Node
 // positions and other UI state are intentionally not persisted.
 const EDGES_KEY = "graph-editor:edges";
 const BOUNDARIES_KEY = "graph-editor:boundaries";
@@ -9,26 +9,26 @@ const LAYOUT_MODE_KEY = "graph-editor:layout-mode";
 const SETTINGS_KEY = "graph-editor:settings";
 
 // Reads previously saved editor text, if any. Returns null values for
-// anything that wasn't saved (or if localStorage is unavailable).
+// anything that wasn't saved (or if sessionStorage is unavailable).
 export function loadSavedEditors() {
   try {
     return {
-      edgesText: localStorage.getItem(EDGES_KEY),
-      boundariesText: localStorage.getItem(BOUNDARIES_KEY),
-      groupsText: localStorage.getItem(GROUPS_KEY),
+      edgesText: sessionStorage.getItem(EDGES_KEY),
+      boundariesText: sessionStorage.getItem(BOUNDARIES_KEY),
+      groupsText: sessionStorage.getItem(GROUPS_KEY),
     };
   } catch {
     return { edgesText: null, boundariesText: null, groupsText: null };
   }
 }
 
-// Saves the current editor text. Silently no-ops if localStorage is
+// Saves the current editor text. Silently no-ops if sessionStorage is
 // unavailable (e.g. private browsing with storage disabled).
 export function saveEditors(edgesText, boundariesText, groupsText) {
   try {
-    localStorage.setItem(EDGES_KEY, edgesText);
-    localStorage.setItem(BOUNDARIES_KEY, boundariesText);
-    localStorage.setItem(GROUPS_KEY, groupsText);
+    sessionStorage.setItem(EDGES_KEY, edgesText);
+    sessionStorage.setItem(BOUNDARIES_KEY, boundariesText);
+    sessionStorage.setItem(GROUPS_KEY, groupsText);
   } catch {
     // ignore — persistence is a nice-to-have, not a requirement
   }
