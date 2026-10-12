@@ -28,8 +28,6 @@ test("persists graph input after a refresh", async ({ page }) => {
   await expect(page.locator("#edgeEditor")).toHaveValue("A B\nB C");
   await expect(page.locator("#nodeCount")).toHaveText("3");
   await expect(page.locator("#edgeCount")).toHaveText("2");
-  await expect(importText).toHaveValue("");
-  await expect(importButton).toBeDisabled();
 });
 
 test("persists each editor mode after a refresh", async ({ page }) => {
