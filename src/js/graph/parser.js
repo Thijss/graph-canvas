@@ -1,6 +1,29 @@
 import { EDGE_COLORS, BOUNDARY_TYPE_PATTERN } from "../config.js";
 
 const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
+const TXT_IMPORT_EDGE_ALIASES = new Map([
+  ["open", "dotted"],
+  ["transformer", "blue"],
+  ["link", "green"],
+]);
+
+export function normalizeTxtImportEdgeAliases(text) {
+  return text.split(/\r?\n/).map((line) => {
+    const match = line.match(/^(\s*(?:"(?:\\.|[^"\\])*"|[^\s]+)\s+(?:"(?:\\.|[^"\\])*"|[^\s]+)\s+)([\s\S]*)$/);
+    if (!match) return line;
+
+    const [, endpoints, labels] = match;
+    const normalizedLabels = labels.split(",").map((label) => {
+      const trimmedLabel = label.trim();
+      const replacement = TXT_IMPORT_EDGE_ALIASES.get(trimmedLabel.toLowerCase());
+      if (!replacement) return label;
+      const leadingWhitespace = label.match(/^\s*/)[0];
+      const trailingWhitespace = label.match(/\s*$/)[0];
+      return `${leadingWhitespace}${replacement}${trailingWhitespace}`;
+    });
+    return `${endpoints}${normalizedLabels.join(",")}`;
+  }).join("\n");
+}
 
 // Parses one edge's optional comma-separated values into the normalized fields
 // used by the visual editor. Yellow and solid are the implicit defaults.

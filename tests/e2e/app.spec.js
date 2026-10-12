@@ -66,6 +66,38 @@ test("imports pasted TXT graph text from the Edges section", async ({ page }) =>
   await expect(importText).toBeHidden();
 });
 
+test("normalizes PGM edge options only during TXT import", async ({ page }) => {
+  const source = [
+    "open transformer open",
+    "transformer link transformer",
+    "link A link",
+    "-----BOUNDARIES-----",
+    "open open,transformer link",
+    "-----GROUPS-----",
+    "transformer link,A",
+  ].join("\n");
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill(source);
+  await page.locator("#importButton").click();
+
+  await expect(page.locator("#edgeEditor")).toHaveValue(
+    "open transformer dotted\ntransformer link blue\nlink A green",
+  );
+  await expect(page.locator("#boundaryEditor")).toHaveValue("open open,transformer link");
+  await expect(page.locator("#groupEditor")).toHaveValue("transformer link,A");
+  await expect(page.locator("#nodeCount")).toHaveText("4");
+  await expect(page.locator("#edgeCount")).toHaveText("3");
+  const rows = page.locator("#edgeList .edge-row");
+  await expect(rows.nth(0).getByRole("button", { name: "Style dotted line", exact: true })).toBeVisible();
+  await expect(rows.nth(1).locator(".edge-color-control input")).toHaveValue("blue");
+  await expect(rows.nth(2).locator(".edge-color-control input")).toHaveValue("green");
+
+  await page.reload();
+  await expect(page.locator("#edgeEditor")).toHaveValue(
+    "open transformer dotted\ntransformer link blue\nlink A green",
+  );
+});
+
 test("exports graph data as a text file", async ({ page }) => {
   await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");
