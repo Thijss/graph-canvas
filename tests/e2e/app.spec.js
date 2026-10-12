@@ -28,6 +28,8 @@ test("persists graph input after a refresh", async ({ page }) => {
   await expect(page.locator("#edgeEditor")).toHaveValue("A B\nB C");
   await expect(page.locator("#nodeCount")).toHaveText("3");
   await expect(page.locator("#edgeCount")).toHaveText("2");
+  await expect(importText).toHaveValue("");
+  await expect(importButton).toBeDisabled();
 });
 
 test("persists each editor mode after a refresh", async ({ page }) => {
@@ -41,6 +43,25 @@ test("persists each editor mode after a refresh", async ({ page }) => {
   await expect(page.locator("#groupEditor")).not.toHaveClass(/is-text/);
   await expect(page.locator("#rawEdgeModeButton")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#boundaryTextModeButton")).toHaveAttribute("aria-pressed", "true");
+});
+
+test("imports pasted TXT graph text from the Edges section", async ({ page }) => {
+  const importButton = page.locator("#importButton");
+  const importText = page.locator("#importText");
+  await expect(importText).toHaveAttribute("rows", "1");
+  await expect(importText).toHaveAttribute("wrap", "off");
+  await expect(importButton).toBeDisabled();
+
+  await importText.fill("A B\nB C");
+
+  await expect(importButton).toBeEnabled();
+  await importButton.click();
+
+  await expect(page.locator("#edgeEditor")).toHaveValue("A B\nB C");
+  await expect(page.locator("#nodeCount")).toHaveText("3");
+  await expect(page.locator("#edgeCount")).toHaveText("2");
+  await expect(importText).toHaveValue("");
+  await expect(importButton).toBeDisabled();
 });
 
 test("exports graph data as a text file", async ({ page }) => {

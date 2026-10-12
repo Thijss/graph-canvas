@@ -22,10 +22,7 @@
           </div>
         </div>
         <div class="topbar-actions">
-          <div class="topbar-file-actions">
-            <button class="button button-quiet" id="openButton" type="button">Import</button>
-            <button class="button button-quiet" id="saveButton" type="button">Export</button>
-          </div>
+          <button class="button button-quiet" id="saveButton" type="button">Export</button>
           <button class="button button-examples" id="templateButton" type="button">Examples</button>
           <button class="button button-danger" id="clearButton" type="button">Clear all</button>
         </div>
@@ -45,7 +42,6 @@
               </div>
               <span class="panel-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="Collapse Edges section">^</span>
             </div>
-            <input id="fileInput" type="file" accept=".txt,text/plain" hidden />
             <div class="edge-editor" id="edgeEditorPanel">
               <div class="edge-list" id="edgeList" aria-live="polite">
                 <div class="edge-list-header" id="edgeListHeader" aria-hidden="true">
@@ -63,6 +59,10 @@
             <datalist id="edgeNodeSuggestions"></datalist>
             <textarea id="edgeEditor" class="edge-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
             <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
+            <div class="edge-import-row">
+              <textarea id="importText" class="edge-import-text" rows="1" wrap="off" spellcheck="false" placeholder="Paste TXT content" aria-label="Graph text to import"></textarea>
+              <button class="button button-quiet" id="importButton" type="button" disabled>Import</button>
+            </div>
           </section>
 
           <section class="panel-section">
