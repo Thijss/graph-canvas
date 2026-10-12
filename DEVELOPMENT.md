@@ -151,6 +151,19 @@ source target optional,label,style
 standalone-node
 ```
 
+TXT import also accepts an unbracketed, comma-separated list of double-quoted
+strings, such as `"1 2", "3 4 open", "3 5 blue"`. Whitespace and line breaks
+between entries are allowed, as is a trailing comma. Entries use JSON string
+escaping, so quoted node names must escape their quotes. The import decodes
+the list into newline-separated text before splitting graph sections and
+normalizing PGM edge options. Malformed lists and non-string entries show an
+import error without replacing the current graph. Ordinary TXT, including
+quoted node names, continues to use the existing format.
+
+Imports ignore `#` comments outside double-quoted strings, from the `#` to the
+end of the line. Full-line and inline comments are supported in both ordinary
+TXT and quoted string lists. A `#` inside a quoted string is preserved.
+
 Optional sections are separated by these exact markers:
 
 ```text

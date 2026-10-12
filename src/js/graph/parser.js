@@ -7,6 +7,19 @@ const TXT_IMPORT_EDGE_ALIASES = new Map([
   ["link", "green"],
 ]);
 
+export function normalizeTxtImportStringList(text) {
+  const uncommentedText = text.replace(/"(?:\\.|[^"\\])*"|#[^\r\n]*/g, (match) => (
+    match.startsWith("#") ? "" : match
+  ));
+  if (!/^\s*"(?:\\.|[^"\\])*"\s*,/.test(uncommentedText)) return uncommentedText;
+
+  const entries = JSON.parse(`[${uncommentedText.trim().replace(/,\s*$/, "")}]`);
+  if (!entries.every((entry) => typeof entry === "string")) {
+    throw new SyntaxError("Import list must contain only strings.");
+  }
+  return entries.join("\n");
+}
+
 export function normalizeTxtImportEdgeAliases(text) {
   return text.split(/\r?\n/).map((line) => {
     const match = line.match(/^(\s*(?:"(?:\\.|[^"\\])*"|[^\s]+)\s+(?:"(?:\\.|[^"\\])*"|[^\s]+)\s+)([\s\S]*)$/);

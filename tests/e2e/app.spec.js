@@ -98,6 +98,81 @@ test("normalizes PGM edge options only during TXT import", async ({ page }) => {
   );
 });
 
+test("imports comma-separated strings through the normal TXT pipeline", async ({ page }) => {
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill([
+    '"1 2", "3 4 open",',
+    '"3 5 blue", "5 6 transformer,open", "6 7 link",',
+    '"-----BOUNDARIES-----", "A 1,2 Example",',
+    '"-----GROUPS-----", "Team 3,4"',
+  ].join("\n"));
+  await page.locator("#importButton").click();
+
+  const expectedEdges = "1 2\n3 4 dotted\n3 5 blue\n5 6 blue,dotted\n6 7 green";
+  await expect(page.locator("#edgeEditor")).toHaveValue(expectedEdges);
+  await expect(page.locator("#boundaryEditor")).toHaveValue("A 1,2 Example");
+  await expect(page.locator("#groupEditor")).toHaveValue("Team 3,4");
+  await expect(page.locator("#nodeCount")).toHaveText("7");
+  await expect(page.locator("#edgeCount")).toHaveText("5");
+  await expect(page.locator("#importText")).toBeHidden();
+
+  await page.reload();
+  await expect(page.locator("#edgeEditor")).toHaveValue(expectedEdges);
+});
+
+test("ignores comments when importing a quoted string list", async ({ page }) => {
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill([
+    "# Connections",
+    '"S10 20 4,transformer", #asdasd',
+    '  "20 30 5,transformer", "30 40 6,transformer" # last edge',
+  ].join("\n"));
+  await page.locator("#importButton").click();
+
+  await expect(page.locator("#edgeEditor")).toHaveValue(
+    "S10 20 4,blue\n20 30 5,blue\n30 40 6,blue",
+  );
+  await expect(page.locator("#nodeCount")).toHaveText("4");
+  await expect(page.locator("#edgeCount")).toHaveText("3");
+  const rows = page.locator("#edgeList .edge-row");
+  await expect(rows.nth(0).locator(".edge-labels input")).toHaveValue("4");
+  await expect(rows.nth(1).locator(".edge-labels input")).toHaveValue("5");
+  await expect(rows.nth(2).locator(".edge-labels input")).toHaveValue("6");
+});
+
+test("keeps the current graph and pasted text when a string list is invalid", async ({ page }) => {
+  await page.locator("#rawEdgeModeButton").click();
+  await page.locator("#edgeEditor").fill("A B");
+  await expect(page.locator("#edgeCount")).toHaveText("1");
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill('"1 2", 42');
+  await page.locator("#importButton").click();
+
+  await expect(page.locator("#statusText")).toHaveText(
+    "Couldn't import graph: Import list must contain only strings.",
+  );
+  await expect(page.locator("#edgeEditor")).toHaveValue("A B");
+  await expect(page.locator("#importText")).toHaveValue('"1 2", 42');
+  await expect(page.locator("#importText")).toBeVisible();
+
+  await page.locator("#importText").fill('"1 2", "3 4"');
+  await page.locator("#importButton").click();
+  await expect(page.locator("#edgeEditor")).toHaveValue("1 2\n3 4");
+  await expect(page.locator("#edgeCount")).toHaveText("2");
+});
+
+test("keeps the current graph when importing only comments", async ({ page }) => {
+  await page.locator("#rawEdgeModeButton").click();
+  await page.locator("#edgeEditor").fill("A B");
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill("# this is a comment, hello!");
+  await page.locator("#importButton").click();
+
+  await expect(page.locator("#edgeEditor")).toHaveValue("A B");
+  await expect(page.locator("#importText")).toHaveValue("# this is a comment, hello!");
+  await expect(page.locator("#importText")).toBeVisible();
+});
+
 test("exports graph data as a text file", async ({ page }) => {
   await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");

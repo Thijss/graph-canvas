@@ -53,7 +53,7 @@ import {
 import { state } from "./state.js";
 import { draw, restartSimulation } from "./graph/engine.js";
 import { updateEdgeErrors } from "./graph/renderer.js";
-import { normalizeTxtImportEdgeAliases } from "./graph/parser.js";
+import { normalizeTxtImportEdgeAliases, normalizeTxtImportStringList } from "./graph/parser.js";
 import {
   loadSavedEditors,
   saveEditors,
@@ -229,7 +229,20 @@ importButton.addEventListener("click", () => {
     importText.focus();
     return;
   }
-  const { edgesText, boundariesText, groupsText } = splitGraphText(importText.value);
+  let graphText;
+  try {
+    graphText = normalizeTxtImportStringList(importText.value);
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    statusText.textContent = `Couldn't import graph: ${error.message}`;
+    importText.focus();
+    return;
+  }
+  if (graphText.trim().length === 0) {
+    importText.focus();
+    return;
+  }
+  const { edgesText, boundariesText, groupsText } = splitGraphText(graphText);
 
   cancelScheduledEditorRedraw();
   edgeEditor.value = normalizeTxtImportEdgeAliases(edgesText).trim();
