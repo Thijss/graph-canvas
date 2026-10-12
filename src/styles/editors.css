@@ -187,6 +187,7 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
 .edge-import-row.is-expanded {
   grid-template-columns: minmax(0, 1fr) auto;
 }
+.edge-import-row > .button { justify-self: end; }
 .edge-import-panel {
   min-width: 0;
   overflow: hidden;

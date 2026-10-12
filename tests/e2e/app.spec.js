@@ -48,12 +48,16 @@ test("persists each editor mode after a refresh", async ({ page }) => {
 test("imports pasted TXT graph text from the Edges section", async ({ page }) => {
   const importButton = page.locator("#importButton");
   const importText = page.locator("#importText");
+  const buttonWidth = await importButton.evaluate((button) => button.getBoundingClientRect().width);
+  const rowWidth = await page.locator("#edgeImportRow").evaluate((row) => row.getBoundingClientRect().width);
+  expect(buttonWidth).toBeLessThan(rowWidth / 2);
   await expect(importText).toHaveAttribute("rows", "1");
   await expect(importText).toHaveAttribute("wrap", "off");
   await expect(importText).toBeHidden();
 
   await importButton.click();
   await expect(importText).toBeVisible();
+  await expect.poll(() => importButton.evaluate((button) => button.getBoundingClientRect().width)).toBe(buttonWidth);
   await importText.fill("A B\nB C");
   await importButton.click();
 
