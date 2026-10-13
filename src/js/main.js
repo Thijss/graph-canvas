@@ -31,6 +31,7 @@ import {
   importPanel,
   importButton,
   importText,
+  importError,
   templateDialog,
   templateDialogClose,
   templateList,
@@ -217,6 +218,11 @@ wireDialog({
   onOpen: loadHelp,
 });
 setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText });
+function clearImportError() {
+  importError.textContent = "";
+  importText.setAttribute("aria-invalid", "false");
+}
+importText.addEventListener("input", clearImportError);
 importButton.addEventListener("click", () => {
   if (!edgeImportRow.classList.contains("is-expanded")) {
     edgeImportRow.classList.add("is-expanded");
@@ -234,7 +240,8 @@ importButton.addEventListener("click", () => {
     graphText = normalizeTxtImportStringList(importText.value);
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error;
-    statusText.textContent = `Couldn't import graph: ${error.message}`;
+    importError.textContent = `Couldn't import graph: ${error.message}`;
+    importText.setAttribute("aria-invalid", "true");
     importText.focus();
     return;
   }
@@ -242,6 +249,7 @@ importButton.addEventListener("click", () => {
     importText.focus();
     return;
   }
+  clearImportError();
   const { edgesText, boundariesText, groupsText } = splitGraphText(graphText);
 
   cancelScheduledEditorRedraw();

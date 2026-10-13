@@ -154,9 +154,14 @@ test("keeps the current graph and pasted text when a string list is invalid", as
   await page.locator("#importText").fill('"1 2", 42');
   await page.locator("#importButton").click();
 
-  await expect(page.locator("#statusText")).toHaveText(
+  await page.locator("label").filter({ has: page.locator("#directedToggle") }).click();
+  await expect(page.locator("#importError")).toHaveText(
     "Couldn't import graph: Import list must contain only strings.",
   );
+  await expect(page.locator("#importError")).toBeVisible();
+  await expect(page.locator("#importText")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.locator("#importText")).toHaveAttribute("aria-describedby", "importError");
+  await expect(page.locator("#statusText")).toHaveText("No issues");
   await expect(page.locator("#edgeEditor")).toHaveValue("A B");
   await expect(page.locator("#importText")).toHaveValue('"1 2", 42');
   await expect(page.locator("#importText")).toBeVisible();
@@ -165,6 +170,28 @@ test("keeps the current graph and pasted text when a string list is invalid", as
   await page.locator("#importButton").click();
   await expect(page.locator("#edgeEditor")).toHaveValue("1 2\n3 4");
   await expect(page.locator("#edgeCount")).toHaveText("2");
+  await expect(page.locator("#statusText")).toHaveText("No issues");
+  await expect(page.locator("#importError")).toBeEmpty();
+  await expect(page.locator("#importText")).toHaveAttribute("aria-invalid", "false");
+});
+
+test("clears an import error when the pasted text changes", async ({ page }) => {
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill('"1 2", 42');
+  await page.locator("#importButton").click();
+  await expect(page.locator("#importError")).toHaveText(
+    "Couldn't import graph: Import list must contain only strings.",
+  );
+
+  await page.locator("#clearButton").click();
+  await expect(page.locator("#statusText")).toHaveText("Ready to draw");
+  await expect(page.locator("#importError")).toHaveText(
+    "Couldn't import graph: Import list must contain only strings.",
+  );
+
+  await page.locator("#importText").fill('"1 2", "3 4"');
+  await expect(page.locator("#importError")).toBeEmpty();
+  await expect(page.locator("#importText")).toHaveAttribute("aria-invalid", "false");
 });
 
 test("keeps the current graph when importing only comments", async ({ page }) => {
