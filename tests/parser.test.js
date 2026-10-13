@@ -85,18 +85,18 @@ describe("normalizeTxtImportEdgeAliases", () => {
   it("maps PGM edge labels without changing node names", () => {
     expect(normalizeTxtImportEdgeAliases(
       "A B open\nC D transformer\nE F link\nopen transformer link",
-    )).toBe("A B dotted\nC D blue\nE F green\nopen transformer green");
+    )).toBe("A B dashed\nC D blue\nE F green\nopen transformer green");
   });
 
   it("maps aliases in comma-separated labels case-insensitively", () => {
     expect(normalizeTxtImportEdgeAliases("A B OPEN,Transformer,LINK"))
-      .toBe("A B dotted,blue,green");
+      .toBe("A B dashed,blue,green");
   });
 
   it("preserves quoted endpoints, standalone nodes, and unrelated labels", () => {
     expect(normalizeTxtImportEdgeAliases(
       '"open transformer" "link node" open, transformer, backup link\nopen\nA B reopened,hyperlink,transformers',
-    )).toBe('"open transformer" "link node" dotted, blue, backup link\nopen\nA B reopened,hyperlink,transformers');
+    )).toBe('"open transformer" "link node" dashed, blue, backup link\nopen\nA B reopened,hyperlink,transformers');
   });
 
   it("parses normalized aliases as edge styles and colors", () => {
@@ -104,7 +104,7 @@ describe("normalizeTxtImportEdgeAliases", () => {
       "A B open,transformer,backup\nB C link",
     ));
     expect(edges).toEqual([
-      { from: "A", to: "B", color: "blue", style: "dotted", label: "backup", line: 0 },
+      { from: "A", to: "B", color: "blue", style: "dashed", label: "backup", line: 0 },
       { from: "B", to: "C", color: "green", style: "solid", label: "", line: 1 },
     ]);
   });
@@ -112,12 +112,12 @@ describe("normalizeTxtImportEdgeAliases", () => {
 
 describe("parseEdgeText", () => {
   it("parses edges, labels, and floating nodes", () => {
-    expect(parseEdgeText("A B blue, dotted, backup\nC")).toEqual({
+    expect(parseEdgeText("A B blue, dashed, backup\nC")).toEqual({
       edges: [{
         from: "A",
         to: "B",
         color: "blue",
-        style: "dotted",
+        style: "dashed",
         label: "backup",
         line: 0,
       }],
@@ -131,6 +131,10 @@ describe("parseEdgeText", () => {
       }],
       nodes: ["A", "B", "C"],
     });
+  });
+
+  it("accepts dotted as a legacy alias for dashed", () => {
+    expect(parseEdgeText("A B dotted").edges[0].style).toBe("dashed");
   });
 
   it("uses defaults when edge labels are missing or ambiguous", () => {
@@ -164,9 +168,9 @@ describe("edge and boundary serialization", () => {
   it("serializes normalized edges without implicit defaults", () => {
     expect(serializeEdges([
       { from: "A", to: "B", color: "yellow", style: "solid", label: "" },
-      { from: "B", to: "C", color: "red", style: "dotted", label: "important" },
+      { from: "B", to: "C", color: "red", style: "dashed", label: "important" },
       { from: "D", to: "" },
-    ])).toBe("A B\nB C red,dotted,important\nD");
+    ])).toBe("A B\nB C red,dashed,important\nD");
   });
 
   it("quotes endpoint names containing spaces", () => {

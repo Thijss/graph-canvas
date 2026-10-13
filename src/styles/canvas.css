@@ -51,7 +51,7 @@
 .edge-line.self { stroke: var(--accent); }
 .edge-line.blue { stroke: #2f7de1; }
 .edge-line.green { stroke: #2fa84f; }
-.edge-line.dotted { stroke-dasharray: 6 5; }
+.edge-line.dashed { stroke-dasharray: 6 10; }
 .edge-line.red { stroke: #d84b4b; }
 .edge-label { fill: #697587; font-size: 11px; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 5px; stroke-linejoin: round; }
 .boundary-hull { fill-opacity: .3; stroke-width: 2; stroke-dasharray: 5 5; }

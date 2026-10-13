@@ -81,20 +81,26 @@ test("normalizes PGM edge options only during TXT import", async ({ page }) => {
   await page.locator("#importButton").click();
 
   await expect(page.locator("#edgeEditor")).toHaveValue(
-    "open transformer dotted\ntransformer link blue\nlink A green",
+    "open transformer dashed\ntransformer link blue\nlink A green",
   );
   await expect(page.locator("#boundaryEditor")).toHaveValue("open open,transformer link");
   await expect(page.locator("#groupEditor")).toHaveValue("transformer link,A");
   await expect(page.locator("#nodeCount")).toHaveText("4");
   await expect(page.locator("#edgeCount")).toHaveText("3");
   const rows = page.locator("#edgeList .edge-row");
-  await expect(rows.nth(0).getByRole("button", { name: "Style dotted line", exact: true })).toBeVisible();
+  await expect(rows.nth(0).getByRole("button", { name: "Style dashed line", exact: true })).toBeVisible();
   await expect(rows.nth(1).locator(".edge-color-control input")).toHaveValue("blue");
   await expect(rows.nth(2).locator(".edge-color-control input")).toHaveValue("green");
+  const dashedEdge = page.locator("#graph .edge-line.dashed");
+  await expect(dashedEdge).toHaveCount(1);
+  await expect.poll(() => dashedEdge.evaluate((line) => (
+    getComputedStyle(line).strokeDasharray.split(/[ ,]+/).map(parseFloat)
+  ))).toEqual([6, 10]);
+  await expect.poll(() => dashedEdge.evaluate((line) => getComputedStyle(line).strokeLinecap)).toBe("butt");
 
   await page.reload();
   await expect(page.locator("#edgeEditor")).toHaveValue(
-    "open transformer dotted\ntransformer link blue\nlink A green",
+    "open transformer dashed\ntransformer link blue\nlink A green",
   );
 });
 
@@ -108,7 +114,7 @@ test("imports comma-separated strings through the normal TXT pipeline", async ({
   ].join("\n"));
   await page.locator("#importButton").click();
 
-  const expectedEdges = "1 2\n3 4 dotted\n3 5 blue\n5 6 blue,dotted\n6 7 green";
+  const expectedEdges = "1 2\n3 4 dashed\n3 5 blue\n5 6 blue,dashed\n6 7 green";
   await expect(page.locator("#edgeEditor")).toHaveValue(expectedEdges);
   await expect(page.locator("#boundaryEditor")).toHaveValue("A 1,2 Example");
   await expect(page.locator("#groupEditor")).toHaveValue("Team 3,4");

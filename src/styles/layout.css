@@ -112,7 +112,7 @@ h2 { margin-top: 4px; font-size: 20px; letter-spacing: -.04em; }
 .keyword-preview-yellow { color: #facc37; }
 .keyword-preview-blue { color: #2f7de1; }
 .keyword-preview-green { color: #2fa84f; }
-.keyword-preview-dotted { color: #697587; border-top-style: dotted; }
+.keyword-preview-dashed { color: #697587; border-top-style: dashed; }
 
 .editor-hint { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; color: var(--muted); font-size: 10px; }
 .options { padding-top: 23px; }

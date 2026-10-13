@@ -82,9 +82,9 @@ code { padding: 2px 4px; border-radius: 4px; color: var(--accent-dark); backgrou
   content: "";
   border-top: 3px solid #000;
 }
-.edge-style-button[data-style="dotted"]::before,
-.edge-style-option[data-value="dotted"]::before {
-  border-top-style: dotted;
+.edge-style-button[data-style="dashed"]::before,
+.edge-style-option[data-value="dashed"]::before {
+  border-top-style: dashed;
 }
 .edge-style-button:focus-visible {
   outline: none;
