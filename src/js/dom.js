@@ -1,12 +1,5 @@
 // Central lookup of DOM elements shared across modules.
 export const edgeEditor = document.querySelector("#edgeEditor");
-export const edgeList = document.querySelector("#edgeList");
-export const edgeListHeader = document.querySelector("#edgeListHeader");
-export const edgeEmptyState = document.querySelector("#edgeEmptyState");
-export const edgeNodeSuggestions = document.querySelector("#edgeNodeSuggestions");
-export const addEdgeButton = document.querySelector("#addEdgeButton");
-export const visualEdgeModeButton = document.querySelector("#visualEdgeModeButton");
-export const rawEdgeModeButton = document.querySelector("#rawEdgeModeButton");
 export const edgeErrors = document.querySelector("#edgeErrors");
 export const boundaryEditor = document.querySelector("#boundaryEditor");
 export const boundaryList = document.querySelector("#boundaryList");

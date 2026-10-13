@@ -38,12 +38,11 @@ export function loadEditorModes() {
   try {
     const saved = JSON.parse(localStorage.getItem(EDITOR_MODES_KEY) ?? "{}");
     return {
-      edges: saved.edges === "raw" ? "raw" : "visual",
       boundaries: saved.boundaries === "text" ? "text" : "visual",
       groups: saved.groups === "text" ? "text" : "visual",
     };
   } catch {
-    return { edges: "visual", boundaries: "visual", groups: "visual" };
+    return { boundaries: "visual", groups: "visual" };
   }
 }
 

@@ -60,9 +60,4 @@
   .canvas-meta .separator { display: block; }
   .graph-wrap, #graph { min-height: 420px; }
 
-  .edge-list-header,
-  .edge-row {
-    grid-template-columns: minmax(40px, .8fr) minmax(40px, .8fr) 38px 38px minmax(58px, 1.3fr) 24px;
-    gap: 4px;
-  }
 }

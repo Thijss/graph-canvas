@@ -10,7 +10,9 @@ test("loads the editor and accepts graph input", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "GraphCanvas" })).toBeVisible();
   await expect(page.locator("#emptyState")).toBeVisible();
 
-  await page.locator("#rawEdgeModeButton").click();
+  await expect(page.getByRole("textbox", { name: "Edges", exact: true })).toBeVisible();
+  await expect(page.getByRole("group", { name: "Edge editor mode", exact: true })).toHaveCount(0);
+  await expect(page.locator("#edgeList, #addEdgeButton")).toHaveCount(0);
   await page.locator("#edgeEditor").fill("A B\nB C");
 
   await expect(page.locator("#nodeCount")).toHaveText("3");
@@ -19,7 +21,6 @@ test("loads the editor and accepts graph input", async ({ page }) => {
 });
 
 test("persists graph input after a refresh", async ({ page }) => {
-  await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B\nB C");
   await expect(page.locator("#edgeCount")).toHaveText("2");
 
@@ -30,17 +31,80 @@ test("persists graph input after a refresh", async ({ page }) => {
   await expect(page.locator("#edgeCount")).toHaveText("2");
 });
 
-test("persists each editor mode after a refresh", async ({ page }) => {
-  await page.locator("#rawEdgeModeButton").click();
+test("persists boundary and group editor modes after a refresh", async ({ page }) => {
   await page.locator("#boundaryTextModeButton").click();
 
   await page.reload();
 
-  await expect(page.locator("#edgeEditor")).toHaveClass(/is-raw/);
+  await expect(page.locator("#edgeEditor")).toBeVisible();
   await expect(page.locator("#boundaryEditor")).toHaveClass(/is-text/);
   await expect(page.locator("#groupEditor")).not.toHaveClass(/is-text/);
-  await expect(page.locator("#rawEdgeModeButton")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#boundaryTextModeButton")).toHaveAttribute("aria-pressed", "true");
+
+  await page.locator("#groupTextModeButton").click();
+  await page.locator("#boundaryVisualModeButton").click();
+  await page.reload();
+  await expect(page.locator("#boundaryEditor")).not.toHaveClass(/is-text/);
+  await expect(page.locator("#groupEditor")).toHaveClass(/is-text/);
+  await expect(page.locator("#groupTextModeButton")).toHaveAttribute("aria-pressed", "true");
+});
+
+for (const mode of ["visual", "raw"]) {
+  test(`ignores the legacy ${mode} edge mode without changing saved text`, async ({ page }) => {
+    const source = '"Node A" B blue,dashed,backup\nstandalone';
+    await page.evaluate(({ mode, source }) => {
+      localStorage.setItem("graph-editor:editor-modes", JSON.stringify({
+        edges: mode, boundaries: "text", groups: "visual",
+      }));
+      sessionStorage.setItem("graph-editor:edges", source);
+    }, { mode, source });
+    await page.reload();
+
+    await expect(page.getByRole("textbox", { name: "Edges", exact: true })).toBeVisible();
+    await expect(page.locator("#edgeEditor")).toHaveValue(source);
+    await expect(page.locator("#nodeCount")).toHaveText("3");
+    await expect(page.locator("#edgeCount")).toHaveText("1");
+    await expect(page.locator("#graph .edge-line.blue.dashed")).toHaveCount(1);
+    await expect(page.locator("#graph .edge-label")).toHaveText("backup");
+    await expect(page.locator("#boundaryEditor")).toHaveClass(/is-text/);
+    await expect(page.locator("#groupEditor")).not.toHaveClass(/is-text/);
+  });
+}
+
+test("validates edge colors and restores valid text", async ({ page }) => {
+  await page.locator("#edgeEditor").fill("A B blue,red");
+  await expect(page.locator("#statusText")).toHaveText("Error: choose only one color per edge");
+  await expect(page.locator("#edgeErrors .editor-error")).toHaveCount(1);
+  await expect(page.locator("#graph .edge-line")).toHaveCount(0);
+
+  await page.locator("#edgeEditor").fill("A B blue");
+  await expect(page.locator("#statusText")).toHaveText("No issues");
+  await expect(page.locator("#edgeErrors .editor-error")).toHaveCount(0);
+  await expect(page.locator("#graph .edge-line.blue")).toHaveCount(1);
+});
+
+test("loads and clears a template in the text-only Edges editor", async ({ page }) => {
+  await page.locator("#templateButton").click();
+  await page.locator('.template-option[data-template="30-node"]').click();
+
+  await expect(page.locator("#edgeEditor")).toBeVisible();
+  await expect(page.locator("#edgeEditor")).toHaveValue(/^1 2 blue\n[\s\S]*25 30 dashed$/);
+  await expect(page.locator("#nodeCount")).toHaveText("30");
+  await expect(page.locator("#edgeCount")).toHaveText("33");
+  await expect(page.locator("#boundaryList .boundary-row")).toHaveCount(3);
+
+  await page.getByRole("button", { name: "Collapse Edges section", exact: true }).click();
+  await expect(page.locator("#edgeEditor")).toBeHidden();
+  await page.getByRole("button", { name: "Expand Edges section", exact: true }).click();
+  await expect(page.locator("#edgeEditor")).toBeVisible();
+
+  await page.locator("#clearButton").click();
+  await expect(page.locator("#edgeEditor")).toHaveValue("");
+  await expect(page.locator("#nodeCount")).toHaveText("0");
+  await expect(page.locator("#edgeCount")).toHaveText("0");
+  await page.reload();
+  await expect(page.locator("#edgeEditor")).toHaveValue("");
+  await expect(page.locator("#emptyState")).toBeVisible();
 });
 
 test("imports pasted TXT graph text from the Edges section", async ({ page }) => {
@@ -87,10 +151,8 @@ test("normalizes PGM edge options only during TXT import", async ({ page }) => {
   await expect(page.locator("#groupEditor")).toHaveValue("transformer link,A");
   await expect(page.locator("#nodeCount")).toHaveText("4");
   await expect(page.locator("#edgeCount")).toHaveText("3");
-  const rows = page.locator("#edgeList .edge-row");
-  await expect(rows.nth(0).getByRole("button", { name: "Style dashed line", exact: true })).toBeVisible();
-  await expect(rows.nth(1).locator(".edge-color-control input")).toHaveValue("blue");
-  await expect(rows.nth(2).locator(".edge-color-control input")).toHaveValue("green");
+  await expect(page.locator("#graph .edge-line.blue")).toHaveCount(1);
+  await expect(page.locator("#graph .edge-line.green")).toHaveCount(1);
   const dashedEdge = page.locator("#graph .edge-line.dashed");
   await expect(dashedEdge).toHaveCount(1);
   await expect.poll(() => dashedEdge.evaluate((line) => (
@@ -140,14 +202,10 @@ test("ignores comments when importing a quoted string list", async ({ page }) =>
   );
   await expect(page.locator("#nodeCount")).toHaveText("4");
   await expect(page.locator("#edgeCount")).toHaveText("3");
-  const rows = page.locator("#edgeList .edge-row");
-  await expect(rows.nth(0).locator(".edge-labels input")).toHaveValue("4");
-  await expect(rows.nth(1).locator(".edge-labels input")).toHaveValue("5");
-  await expect(rows.nth(2).locator(".edge-labels input")).toHaveValue("6");
+  await expect(page.locator("#graph .edge-label")).toHaveText(["4", "5", "6"]);
 });
 
 test("keeps the current graph and pasted text when a string list is invalid", async ({ page }) => {
-  await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");
   await expect(page.locator("#edgeCount")).toHaveText("1");
   await page.locator("#importButton").click();
@@ -195,7 +253,6 @@ test("clears an import error when the pasted text changes", async ({ page }) => 
 });
 
 test("keeps the current graph when importing only comments", async ({ page }) => {
-  await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");
   await page.locator("#importButton").click();
   await page.locator("#importText").fill("# this is a comment, hello!");
@@ -207,7 +264,6 @@ test("keeps the current graph when importing only comments", async ({ page }) =>
 });
 
 test("exports graph data as a text file", async ({ page }) => {
-  await page.locator("#rawEdgeModeButton").click();
   await page.locator("#edgeEditor").fill("A B");
   await expect(page.locator("#edgeCount")).toHaveText("1");
 
