@@ -31,6 +31,21 @@ h1 { font-size: 16px; letter-spacing: -.02em; }
 .panel-section { padding: 29px 25px 24px; border-bottom: 1px solid var(--line); }
 .section-heading { justify-content: space-between; gap: 10px; }
 .section-heading > div:first-child { flex: 1; }
+.edge-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  width: 120px;
+  gap: 3px;
+}
+.edge-heading-actions .button {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  padding: 5px 3px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 700;
+}
 .edge-mode-toggle {
   display: flex;
   gap: 3px;

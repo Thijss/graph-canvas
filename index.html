@@ -23,8 +23,6 @@
         </div>
         <div class="topbar-actions">
           <button class="button button-quiet" id="saveButton" type="button">Export</button>
-          <button class="button button-examples" id="templateButton" type="button">Examples</button>
-          <button class="button button-danger" id="clearButton" type="button">Clear all</button>
         </div>
       </header>
 
@@ -36,10 +34,14 @@
                 <span class="eyebrow">01 / Define</span>
                 <h2>Edges</h2>
               </div>
+              <div class="edge-heading-actions">
+                <button class="button button-examples" id="templateButton" type="button">Examples</button>
+                <button class="button button-danger" id="clearButton" type="button">Clear</button>
+              </div>
               <span class="panel-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="Collapse Edges section">^</span>
             </div>
             <div class="editor-status-wrap">
-              <textarea id="edgeEditor" spellcheck="false" aria-label="Edges" placeholder="A B&#10;B C blue,dashed,label"></textarea>
+              <textarea id="edgeEditor" spellcheck="false" aria-label="Edges" placeholder="Enter a graph or choose from Examples"></textarea>
               <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
             </div>
             <div id="edgeImportRow" class="edge-import-row">
@@ -161,11 +163,6 @@
               <button type="button" class="zoom-button" id="zoomOutButton" aria-label="Zoom out">−</button>
             </div>
             <button type="button" class="fullscreen-button" id="fullscreenButton" aria-label="Toggle fullscreen" title="Toggle fullscreen">⛶</button>
-            <div class="empty-state" id="emptyState">
-              <div class="empty-icon">⌁</div>
-              <h3>Your graph is waiting</h3>
-              <p>Click <strong>add edge</strong> on the left or load one of the <strong>Examples</strong> to get started.</p>
-            </div>
             <div class="canvas-tip">Drag nodes to reposition</div>
           </div>
         </section>

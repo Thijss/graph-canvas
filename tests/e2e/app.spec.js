@@ -8,7 +8,8 @@ test.beforeEach(async ({ page }) => {
 
 test("loads the editor and accepts graph input", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "GraphCanvas" })).toBeVisible();
-  await expect(page.locator("#emptyState")).toBeVisible();
+  await expect(page.locator("#emptyState")).toHaveCount(0);
+  await expect(page.locator("#graph")).toBeEmpty();
 
   await expect(page.getByRole("textbox", { name: "Edges", exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: "Edge editor mode", exact: true })).toHaveCount(0);
@@ -17,7 +18,7 @@ test("loads the editor and accepts graph input", async ({ page }) => {
 
   await expect(page.locator("#nodeCount")).toHaveText("3");
   await expect(page.locator("#edgeCount")).toHaveText("2");
-  await expect(page.locator("#emptyState")).toBeHidden();
+  await expect(page.locator("#graph .node-circle")).toHaveCount(3);
 });
 
 test("persists graph input after a refresh", async ({ page }) => {
@@ -104,7 +105,35 @@ test("loads and clears a template in the text-only Edges editor", async ({ page 
   await expect(page.locator("#edgeCount")).toHaveText("0");
   await page.reload();
   await expect(page.locator("#edgeEditor")).toHaveValue("");
-  await expect(page.locator("#emptyState")).toBeVisible();
+  await expect(page.locator("#graph")).toBeEmpty();
+});
+
+test("shows compact Examples and Clear buttons in the Edges heading on desktop and mobile", async ({ page }) => {
+  const examples = page.locator("#templateButton");
+  const clear = page.locator("#clearButton");
+  const edgeHeading = page.locator(".section-heading").filter({
+    has: page.getByRole("heading", { name: "Edges", exact: true }),
+  });
+  await expect(edgeHeading.locator("#templateButton")).toBeVisible();
+  await expect(edgeHeading.locator("#clearButton")).toBeVisible();
+  await expect(page.locator(".topbar-actions #templateButton")).toHaveCount(0);
+  await expect(page.locator(".topbar-actions #clearButton")).toHaveCount(0);
+
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 800 });
+    const actionsBounds = await page.locator(".edge-heading-actions").boundingBox();
+    expect(actionsBounds.width).toBe(120);
+    expect(actionsBounds.height).toBe(30);
+    const bounds = await examples.boundingBox();
+    expect(bounds.height).toBe(30);
+    const clearBounds = await clear.boundingBox();
+    expect(clearBounds.height).toBe(30);
+    expect(clearBounds.x - bounds.x - bounds.width).toBe(3);
+    expect(clearBounds.y).toBe(bounds.y);
+    await examples.click();
+    await expect(page.locator("#templateDialog")).toBeVisible();
+    await page.locator("#templateDialogClose").click();
+  }
 });
 
 test("imports pasted TXT graph text from the Edges section", async ({ page }) => {

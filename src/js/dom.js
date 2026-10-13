@@ -17,7 +17,6 @@ export const groupVisualModeButton = document.querySelector("#groupVisualModeBut
 export const groupTextModeButton = document.querySelector("#groupTextModeButton");
 export const graph = document.querySelector("#graph");
 export const graphWrap = document.querySelector("#graphWrap");
-export const emptyState = document.querySelector("#emptyState");
 export const nodeCount = document.querySelector("#nodeCount");
 export const edgeCount = document.querySelector("#edgeCount");
 export const boundaryMetaCount = document.querySelector("#boundaryMetaCount");
