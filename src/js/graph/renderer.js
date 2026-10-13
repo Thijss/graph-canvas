@@ -37,9 +37,7 @@ export function render(state, edges, nodes, boundaries, groups, handlers) {
   currentConflictingEdges = conflictingEdges;
   const hasConflictingColorError = conflictingEdges.length > 0;
   updateEdgeErrors(conflictingEdges);
-  if (statusText.dataset.importError) {
-    statusText.textContent = statusText.dataset.importError;
-  } else if (hasConflictingColorError) {
+  if (hasConflictingColorError) {
     statusText.textContent = "Error: choose only one color per edge";
   } else {
     statusText.textContent = nodes.length ? "No issues" : "Ready to draw";

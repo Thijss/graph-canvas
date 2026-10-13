@@ -61,7 +61,8 @@
             <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
             <div id="edgeImportRow" class="edge-import-row">
               <div id="importPanel" class="edge-import-panel" aria-hidden="true" inert>
-                <textarea id="importText" class="edge-import-text" rows="1" wrap="off" spellcheck="false" placeholder="Paste TXT content" aria-label="Graph text to import"></textarea>
+                <textarea id="importText" class="edge-import-text" rows="1" wrap="off" spellcheck="false" placeholder="Paste TXT content" aria-label="Graph text to import" aria-describedby="importError" aria-invalid="false"></textarea>
+                <p id="importError" class="edge-import-error" aria-live="polite" aria-atomic="true"></p>
               </div>
               <button class="button button-quiet" id="importButton" type="button">Import</button>
             </div>

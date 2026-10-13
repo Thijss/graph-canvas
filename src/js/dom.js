@@ -44,6 +44,7 @@ export const edgeImportRow = document.querySelector("#edgeImportRow");
 export const importPanel = document.querySelector("#importPanel");
 export const importButton = document.querySelector("#importButton");
 export const importText = document.querySelector("#importText");
+export const importError = document.querySelector("#importError");
 export const saveButton = document.querySelector("#saveButton");
 export const saveDialog = document.querySelector("#saveDialog");
 export const saveDialogClose = document.querySelector("#saveDialogClose");

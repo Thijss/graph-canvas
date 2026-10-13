@@ -163,8 +163,10 @@ normalizing PGM edge options. Malformed lists and non-string entries show an
 import error without replacing the current graph. Ordinary TXT, including
 quoted node names, continues to use the existing format.
 
-Import errors survive graph redraws and simulation ticks until a successful
-import or an edit, clear, or template load changes the graph.
+Import errors appear beside the import textarea and are announced to screen
+readers. They are independent of graph status and survive graph redraws and
+simulation ticks. Editing the pasted text or successfully importing clears
+the error.
 
 Imports ignore `#` comments outside double-quoted strings, from the `#` to the
 end of the line. Full-line and inline comments are supported in both ordinary

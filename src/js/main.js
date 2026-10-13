@@ -31,6 +31,7 @@ import {
   importPanel,
   importButton,
   importText,
+  importError,
   templateDialog,
   templateDialogClose,
   templateList,
@@ -99,7 +100,6 @@ function updateLayoutControlVisibility() {
 // being overwritten by a stale scheduled redraw.
 let editorDrawTimer = null;
 function scheduleEditorRedraw() {
-  delete statusText.dataset.importError;
   persistEditors();
   window.clearTimeout(editorDrawTimer);
   editorDrawTimer = window.setTimeout(() => {
@@ -116,7 +116,6 @@ function cancelScheduledEditorRedraw() {
 }
 
 clearButton.addEventListener("click", () => {
-  delete statusText.dataset.importError;
   cancelScheduledEditorRedraw();
   edgeEditor.value = "";
   boundaryEditor.value = "";
@@ -178,7 +177,6 @@ async function loadTemplate(templateName) {
     if (!response.ok) throw new Error(`Could not load template: ${templateName}`);
     const templateText = await response.text();
     const { edgesText, boundariesText, groupsText } = splitGraphText(templateText);
-    delete statusText.dataset.importError;
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
     boundaryEditor.value = boundariesText.trim();
@@ -220,6 +218,11 @@ wireDialog({
   onOpen: loadHelp,
 });
 setupExportDialog({ graph, edgeEditor, boundaryEditor, groupEditor, statusText });
+function clearImportError() {
+  importError.textContent = "";
+  importText.setAttribute("aria-invalid", "false");
+}
+importText.addEventListener("input", clearImportError);
 importButton.addEventListener("click", () => {
   if (!edgeImportRow.classList.contains("is-expanded")) {
     edgeImportRow.classList.add("is-expanded");
@@ -237,8 +240,8 @@ importButton.addEventListener("click", () => {
     graphText = normalizeTxtImportStringList(importText.value);
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error;
-    statusText.dataset.importError = `Couldn't import graph: ${error.message}`;
-    statusText.textContent = statusText.dataset.importError;
+    importError.textContent = `Couldn't import graph: ${error.message}`;
+    importText.setAttribute("aria-invalid", "true");
     importText.focus();
     return;
   }
@@ -246,7 +249,7 @@ importButton.addEventListener("click", () => {
     importText.focus();
     return;
   }
-  delete statusText.dataset.importError;
+  clearImportError();
   const { edgesText, boundariesText, groupsText } = splitGraphText(graphText);
 
   cancelScheduledEditorRedraw();
