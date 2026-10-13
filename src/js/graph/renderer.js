@@ -147,7 +147,7 @@ function drawEdge(state, edge, parallelOffset = 0) {
 
   const selectedColor = EDGE_COLORS.find(({ token }) => token === edge.color) ?? EDGE_COLORS[0];
   line.classList.add(selectedColor.className);
-  if (edge.style === "dotted") line.classList.add("dotted");
+  if (edge.style === "dashed") line.classList.add("dashed");
   const colorKey = selectedColor.className;
   const displayLabel = edge.label ?? "";
   if (edge.from === edge.to) {

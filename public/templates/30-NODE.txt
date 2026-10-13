@@ -27,10 +27,10 @@
 27 28
 28 29
 29 30
-7 13 dotted
-13 19 dotted
-19 25 dotted
-25 30 dotted
+7 13 dashed
+13 19 dashed
+19 25 dashed
+25 30 dashed
 -----BOUNDARIES-----
 SUB 1 Substation
 CS 2,8,14,20,26 Control Station

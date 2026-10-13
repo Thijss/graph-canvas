@@ -2,7 +2,7 @@ import { EDGE_COLORS, BOUNDARY_TYPE_PATTERN } from "../config.js";
 
 const EDGE_COLOR_TOKENS = EDGE_COLORS.map(({ token }) => token);
 const TXT_IMPORT_EDGE_ALIASES = new Map([
-  ["open", "dotted"],
+  ["open", "dashed"],
   ["transformer", "blue"],
   ["link", "green"],
 ]);
@@ -46,12 +46,13 @@ function normalizeEdgeLabels(label) {
     .map((part) => part.trim())
     .filter(Boolean);
   const edgeColors = labels.filter((part) => EDGE_COLOR_TOKENS.includes(part.toLowerCase()));
-  const styleValues = labels.filter((part) => ["solid", "dotted"].includes(part.toLowerCase()));
+  const styleValues = labels.filter((part) => ["solid", "dashed", "dotted"].includes(part.toLowerCase()));
   const color = edgeColors.length === 1 ? edgeColors[0].toLowerCase() : "yellow";
-  const style = styleValues.length === 1 ? styleValues[0].toLowerCase() : "solid";
+  const parsedStyle = styleValues.length === 1 ? styleValues[0].toLowerCase() : "solid";
+  const style = parsedStyle === "dotted" ? "dashed" : parsedStyle;
   const additionalLabels = labels.filter((part) => (
     part.toLowerCase() !== color
-    && !["solid", "dotted"].includes(part.toLowerCase())
+    && !["solid", "dashed", "dotted"].includes(part.toLowerCase())
   ));
   return {
     color,

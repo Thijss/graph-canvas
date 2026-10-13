@@ -60,16 +60,16 @@ function createStyleField(value) {
   const caption = document.createElement("span");
   caption.textContent = "Style";
   const picker = createPopoverPicker({
-    value: value === true ? "dotted" : value === "dotted" ? "dotted" : "solid",
+    value: value === true || value === "dashed" || value === "dotted" ? "dashed" : "solid",
     controlClass: "edge-style-control",
     buttonClass: "edge-style-button",
     popoverClass: "edge-style-popover",
     optionClass: "edge-style-option",
-    options: [["solid", "Solid line"], ["dotted", "Dotted line"]].map(([optionValue, label]) => ({
+    options: [["solid", "Solid line"], ["dashed", "Dashed line"]].map(([optionValue, label]) => ({
       value: optionValue,
       ariaLabel: label,
     })),
-    getButtonLabel: (currentValue) => currentValue === "dotted" ? "Style dotted line" : "Style solid line",
+    getButtonLabel: (currentValue) => currentValue === "dashed" ? "Style dashed line" : "Style solid line",
     updateButton: (button, currentValue) => {
       button.dataset.style = currentValue;
     },

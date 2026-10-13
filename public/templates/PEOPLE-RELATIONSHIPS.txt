@@ -4,10 +4,10 @@ Bob Carol blue,sibling
 Alice David green,friend
 Carol Eva green,friend
 David Eva green,friend
-Bob Frank dotted,colleague
-Frank Grace dotted,colleague
-Grace Helen dotted,colleague
-Eva Helen dotted,colleague
+Bob Frank dashed,colleague
+Frank Grace dashed,colleague
+Grace Helen dashed,colleague
+Eva Helen dashed,colleague
 Helen Ian yellow,mentor
 Ian Jack yellow,friend
 -----BOUNDARIES-----
