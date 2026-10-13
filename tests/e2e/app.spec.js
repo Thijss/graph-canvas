@@ -154,6 +154,7 @@ test("keeps the current graph and pasted text when a string list is invalid", as
   await page.locator("#importText").fill('"1 2", 42');
   await page.locator("#importButton").click();
 
+  await page.locator("label").filter({ has: page.locator("#directedToggle") }).click();
   await expect(page.locator("#statusText")).toHaveText(
     "Couldn't import graph: Import list must contain only strings.",
   );
@@ -165,6 +166,19 @@ test("keeps the current graph and pasted text when a string list is invalid", as
   await page.locator("#importButton").click();
   await expect(page.locator("#edgeEditor")).toHaveValue("1 2\n3 4");
   await expect(page.locator("#edgeCount")).toHaveText("2");
+  await expect(page.locator("#statusText")).toHaveText("No issues");
+});
+
+test("clears an import error when the graph is cleared", async ({ page }) => {
+  await page.locator("#importButton").click();
+  await page.locator("#importText").fill('"1 2", 42');
+  await page.locator("#importButton").click();
+  await expect(page.locator("#statusText")).toHaveText(
+    "Couldn't import graph: Import list must contain only strings.",
+  );
+
+  await page.locator("#clearButton").click();
+  await expect(page.locator("#statusText")).toHaveText("Ready to draw");
 });
 
 test("keeps the current graph when importing only comments", async ({ page }) => {

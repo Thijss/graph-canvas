@@ -99,6 +99,7 @@ function updateLayoutControlVisibility() {
 // being overwritten by a stale scheduled redraw.
 let editorDrawTimer = null;
 function scheduleEditorRedraw() {
+  delete statusText.dataset.importError;
   persistEditors();
   window.clearTimeout(editorDrawTimer);
   editorDrawTimer = window.setTimeout(() => {
@@ -115,6 +116,7 @@ function cancelScheduledEditorRedraw() {
 }
 
 clearButton.addEventListener("click", () => {
+  delete statusText.dataset.importError;
   cancelScheduledEditorRedraw();
   edgeEditor.value = "";
   boundaryEditor.value = "";
@@ -176,6 +178,7 @@ async function loadTemplate(templateName) {
     if (!response.ok) throw new Error(`Could not load template: ${templateName}`);
     const templateText = await response.text();
     const { edgesText, boundariesText, groupsText } = splitGraphText(templateText);
+    delete statusText.dataset.importError;
     edgeEditor.value = edgesText.trim();
     syncEdgeEditor();
     boundaryEditor.value = boundariesText.trim();
@@ -234,7 +237,8 @@ importButton.addEventListener("click", () => {
     graphText = normalizeTxtImportStringList(importText.value);
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error;
-    statusText.textContent = `Couldn't import graph: ${error.message}`;
+    statusText.dataset.importError = `Couldn't import graph: ${error.message}`;
+    statusText.textContent = statusText.dataset.importError;
     importText.focus();
     return;
   }
@@ -242,6 +246,7 @@ importButton.addEventListener("click", () => {
     importText.focus();
     return;
   }
+  delete statusText.dataset.importError;
   const { edgesText, boundariesText, groupsText } = splitGraphText(graphText);
 
   cancelScheduledEditorRedraw();

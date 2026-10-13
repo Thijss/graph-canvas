@@ -55,6 +55,9 @@ Playwright's Chromium browser must be installed once on a new machine:
 pnpm exec playwright install chromium
 ```
 
+Playwright starts Vite directly on port 4173 and stops it after the suite.
+Keep that port free; tests do not reuse an existing server.
+
 The browser smoke tests start Vite automatically and cover only critical
 end-to-end flows: loading the editor, entering graph data, restoring it after
 a refresh, and exporting a text file. They do not replace manual testing of
@@ -159,6 +162,9 @@ the list into newline-separated text before splitting graph sections and
 normalizing PGM edge options. Malformed lists and non-string entries show an
 import error without replacing the current graph. Ordinary TXT, including
 quoted node names, continues to use the existing format.
+
+Import errors survive graph redraws and simulation ticks until a successful
+import or an edit, clear, or template load changes the graph.
 
 Imports ignore `#` comments outside double-quoted strings, from the `#` to the
 end of the line. Full-line and inline comments are supported in both ordinary
