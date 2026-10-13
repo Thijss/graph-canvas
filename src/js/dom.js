@@ -1,12 +1,5 @@
 // Central lookup of DOM elements shared across modules.
 export const edgeEditor = document.querySelector("#edgeEditor");
-export const edgeList = document.querySelector("#edgeList");
-export const edgeListHeader = document.querySelector("#edgeListHeader");
-export const edgeEmptyState = document.querySelector("#edgeEmptyState");
-export const edgeNodeSuggestions = document.querySelector("#edgeNodeSuggestions");
-export const addEdgeButton = document.querySelector("#addEdgeButton");
-export const visualEdgeModeButton = document.querySelector("#visualEdgeModeButton");
-export const rawEdgeModeButton = document.querySelector("#rawEdgeModeButton");
 export const edgeErrors = document.querySelector("#edgeErrors");
 export const boundaryEditor = document.querySelector("#boundaryEditor");
 export const boundaryList = document.querySelector("#boundaryList");
@@ -24,7 +17,6 @@ export const groupVisualModeButton = document.querySelector("#groupVisualModeBut
 export const groupTextModeButton = document.querySelector("#groupTextModeButton");
 export const graph = document.querySelector("#graph");
 export const graphWrap = document.querySelector("#graphWrap");
-export const emptyState = document.querySelector("#emptyState");
 export const nodeCount = document.querySelector("#nodeCount");
 export const edgeCount = document.querySelector("#edgeCount");
 export const boundaryMetaCount = document.querySelector("#boundaryMetaCount");

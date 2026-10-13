@@ -3,9 +3,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   loadLayoutMode,
+  loadEditorModes,
   loadSavedEditors,
   loadSettings,
   saveEditors,
+  saveEditorModes,
   saveSettings,
 } from "../src/js/persistence.js";
 
@@ -44,6 +46,31 @@ describe("editor persistence", () => {
       boundariesText: null,
       groupsText: null,
     });
+  });
+});
+
+describe("editor mode persistence", () => {
+  it("defaults only the boundary and group modes", () => {
+    expect(loadEditorModes()).toEqual({ boundaries: "visual", groups: "visual" });
+  });
+
+  it.each(["visual", "raw"])("ignores the legacy %s edge mode", (edges) => {
+    localStorage.setItem("graph-editor:editor-modes", JSON.stringify({
+      edges, boundaries: "text", groups: "visual",
+    }));
+    expect(loadEditorModes()).toEqual({ boundaries: "text", groups: "visual" });
+  });
+
+  it("saves and loads boundary and group modes", () => {
+    saveEditorModes({ boundaries: "visual", groups: "text" });
+    expect(loadEditorModes()).toEqual({ boundaries: "visual", groups: "text" });
+    expect(JSON.parse(localStorage.getItem("graph-editor:editor-modes")))
+      .toEqual({ boundaries: "visual", groups: "text" });
+  });
+
+  it("uses defaults for invalid saved modes", () => {
+    localStorage.setItem("graph-editor:editor-modes", "{");
+    expect(loadEditorModes()).toEqual({ boundaries: "visual", groups: "visual" });
   });
 });
 

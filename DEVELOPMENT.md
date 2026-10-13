@@ -110,7 +110,8 @@ objects without maintaining a second positions or velocities structure.
 
 The modules in `editors/` own editor-specific DOM behavior:
 
-- `edge-editor.js` manages edges and floating nodes.
+- Edges are edited directly in the text editor; `main.js` wires redraws and
+  persistence, while `graph/parser.js` handles edges and floating nodes.
 - `boundary-editor.js` manages boundary types, names, and members.
 - `group-editor.js` manages groups and members.
 - `editor-controls.js` contains shared picker, chip-list, list-state, and
@@ -153,6 +154,10 @@ The first section contains edge definitions:
 source target optional,label,style
 standalone-node
 ```
+
+The Edges section is text-only. Boundaries and Groups retain their Visual/Text
+mode toggles. Legacy saved edge-mode preferences are ignored without changing
+saved graph text.
 
 TXT import also accepts an unbracketed, comma-separated list of double-quoted
 strings, such as `"1 2", "3 4 open", "3 5 blue"`. Whitespace and line breaks

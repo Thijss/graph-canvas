@@ -23,8 +23,6 @@
         </div>
         <div class="topbar-actions">
           <button class="button button-quiet" id="saveButton" type="button">Export</button>
-          <button class="button button-examples" id="templateButton" type="button">Examples</button>
-          <button class="button button-danger" id="clearButton" type="button">Clear all</button>
         </div>
       </header>
 
@@ -36,29 +34,16 @@
                 <span class="eyebrow">01 / Define</span>
                 <h2>Edges</h2>
               </div>
-              <div class="edge-mode-toggle" role="group" aria-label="Edge editor mode">
-                <button class="edge-mode-button is-active" id="visualEdgeModeButton" type="button" aria-pressed="true">Visual</button>
-                <button class="edge-mode-button" id="rawEdgeModeButton" type="button" aria-pressed="false">Text</button>
+              <div class="edge-heading-actions">
+                <button class="button button-examples" id="templateButton" type="button">Examples</button>
+                <button class="button button-danger" id="clearButton" type="button">Clear</button>
               </div>
               <span class="panel-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="Collapse Edges section">^</span>
             </div>
-            <div class="edge-editor" id="edgeEditorPanel">
-              <div class="edge-list" id="edgeList" aria-live="polite">
-                <div class="edge-list-header" id="edgeListHeader" aria-hidden="true">
-                  <span>From</span>
-                  <span>To</span>
-                  <span>COLOR</span>
-                  <span>STYLE</span>
-                  <span>LABEL</span>
-                  <span></span>
-                </div>
-                <div class="edge-empty-state" id="edgeEmptyState">No edges yet. Add an edge to start building your graph.</div>
-              </div>
-              <button class="button edge-add-button" id="addEdgeButton" type="button">+ Add edge</button>
+            <div class="editor-status-wrap">
+              <textarea id="edgeEditor" spellcheck="false" aria-label="Edges" placeholder="Enter a graph or choose from Examples"></textarea>
+              <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
             </div>
-            <datalist id="edgeNodeSuggestions"></datalist>
-            <textarea id="edgeEditor" class="edge-editor-source" spellcheck="false" aria-hidden="true" tabindex="-1"></textarea>
-            <div id="edgeErrors" class="edge-errors" aria-hidden="true"></div>
             <div id="edgeImportRow" class="edge-import-row">
               <div id="importPanel" class="edge-import-panel" aria-hidden="true" inert>
                 <textarea id="importText" class="edge-import-text" rows="1" wrap="off" spellcheck="false" placeholder="Paste TXT content" aria-label="Graph text to import" aria-describedby="importError" aria-invalid="false"></textarea>
@@ -178,11 +163,6 @@
               <button type="button" class="zoom-button" id="zoomOutButton" aria-label="Zoom out">−</button>
             </div>
             <button type="button" class="fullscreen-button" id="fullscreenButton" aria-label="Toggle fullscreen" title="Toggle fullscreen">⛶</button>
-            <div class="empty-state" id="emptyState">
-              <div class="empty-icon">⌁</div>
-              <h3>Your graph is waiting</h3>
-              <p>Click <strong>add edge</strong> on the left or load one of the <strong>Examples</strong> to get started.</p>
-            </div>
             <div class="canvas-tip">Drag nodes to reposition</div>
           </div>
         </section>

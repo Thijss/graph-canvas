@@ -1,7 +1,6 @@
 import {
   graph,
   graphWrap,
-  emptyState,
   edgeEditor,
   edgeErrors,
   boundaryMetaCount,
@@ -32,7 +31,6 @@ export function render(state, edges, nodes, boundaries, groups, handlers) {
   edgeCount.textContent = edges.length;
   boundaryMetaCount.textContent = boundaries.length;
   nodeCount.textContent = nodes.length;
-  emptyState.hidden = nodes.length > 0;
   const conflictingEdges = edges.filter(hasConflictingColors);
   currentConflictingEdges = conflictingEdges;
   const hasConflictingColorError = conflictingEdges.length > 0;

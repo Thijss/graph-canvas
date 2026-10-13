@@ -1,9 +1,5 @@
 import {
   edgeEditor,
-  edgeList,
-  addEdgeButton,
-  visualEdgeModeButton,
-  rawEdgeModeButton,
   boundaryEditor,
   boundaryList,
   addBoundaryButton,
@@ -64,7 +60,6 @@ import {
   saveSettings,
 } from "./persistence.js";
 import { splitGraphText } from "./io/file-io.js";
-import { addEdge, syncEdgeEditor } from "./editors/edge-editor.js";
 import { addBoundary, syncBoundaryEditor, updateBoundarySourceText } from "./editors/boundary-editor.js";
 import { addGroup, syncGroupEditor, updateGroupSourceText } from "./editors/group-editor.js";
 import { wireEditorModeToggle } from "./editors/editor-mode.js";
@@ -105,7 +100,6 @@ function scheduleEditorRedraw() {
   editorDrawTimer = window.setTimeout(() => {
     editorDrawTimer = null;
     restartSimulation();
-    if (edgeEditor.classList.contains("is-raw")) syncEdgeEditor();
     if (boundaryEditor.classList.contains("is-text")) syncBoundaryEditor();
     if (groupEditor.classList.contains("is-text")) syncGroupEditor();
   }, 500);
@@ -120,7 +114,6 @@ clearButton.addEventListener("click", () => {
   edgeEditor.value = "";
   boundaryEditor.value = "";
   groupEditor.value = "";
-  syncEdgeEditor();
   syncBoundaryEditor();
   syncGroupEditor();
   persistEditors();
@@ -178,7 +171,6 @@ async function loadTemplate(templateName) {
     const templateText = await response.text();
     const { edgesText, boundariesText, groupsText } = splitGraphText(templateText);
     edgeEditor.value = edgesText.trim();
-    syncEdgeEditor();
     boundaryEditor.value = boundariesText.trim();
     syncBoundaryEditor();
     groupEditor.value = groupsText.trim();
@@ -254,7 +246,6 @@ importButton.addEventListener("click", () => {
 
   cancelScheduledEditorRedraw();
   edgeEditor.value = normalizeTxtImportEdgeAliases(edgesText).trim();
-  syncEdgeEditor();
   boundaryEditor.value = boundariesText.trim();
   syncBoundaryEditor();
   groupEditor.value = groupsText.trim();
@@ -344,25 +335,11 @@ const persistEditorMode = (section, mode) => {
 if (edgesText !== null) edgeEditor.value = edgesText;
 if (boundariesText !== null) boundaryEditor.value = boundariesText;
 if (groupsText !== null) groupEditor.value = groupsText;
-syncEdgeEditor();
 syncBoundaryEditor();
 syncGroupEditor();
-addEdgeButton.addEventListener("click", addEdge);
 addBoundaryButton.addEventListener("click", addBoundary);
 addGroupButton.addEventListener("click", addGroup);
 
-wireEditorModeToggle({
-  editor: edgeEditor,
-  list: edgeList,
-  addButton: addEdgeButton,
-  visualButton: visualEdgeModeButton,
-  sourceButton: rawEdgeModeButton,
-  sourceMode: "raw",
-  syncFromSource: syncEdgeEditor,
-  syncToSource: () => {},
-  initialMode: editorModes.edges,
-  onModeChange: (mode) => persistEditorMode("edges", mode),
-});
 wireEditorModeToggle({
   editor: boundaryEditor,
   list: boundaryList,
